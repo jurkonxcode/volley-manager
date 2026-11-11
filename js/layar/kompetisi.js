@@ -1,5 +1,5 @@
 // Kompetisi: tab Klasemen / Jadwal / Analitik. Grafik dibuat dengan SVG.
-import { ikon, esc } from './gambar.js';
+import { ikon, esc, logoMini } from './gambar.js';
 import { sekarang } from '../inti/waktu.js';
 import { tabel, akhiriMusim } from '../sistem/musim.js';
 import { analitik } from '../sistem/analitik.js';
@@ -9,16 +9,16 @@ export const setSubLiga = s => { sub = s; };
 const SUB = { klasemen: 'Klasemen', jadwal: 'Jadwal', analitik: 'Analitik' };
 
 function klasemen(M) {
-  const baris = tabel(M).map((x, n) => `<tr class="${x.i === 0 ? 'saya' : ''}"><td>${n + 1}</td><td class="tn">${esc(M.tim[x.i].nama)}</td><td>${x.m}</td><td>${x.mn}</td><td>${x.k}</td><td>${x.sm - x.sk}</td><td><b>${x.poin}</b></td></tr>`).join('');
+  const baris = tabel(M).map((x, n) => `<tr class="${x.i === 0 ? 'saya' : ''}"><td>${n + 1}</td><td class="tn">${logoMini(M.tim[x.i].nama)+esc(M.tim[x.i].nama)}</td><td>${x.m}</td><td>${x.mn}</td><td>${x.k}</td><td>${x.sm - x.sk}</td><td><b>${x.poin}</b></td></tr>`).join('');
   return `<section class="pengaturan"><table class="tabel"><thead><tr><th>#</th><th class="tn">Tim</th><th>M</th><th>Mn</th><th>K</th><th>Sel</th><th>Poin</th></tr></thead><tbody>${baris}</tbody></table></section>`;
 }
 function jadwal(M) {
   const A = analitik(M), pekan = Math.max(0, M.hari - 1);
   const mine = M.jadwal.map((p, h) => {
     const f = p.find(x => x.includes(0)), lw = f[0] === 0 ? f[1] : f[0], r = A.L.find(x => x.h === h);
-    return `<div class="jd3 ${h === M.hari ? 'kini' : ''}"><small>P${h + 1}</small><span>${f[0] === 0 ? 'vs' : '@'} ${esc(M.tim[lw].nama)}</span>${r ? `<b class="hc ${r.menang ? 'm' : 'k'}">${r.sa}-${r.sb}</b>` : '<b class="belum">-</b>'}</div>`;
+    return `<div class="jd3 ${h === M.hari ? 'kini' : ''}"><small>P${h + 1}</small><span>${f[0] === 0 ? 'vs' : '@'} ${logoMini(M.tim[lw].nama)+esc(M.tim[lw].nama)}</span>${r ? `<b class="hc ${r.menang ? 'm' : 'k'}">${r.sa}-${r.sb}</b>` : '<b class="belum">-</b>'}</div>`;
   }).join('');
-  const sem = M.jadwal[pekan].map(([i, j]) => { const r = M.hasil.find(r => r.h === pekan && r.i === i); return `<div class="jd ${i === 0 || j === 0 ? 'saya' : ''}"><span>${esc(M.tim[i].nama)}</span><b>${r ? r.s1 + ' - ' + r.s2 : '-'}</b><span>${esc(M.tim[j].nama)}</span></div>`; }).join('');
+  const sem = M.jadwal[pekan].map(([i, j]) => { const r = M.hasil.find(r => r.h === pekan && r.i === i); return `<div class="jd ${i === 0 || j === 0 ? 'saya' : ''}"><span>${logoMini(M.tim[i].nama)+esc(M.tim[i].nama)}</span><b>${r ? r.s1 + ' - ' + r.s2 : '-'}</b><span>${logoMini(M.tim[j].nama)+esc(M.tim[j].nama)}</span></div>`; }).join('');
   return `<section class="pengaturan"><h2>Laga saya</h2>${mine}</section><section class="pengaturan"><h2>Semua laga pekan ${pekan + 1}</h2>${sem}</section>`;
 }
 // Cincin win rate

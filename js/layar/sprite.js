@@ -1,8 +1,10 @@
 // Sprite pemain di assets/pose/. Tim saya (A, sisi dekat) dilihat dari belakang: belakang-*.png.
 // Tim lawan (B, sisi jauh) dilihat dari depan: *.png, dicat ulang (jersey biru tua jadi merah tua).
-export const POSE = ['siap', 'servis', 'receive', 'umpan', 'smash', 'blok'];
+export const POSE = ['siap', 'servis', 'receive', 'umpan', 'smash', 'blok', 'selebrasi', 'kecewa', 'dive'];
+// Pose yang hanya ada tampak belakang (tim saya); tim lawan memakai pose depan terdekat.
+const SAMA = { selebrasi: 'umpan', kecewa: 'siap', dive: 'receive' };
 const DIR = 'assets/pose/', cache = { A: {}, B: {} };
-const berkas = (pose, tim) => DIR + (tim === 'A' ? 'belakang-' : '') + pose + '.png';
+const berkas = (pose, tim) => DIR + (tim === 'A' ? 'belakang-' + pose : (SAMA[pose] || pose)) + '.png';
 export const spriteSrc = (pose, tim) => cache[tim][pose] || berkas(pose, tim);
 
 function cat(im) {

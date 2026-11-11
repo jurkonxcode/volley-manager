@@ -74,11 +74,14 @@ function beriPose(root, r) {
   const k = [...root.querySelectorAll('#arena .badan')]; if (k.length < 12) return;
   const pil = a => a[Math.floor(Math.random() * a.length)], depan = s => s ? [6, 7, 8] : [3, 4, 5], belakang = s => s ? [9, 10, 11] : [0, 1, 2];
   const PM = { 'a-smash': 'smash', 'a-blok': 'blok', 'a-servis': 'servis', 'a-dig': 'receive', 'a-umpan': 'umpan' };
-  const pose = (i, c) => { const e = k[i]; e.classList.remove(...Object.keys(PM)); void e.getBoundingClientRect(); e.classList.add(c); setPose(e, PM[c]); };
+  const pose = (i, c) => { const e = k[i]; e.classList.remove(...Object.keys(PM)); void e.getBoundingClientRect(); e.classList.add(c); setPose(e, PM[c] === 'receive' && i >= 6 && Math.random() < .3 ? 'dive' : PM[c]); };
   if (r.jenis === 'smash') { pose(pil(belakang(r.a)), 'a-umpan'); pose(pil(depan(r.a)), 'a-smash'); pose(pil(belakang(!r.a)), 'a-dig'); }
   else if (r.jenis === 'blok') { pose(pil(depan(r.a)), 'a-blok'); pose(pil(depan(!r.a)), 'a-smash'); }
   else if (r.jenis === 'ace') { pose(pil(belakang(r.a)), 'a-servis'); pose(pil(belakang(!r.a)), 'a-dig'); }
   else pose(pil(belakang(!r.a)), 'a-dig');
+  const tim = s => s ? [6, 7, 8, 9, 10, 11] : [0, 1, 2, 3, 4, 5];   // 6-11 tim saya, 0-5 lawan
+  if (Math.random() < .5) setPose(k[pil(tim(r.a))], 'selebrasi');
+  if (Math.random() < .35) setPose(k[pil(tim(!r.a))], 'kecewa');
 }
 async function mainkan(root, S, aksi) {
   const saya = ++token; P.fase = 'main'; P.cepat = !!S.pengaturan?.animasiCepat;

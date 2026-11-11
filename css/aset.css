@@ -25,3 +25,6 @@
 .km-level{background:rgba(0,0,0,.32);border:1px solid var(--garis)}
 .km-level small{color:var(--redup)}
 .km-level b{background:none;-webkit-text-fill-color:var(--bola);color:var(--bola)}
+/* logo tim kecil di klasemen & jadwal, potret pemain di kartu */
+.logo-mini{width:18px;height:18px;object-fit:contain;vertical-align:-4px;margin-right:6px}
+.potret{display:block;flex:none;width:72px;height:72px;border-radius:50%;object-fit:cover;object-position:50% 18%;background:linear-gradient(180deg,#2a3a7a,#141c4a);border:2px solid rgba(255,255,255,.28)}

@@ -1,5 +1,5 @@
 // Kartu profil lengkap pemain, tampil sebagai lembar di atas layar.
-import { figur, radar, chipStat, ikon, esc } from './gambar.js';
+import { potret, radar, chipStat, ikon, esc } from './gambar.js';
 import { K } from '../inti/konfigurasi.js';
 import { ratingPemain, gajiPemain, nilaiPasar } from '../sistem/pemain.js';
 import { staminaSekarang, zonaStamina } from '../sistem/stamina.js';
@@ -15,7 +15,7 @@ export function bukaKartu(p, now) {
   el.setAttribute('aria-modal', 'true');
   el.innerHTML = `<article class="kartu-lengkap" style="--w:${K.warnaPosisi[p.posisi]}">
 <button class="tutup" data-tutup aria-label="Tutup">${ikon('silang', 20)}</button>
-<header class="kl-kepala">${figur(p, 'A', now)}<div><div class="kl-nama">${esc(p.nama)}</div><div class="sub"><i class="lencana">${p.posisi}</i><span>#${p.nomor} · ${p.umur} tahun</span></div><div class="kl-sifat">${esc(p.sifat)}</div></div><div class="rating-besar">${r}</div></header>
+<header class="kl-kepala">${potret(p)}<div><div class="kl-nama">${esc(p.nama)}</div><div class="sub"><i class="lencana">${p.posisi}</i><span>#${p.nomor} · ${p.umur} tahun</span></div><div class="kl-sifat">${esc(p.sifat)}</div></div><div class="rating-besar">${r}</div></header>
 ${radar(p)}
 ${chipStat(p)}
 <section class="data-diri">

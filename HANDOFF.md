@@ -64,3 +64,11 @@ Analitik lintas musim (sekarang hanya musim berjalan; riwayat musim lama belum d
 unzip -oq volley-manager-vN.zip -d /tmp/vN && cp -a /tmp/vN/vm/. ./ && rm -rf /tmp/vN volley-manager-vN.zip
 git add -A && git commit -m "update" && git push
 ```
+
+
+## Aset tambahan (v11.2)
+- `assets/pose/{siap,servis,receive,umpan,smash,blok}.png`: pose lawan baru (jersey merah, nomor 7), dipotong dari lembar ChatGPT dengan skala sama.
+- `assets/pose/belakang-{selebrasi,kecewa,dive}.png`: pose tim saya. Dipakai sprite.js (tim lawan memakai pose depan terdekat: umpan, siap, receive). Dipicu di `beriPose` (pertandingan.js).
+- `assets/pose/libero-depan.png`: libero jersey kuning, tampak DEPAN (ChatGPT tidak membuatnya dari belakang). Belum dipakai.
+- `assets/potret/p01..p12.png`: 12 wajah; dipilih dari id pemain lewat `potret(p)` (gambar.js), tampil di kartu lengkap pemain.
+- `assets/logo/logo-{elang,banteng,petir,naga,api,ombak,bintang,singa}.png`: logo 7 tim lawan (peta nama di `LOGO_TIM`, gambar.js) tampil di klasemen dan jadwal. `bintang` cadangan.

@@ -95,3 +95,9 @@ export function badanGambar(p, tim, now) {
 }
 export const LOGO = 'assets/logo/logo-garuda-muda.png';
 export const logoTim = () => `<img class="logo-img" src="${LOGO}" alt="" draggable="false">`;
+
+// Logo tiap tim lawan (nama tim -> berkas); tim sendiri atau nama lain memakai LOGO.
+const LOGO_TIM = { 'Elang Sakti': 'elang', 'Badai Timur': 'petir', 'Macan Putih': 'singa', 'Naga Laut': 'naga', 'Rajawali': 'api', 'Banteng Muda': 'banteng', 'Cakra Biru': 'ombak' };
+export const logoMini = nama => `<img class="logo-mini" src="${LOGO_TIM[nama] ? 'assets/logo/logo-' + LOGO_TIM[nama] + '.png' : LOGO}" alt="" draggable="false">`;
+// Potret pemain: 12 wajah, dipilih tetap dari id pemain.
+export const potret = p => `<img class="potret" src="assets/potret/p${String(([...String(p.id)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % 12) + 1).padStart(2, '0')}.png" alt="" draggable="false">`;
