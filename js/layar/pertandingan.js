@@ -40,7 +40,7 @@ function tampilLapangan(root, S, aksi) {
 <div class="lapangan"><div class="arena" id="arena">
 <div class="separuh">${baris(B.slice(3), 'B', false)}${baris(B.slice(0, 3), 'B', false)}</div><div class="jaring"></div>
 <div class="separuh">${baris(A.slice(0, 3), 'A', edit)}${baris(A.slice(3), 'A', edit)}</div>
-<div class="bola" id="bola" style="left:50%;top:50%">${ikon('bola', 22)}</div><div class="pop" id="pop"></div></div></div>
+<div class="bayangan" id="bay" style="left:50%;top:50%"></div><div class="bola" id="bola" style="left:50%;top:50%">${ikon('bola', 22)}</div><div class="pop" id="pop"></div></div></div>
 <div class="komentar" id="kom">${P.kom || ''}</div>
 ${edit ? `<div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div><button class="tombol-besar" id="main" aria-label="Main set">${ikon('main', 30)}</button>`
        : `<button class="tombol-besar sekunder" id="lompat" aria-label="Lewati animasi">${ikon('lompat', 28)}</button>`}`;
@@ -60,6 +60,8 @@ function gambarRally(root, r, a, b) {
   const el = r.a ? skA : skB; el.classList.remove('naik'); void el.offsetWidth; el.classList.add('naik');
   const x = 10 + Math.random() * 80, y = r.a ? 6 + Math.random() * 36 : 58 + Math.random() * 36;   // bola jatuh di sisi yang kebobolan
   bola.style.left = x + '%'; bola.style.top = y + '%';
+  const bay = root.querySelector('#bay'); if (bay) { bay.style.left = x + '%'; bay.style.top = y + '%'; }
+  bola.classList.remove('terbang'); void bola.offsetWidth; bola.classList.add('terbang');
   pop.style.left = x + '%'; pop.style.top = y + '%';
   pop.className = 'pop ' + r.jenis; pop.innerHTML = ikon(r.jenis === 'salah' ? 'silang' : r.jenis === 'ace' ? 'servis' : r.jenis === 'blok' ? 'blok' : 'smash', 20);
   void pop.offsetWidth; pop.classList.add('muncul');

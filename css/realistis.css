@@ -1,0 +1,31 @@
+/* Level 1 realisme: lapangan berperspektif, bayangan, jaring berdiri, bola melambung. Hanya di layar laga. */
+#layar{padding-bottom:14px}
+[data-layar="tanding"] .papan{padding:6px 8px;margin-bottom:8px}
+[data-layar="tanding"] .papan b{font-size:46px}
+[data-layar="tanding"] .komentar{margin:6px 0;min-height:20px;padding:6px 12px}
+[data-layar="tanding"] .bangku{margin-top:6px;padding:6px 4px}
+[data-layar="tanding"] .tombol-besar{height:52px;margin-top:8px}
+[data-layar="tanding"] .lapangan{perspective:760px;perspective-origin:50% 115%;padding:10px 10px 6px;overflow:hidden;background:radial-gradient(120% 90% at 50% 100%,#24357F,#0D1338 70%)}
+[data-layar="tanding"] .arena,[data-layar="tanding"] .separuh,[data-layar="tanding"] .baris{transform-style:preserve-3d}
+[data-layar="tanding"] .arena{transform:rotateX(34deg);transform-origin:50% 100%;margin-top:-14px;border-width:3px;border-radius:4px;
+ background:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 26px,rgba(0,0,0,.06) 26px 52px),repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 2px,transparent 2px 38px),linear-gradient(180deg,#E7924A,#D17B30);
+ box-shadow:0 18px 30px rgba(0,0,0,.55),0 0 0 8px rgba(255,255,255,.05)}
+/* kilau lampu + redup di sisi jauh (kedalaman) */
+[data-layar="tanding"] .arena::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 55% at 50% 60%,rgba(255,240,200,.28),transparent 70%),linear-gradient(180deg,rgba(8,12,32,.5),transparent 45%)}
+/* pemain berdiri tegak (billboard) dengan bayangan di lantai */
+[data-layar="tanding"] .kartu{transform:rotateX(-34deg);transform-origin:50% 88%;max-width:56px}
+[data-layar="tanding"] .kartu::before{content:"";position:absolute;left:12%;right:12%;top:34px;height:14px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.55),transparent 70%);z-index:-1}
+[data-layar="tanding"] .arena .figur{width:44px;height:44px}
+[data-layar="tanding"] .arena .nilai{font-size:12px}
+/* jaring berdiri dengan tiang */
+[data-layar="tanding"] .jaring{height:34px;margin:0 -8px;transform:rotateX(-34deg);transform-origin:50% 100%;border-radius:0;box-shadow:none;position:relative;
+ background:linear-gradient(#fff 0 4px,transparent 4px),repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 1px,transparent 1px 7px),repeating-linear-gradient(0deg,rgba(255,255,255,.55) 0 1px,transparent 1px 7px),rgba(10,16,40,.35);
+ border-left:5px solid #cfd8ee;border-right:5px solid #cfd8ee}
+/* bola melambung + bayangan */
+[data-layar="tanding"] .bola{transform:rotateX(-34deg);width:26px;height:26px;margin:-13px 0 0 -13px;z-index:5}
+[data-layar="tanding"] .bola.terbang svg{animation:lambung .32s ease-out}
+@keyframes lambung{0%{transform:translateY(-6px) scale(1.25)}45%{transform:translateY(-44px) scale(1.5)}100%{transform:translateY(0) scale(1)}}
+.bayangan{display:none}
+[data-layar="tanding"] .bayangan{display:block;position:absolute;width:24px;height:9px;margin:-4px 0 0 -12px;border-radius:50%;background:rgba(0,0,0,.5);filter:blur(2px);transition:left .2s ease-out,top .2s ease-out;z-index:2;pointer-events:none}
+[data-layar="tanding"] .pop{transform:rotateX(-34deg)}
+@keyframes muncul{0%{opacity:1;transform:rotateX(-34deg) scale(.4)}30%{opacity:1;transform:rotateX(-34deg) scale(1.15)}100%{opacity:0;transform:rotateX(-34deg) translateY(-14px)}}
