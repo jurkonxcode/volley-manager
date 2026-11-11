@@ -20,6 +20,11 @@ export function pasangTukar(root, S, cb = {}) {
     if (!terpilih) { terpilih = id; return tandai(); }
     if (terpilih === id) { terpilih = null; return tandai(); }
     const i1 = S.susunan.indexOf(terpilih), i2 = S.susunan.indexOf(id);
+    if (cb.izin) {   // batas pergantian (jeda antar-set): periksa susunan hasil tukar sebelum dilakukan
+      const baru = [...S.susunan];
+      if (i1 >= 0 && i2 >= 0) [baru[i1], baru[i2]] = [baru[i2], baru[i1]]; else if (i1 >= 0) baru[i1] = id; else if (i2 >= 0) baru[i2] = terpilih;
+      if (!cb.izin(baru)) { terpilih = null; tandai(); return cb.ditolak && cb.ditolak(); }
+    }
     if (i1 >= 0 && i2 >= 0) [S.susunan[i1], S.susunan[i2]] = [S.susunan[i2], S.susunan[i1]];
     else if (i1 >= 0) S.susunan[i1] = id;
     else if (i2 >= 0) S.susunan[i2] = terpilih;

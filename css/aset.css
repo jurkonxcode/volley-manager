@@ -33,3 +33,8 @@
 .arena3d{position:relative;height:310px;border-radius:12px;overflow:hidden;background:#081426}
 .tiga-btn{position:absolute;top:8px;right:8px;z-index:6;display:flex;align-items:center;gap:4px;height:30px;padding:0 10px;border-radius:15px;border:1px solid rgba(255,255,255,.25);background:rgba(8,12,32,.7);color:#cfd8ee;font:700 12px/1 inherit;cursor:pointer}
 .tiga-btn.on{background:linear-gradient(90deg,#FFC83D,#FF5E7E);color:#14214D;border-color:transparent}
+/* jeda antar-set: taktik + banding kekuatan */
+[data-layar="tanding"] .taktik{margin:8px 0 4px;justify-content:center}
+.banding{display:flex;justify-content:space-between;align-items:center;padding:0 6px 4px;font-weight:800;color:var(--redup)}
+.banding b{color:var(--teks)}.banding i{font-style:normal;opacity:.6}
+.banding .kuat.habis{color:var(--kritis)}

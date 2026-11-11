@@ -6,7 +6,7 @@ import { buatAcak } from '../inti/acak.js';
 import { K } from '../inti/konfigurasi.js';
 import { buatPertandingan, mainkanSet, timSaya, kekuatanTim } from '../sistem/pertandingan.js';
 import { buatLawan } from '../sistem/liga.js';
-import { bersihkanSusunan } from '../sistem/taktik.js';
+import { bersihkanSusunan, FORMASI, GAYA, autoSusun } from '../sistem/taktik.js';
 import { fixtureSaya, kickoff, catatLaga, levelLawan } from '../sistem/musim.js';
 import * as D3 from './arena3d.js';
 
@@ -32,7 +32,13 @@ function tampilPilih(root, S, aksi) {
   if (mb) mb.onclick = () => { bersihkanSusunan(S, sekarang()); P.level = level; P.m = buatPertandingan(S.skuad, S.susunan, tim, level, S.taktik); P.fase = 'siap'; P.skor = { a: 0, b: 0 }; renderPertandingan(root, S, aksi); };
 }
 
+// Pergantian di jeda antar-set: pemain di susunan yang tidak main di set terakhir. Dibatasi K.ganti.maks.
+const terpakai = (m, susunan) => m.kickoff ? susunan.filter(id => !m.kickoff.includes(id)).length : 0;
+const taktikBaris = (S, m, A, B, now) => `<div class="taktik" id="taktik">${Object.keys(FORMASI).map(k => `<button class="chip-t ${S.taktik.formasi === k ? 'on' : ''}" data-formasi="${k}">${k}</button>`).join('')}<span class="pemisah"></span>${Object.entries(GAYA).map(([k, g]) => `<button class="chip-t ${S.taktik.gaya === k ? 'on' : ''}" data-gaya="${k}">${g.nama}</button>`).join('')}<button class="chip-t" data-auto aria-label="Susun otomatis">${ikon('ulang', 16)}</button></div>
+<div class="banding"><span class="kuat ${m.kickoff && terpakai(m, S.susunan) >= K.ganti.maks ? 'habis' : ''}">${m.kickoff ? `${ikon('ulang', 14)} ${terpakai(m, S.susunan)}/${K.ganti.maks}` : ''}</span><span>${ikon('smash', 16)} <b>${Math.round(kekuatanTim(A, now, S.taktik))}</b> <i>vs</i> <b>${Math.round(kekuatanTim(B, now))}</b></span></div>`;
+
 function tampilLapangan(root, S, aksi) {
+  P.m.susunan = S.susunan; P.m.taktik = S.taktik;   // susunan/taktik bisa diganti (mis. susun otomatis membuat array baru): selalu pakai yang terkini
   const m = P.m, now = sekarang(), A = timSaya(m), B = m.lawan, edit = P.fase === 'siap', d3 = P.fase === 'main' && !!S.pengaturan?.tiga3d && !gagal3d;
   const titik = n => Array.from({ length: K.set.menang }, (_, i) => `<i class="${i < n ? 'isi' : ''}"></i>`).join('');
   const baris = (a, tim, inter) => `<div class="baris">${a.map(p => kartuMini(p, { tim, now, zona: 'lap', interaktif: inter, badan: true })).join('')}</div>`;
@@ -44,13 +50,31 @@ function tampilLapangan(root, S, aksi) {
 <div class="separuh">${baris(A.slice(0, 3), 'A', edit)}${baris(A.slice(3), 'A', edit)}</div>
 <div class="bayangan" id="bay" style="left:50%;top:50%"></div><div class="bola" id="bola" style="left:50%;top:50%">${ikon('bola', 22)}</div><div class="pop" id="pop"></div></div>`}</div>
 <div class="komentar" id="kom">${P.kom || ''}</div>
-${edit ? `<div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div><button class="tombol-besar" id="main" aria-label="Main set">${ikon('main', 30)}</button>`
+${edit ? `${taktikBaris(S, m, A, B, now)}<div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div><button class="tombol-besar" id="main" aria-label="Main set">${ikon('main', 30)}</button>`
        : `<button class="tombol-besar sekunder" id="lompat" aria-label="Lewati animasi">${ikon('lompat', 28)}</button>`}`;
   const k = root.querySelector('#kembali'); if (k) k.onclick = () => { P = baru(); renderPertandingan(root, S, aksi); };
   const mn = root.querySelector('#main'); if (mn) mn.onclick = () => mainkan(root, S, aksi);
   const tg = root.querySelector('#tiga'); if (tg) tg.onclick = () => { S.pengaturan.tiga3d = !S.pengaturan.tiga3d; gagal3d = false; aksi.simpan(); tampilLapangan(root, S, aksi); if (P.fase === 'main' && root.querySelector('#arena3d')) mulai3D(root, S, aksi); };
   const lm = root.querySelector('#lompat'); if (lm) lm.onclick = () => { P.cepat = true; };
-  if (edit) pasangTukar(root, S, { saatUbah: () => { aksi.simpan(); renderPertandingan(root, S, aksi); } });
+  if (edit) {
+    const tk = root.querySelector('#taktik');
+    tk.onclick = e => {
+      const b = e.target.closest('[data-formasi],[data-gaya],[data-auto]'); if (!b) return;
+      if (b.dataset.auto) {
+        const baru = autoSusun(S, sekarang());
+        if (m.kickoff && terpakai(m, baru) > K.ganti.maks) { P.kom = 'Batas pergantian tercapai'; return renderPertandingan(root, S, aksi); }
+        S.susunan = baru;
+      }
+      if (b.dataset.formasi) S.taktik.formasi = b.dataset.formasi;
+      if (b.dataset.gaya) S.taktik.gaya = b.dataset.gaya;
+      aksi.simpan(); renderPertandingan(root, S, aksi);
+    };
+    pasangTukar(root, S, {
+      izin: m.kickoff ? baru => terpakai(m, baru) <= K.ganti.maks : null,
+      ditolak: () => { P.kom = 'Batas pergantian tercapai'; renderPertandingan(root, S, aksi); },
+      saatUbah: () => { aksi.simpan(); renderPertandingan(root, S, aksi); }
+    });
+  }
 }
 
 // Siapkan tampilan 3D (muat Three.js lalu pasang pemain). Gagal => tampilan 2D otomatis.
@@ -108,7 +132,8 @@ function beriPose(root, r) {
   if (Math.random() < .35) setPose(k[pil(tim(!menang))], 'kecewa');
 }
 async function mainkan(root, S, aksi) {
-  const saya = ++token; P.fase = 'main'; P.cepat = !!S.pengaturan?.animasiCepat;
+  const saya = ++token; P.fase = 'main'; P.m.kickoff = [...S.susunan];   // susunan yang main set ini: patokan hitungan pergantian di jeda berikutnya
+  P.cepat = !!S.pengaturan?.animasiCepat;
   tampilLapangan(root, S, aksi);
   if (root.querySelector('#arena3d')) { await mulai3D(root, S, aksi); if (saya !== token) return; }
   const now = sekarang(), hasil = mainkanSet(P.m, buatAcak(now), now);

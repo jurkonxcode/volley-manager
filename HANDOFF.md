@@ -17,6 +17,7 @@ Catatan serah-terima: apa yang sudah ada, bagaimana strukturnya, dan jebakan yan
 | v11 | Tim saya dilihat dari belakang (`belakang-*.png`), tim lawan dari depan; lantai lapangan bergambar (`lantai.webp`), garis serang dipindah ke 1/3 dari jaring, angka peringkat terbaca |
 | v12 | Mode 3D opsional di layar laga (Three.js, dari asset pack ChatGPT): `js/tiga-d/` (arena, pemain, bola, efek bawaan pack) + `js/layar/arena3d.js` (penghubung). Tombol "3D" di pojok lapangan; aktif saat set berjalan, mode atur susunan tetap 2D. Gagal muat Three/WebGL => otomatis 2D. Ikon SVG pack disalin ke `assets/ui/` (belum dipakai) |
 | v13 | Mesin reli berbasis statistik (`sistem/pertandingan.js`): servis vs receive, umpan, smash vs blok/dig, balas menyerang; penalti pemain di posisi salah; mental berpengaruh saat skor ketat; komentar dan pose memakai pemain yang benar-benar mencetak poin |
+| v14 | Jeda antar-set: ganti formasi/gaya/susun otomatis langsung di layar laga, batas pergantian per jeda (`K.ganti.maks` = 3), banding kekuatan live; perbaikan susunan basi setelah susun otomatis |
 
 ## Struktur
 - `js/inti/` konfigurasi (semua angka keseimbangan di `konfigurasi.js`), waktu, simpan (localStorage, kunci `volley-manager-v2`, `versi: 2`), acak ber-seed
@@ -92,3 +93,10 @@ git add -A && git commit -m "update" && git push
 - Disimulasikan 1500 laga per kasus: seimbang 50%; +3 kekuatan ~72% menang laga, +6 ~86%, +10 ~96%. Poin: ace ~5%, blok ~11%, kesalahan ~20%. Angka ada di `K.reli`.
 - Simulasi antar-AI di `musim.js` masih memakai model peluang lama (`K.skalaPeluang`), bukan mesin ini. Sensitivitasnya mirip, tapi belum identik.
 - Opponent: stamina penuh dan tanpa taktik (belum diubah).
+
+
+## Jeda antar-set (v14)
+- Di fase `siap` layar laga: chip formasi/gaya/auto + hitungan pergantian + kekuatan saya vs lawan (`taktikBaris` di `pertandingan.js`).
+- Pergantian = pemain di susunan yang tidak main di set terakhir (`m.kickoff`, diisi di `mainkan`). Sebelum set 1 bebas; tiap jeda lanjutan maks `K.ganti.maks`. Tukar posisi sesama lapangan tidak dihitung. Hook `izin`/`ditolak` di `pasangTukar` (skuad.js).
+- Bug yang diperbaiki: `autoSusun`/`bersihkanSusunan` membuat array `S.susunan` baru sehingga `m.susunan` laga basi. `tampilLapangan` kini menyamakan `m.susunan` dan `m.taktik` tiap render.
+- Catatan desain: efek taktik ke angka kekuatan kecil (sekitar +-1) dan lawan belum punya gaya, jadi satu gaya bisa selalu terbaik. Langkah berikut: gaya lawan + saling menguntungkan.
