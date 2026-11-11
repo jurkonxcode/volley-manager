@@ -18,6 +18,7 @@ import { lengkapiKlub, pastikanKontrak } from './sistem/klub.js';
 import { renderProfil } from './layar/profil.js';
 import { renderKlubBangun } from './layar/klub-bangun.js';
 import { bukaBuatKlub } from './layar/buat-klub.js';
+import { bukaOnboarding } from './layar/onboarding.js';
 import { identitasAwal, warnaLawan } from './sistem/identitas.js';
 import { lengkapiPersahabatan, kejarPersahabatan } from './sistem/persahabatan.js';
 import { setWarna3D } from './layar/arena3d.js';
@@ -88,7 +89,7 @@ function mulai(data) {
   aksi.perbaruiKoin();
   tampil('beranda');
 }
-// Ada simpanan: lanjut. Tidak ada: mulai dari layar Buat Klub.
+// Ada simpanan: lanjut. Tidak ada: onboarding (sekali), lalu layar Buat Klub.
 const tersimpan = muat();
 if (tersimpan) mulai(tersimpan);
-else bukaBuatKlub(d => { const baru = gameBaru(d); simpan(baru); mulai(baru); });
+else bukaOnboarding(() => bukaBuatKlub(d => { const baru = gameBaru(d); simpan(baru); mulai(baru); }));

@@ -162,3 +162,11 @@ Referensi: alur Top Eleven (buat klub: nama/negara/kota/lambang/warna; stadion +
 - Jebakan: `#layar` dipakai bersama semua tab, jadi handler klik harus dipasang pada elemen di dalam layar (bukan `root.onclick`), kalau tidak ikut menempel ke tab lain (bug ini sempat terjadi di tab Klub).
 - Diuji di Chromium headless (390x844): buat klub, ganti warna, bangun + percepat, akademi, jadwalkan + main persahabatan, laga liga, simpanan lama (field v17 dihapus), auto-main persahabatan terlewat, akhir musim. Belum diuji: Mode 3D dengan warna klub (sandbox tanpa Three.js), tampilan di HP sungguhan.
 - Belum: piala/knockout, tawaran transfer ke pemain kita, pelatih/staf, kontrak sponsor yang bisa dipilih, laga online antar-manajer (Supabase).
+
+## v18 — Aset merek, ikon, onboarding
+- **Merek (`assets/brand/`)**: `logo-mark.svg` (ikon app, bola voli + jejak koral), `favicon.svg` (versi tebal agar terbaca di 16px), `logo-lockup.svg` (mark + teks VOLLEY MANAGER; teks memakai `textLength` agar muat walau font Barlow tidak termuat). Dibuat dengan kode, bukan gambar AI.
+- **Ikon app (`assets/icons/`)**: `icon-192/512.png`, `icon-maskable-512.png` (isi penuh untuk Android), `apple-touch-icon.png`, `favicon-32.png`. Dirender dari SVG lewat Chrome headless. `manifest.webmanifest` + tag di `index.html` (siap dipasang ke layar utama / PWA; belum ada service worker).
+- **Ikon baru** di `IKON` (`js/layar/gambar.js`): tambah, cek, info, bantuan, lonceng, kunci, panah, toko, parkir, medis, akademi, tiket, sponsor, grafik, target, bendera, mata, unduh, lokasi, peluit. Fasilitas Medis/Akademi/Toko/Parkir kini memakai ikon sendiri (`FASILITAS` di `sistem/pasar.js`).
+- **Onboarding**: `js/layar/onboarding.js` + `css/v18.css`. 4 slide (sambutan, taktik, laga, trofi), bisa digeser, tombol Lewati. Tampil sekali sebelum Buat Klub (kunci `localStorage vm-onboard`; hapus kunci itu untuk melihat lagi, atau panggil `bukaOnboarding(fn, {paksa:true})`). Ilustrasi inline SVG di file yang sama.
+- Diuji di Chromium headless 390x844: 4 slide, alur ke Buat Klub, masuk game, tab Klub; tanpa error konsol dan tanpa respons 404. Belum diuji di HP sungguhan. Font Google tidak termuat di sandbox (pakai font cadangan).
+- Jebakan: `file://` tidak bisa memuat ES module; uji lewat server (`python3 -m http.server`).

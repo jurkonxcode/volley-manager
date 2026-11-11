@@ -25,6 +25,9 @@ Mode pertandingan 3D memakai arena indoor procedural dengan lantai parquet, net 
 - **Persahabatan** (Kompetisi > Persahabatan): cari lawan, pilih waktu kick-off dan kandang/tandang, laga terjadwal tampil di Beranda dan layar Laga.
 - Token (mempercepat pembangunan/latihan, menyegarkan pasar), semangat tim, perkembangan pemain tiap akhir musim.
 
+## Baru di v18
+- Aset merek SVG (`assets/brand/`), favicon, ikon PWA + `manifest.webmanifest`, 20 ikon baru, dan layar sambutan (onboarding) 4 slide. Detail di `HANDOFF.md`.
+
 ## Sudah ada
 Menu utama, Kelola Tim bertab (Skuad/Strategi/Formasi/Pasar), liga 8 tim + Kompetisi bertab (klasemen, jadwal, analitik dengan grafik performa dan win rate), laga live berperspektif dengan pemain berpose, transfer + scouting, latihan, fasilitas, cedera, profil pemain & manajer.
 

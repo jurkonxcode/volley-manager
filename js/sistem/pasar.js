@@ -10,10 +10,10 @@ export const STAT_LATIHAN = ['servis', 'smash', 'blok', 'receive', 'umpan', 'tah
 export const FASILITAS = {
   stadion: { nama: 'Stadion', ikon: 'stadion', maks: 8, kali: 1.5, info: 'Kapasitas +500 kursi dan hadiah laga +10% per level' },
   latihan: { nama: 'Lapangan Latihan', ikon: 'smash', maks: 5, kali: 1, info: 'Sesi latihan 10% lebih cepat dan hasil lebih sering per level' },
-  medis: { nama: 'Pusat Medis', ikon: 'jantung', maks: 5, kali: 1, info: 'Cedera 15% lebih singkat per level' },
-  akademi: { nama: 'Akademi Muda', ikon: 'skuad', maks: 5, kali: 1.2, info: 'Level 1 membuka akademi; tiap level menghasilkan bakat lebih matang dan berpotensi tinggi' },
-  toko: { nama: 'Toko Klub', ikon: 'koin', maks: 5, kali: 1, info: 'Pemasukan merchandise tiap laga liga, naik mengikuti jumlah fans' },
-  parkir: { nama: 'Parkir & Kafe', ikon: 'rumah', maks: 5, kali: 1, info: 'Pemasukan tambahan tiap laga kandang, naik mengikuti jumlah penonton' }
+  medis: { nama: 'Pusat Medis', ikon: 'medis', maks: 5, kali: 1, info: 'Cedera 15% lebih singkat per level' },
+  akademi: { nama: 'Akademi Muda', ikon: 'akademi', maks: 5, kali: 1.2, info: 'Level 1 membuka akademi; tiap level menghasilkan bakat lebih matang dan berpotensi tinggi' },
+  toko: { nama: 'Toko Klub', ikon: 'toko', maks: 5, kali: 1, info: 'Pemasukan merchandise tiap laga liga, naik mengikuti jumlah fans' },
+  parkir: { nama: 'Parkir & Kafe', ikon: 'parkir', maks: 5, kali: 1, info: 'Pemasukan tambahan tiap laga kandang, naik mengikuti jumlah penonton' }
 };
 export const urutFasilitas = Object.keys(FASILITAS);
 export const hargaBeli = p => Math.round(ratingPemain(p) ** 2 / 8);

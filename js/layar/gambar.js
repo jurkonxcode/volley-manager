@@ -36,7 +36,28 @@ const IKON = {
   palu: '<path d="M14 4l6 6-3 3-6-6zM12 9L4 17l3 3 8-8"/>',
   buku: '<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3zM5 17a3 3 0 013-3h11"/>',
   kalender: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
-  jabat: '<path d="M3 12l4-4 4 3 4-3 6 5-5 5-3-2-2 2-3-1-5-3z"/>'
+  jabat: '<path d="M3 12l4-4 4 3 4-3 6 5-5 5-3-2-2 2-3-1-5-3z"/>',
+  // v18: ikon tambahan (gaya garis 24px, sama dengan set di atas)
+  tambah: '<path d="M12 5v14M5 12h14"/>',
+  cek: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  bantuan: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 015 .3c0 1.700-2.500 2-2.500 3.700M12 17h.01"/>',
+  lonceng: '<path d="M6 17v-6a6 6 0 0112 0v6l2 2H4zM10 21h4"/>',
+  kunci: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+  panah: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  toko: '<path d="M5 8h14l-1 12H6zM9 8a3 3 0 016 0"/>',
+  parkir: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M10 16V8h3a2.500 2.500 0 010 5h-3"/>',
+  medis: '<path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5z"/>',
+  akademi: '<path d="M2 9l10-5 10 5-10 5zM6 11.500V16c0 1.500 3 3 6 3s6-1.500 6-3v-4.500M22 9v6"/>',
+  tiket: '<path d="M4 7h16v3a2 2 0 000 4v3H4v-3a2 2 0 000-4z"/><path d="M14 7v2M14 11v2M14 15v2"/>',
+  sponsor: '<path d="M4 10v4h3l8 4V6L7 10zM18 9a4 4 0 010 6"/>',
+  grafik: '<path d="M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6"/>',
+  target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.500"/>',
+  bendera: '<path d="M5 21V4M5 5h12l-2 4 2 4H5"/>',
+  mata: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  unduh: '<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+  lokasi: '<path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.500"/>',
+  peluit: '<circle cx="9" cy="14" r="5"/><path d="M13 11l8-3v4l-6 1.500M9 9V6"/>'
 };
 export function ikon(nama, u = 20) {
   return `<svg class="ikon" width="${u}" height="${u}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IKON[nama] || ''}</svg>`;
