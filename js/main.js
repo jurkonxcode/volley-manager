@@ -37,12 +37,13 @@ const aksi = {
   pindah: n => tampil(n),
   reset: () => { if (confirm('Mulai dari awal? Semua data manajer dan pemain akan hilang.')) { hapus(); location.reload(); } }
 };
+const NAMA_TAB = { beranda: 'Klub', liga: 'Liga', skuad: 'Skuad', tanding: 'Laga', profil: 'Profil' };
 const TAB = { beranda: ['rumah', renderBeranda], liga: ['trofi', renderLiga], skuad: ['skuad', renderSkuad], tanding: ['jaring', renderPertandingan], profil: ['orang', renderProfil] };
 
 $('#logo').innerHTML = ikon('bola', 28);
 $('#reset').innerHTML = ikon('hapus', 22);
 $('#reset').onclick = aksi.reset;
-$('#nav').innerHTML = Object.entries(TAB).map(([k, [ik]]) => `<button data-tab="${k}" aria-label="${k}">${ikon(ik, 28)}</button>`).join('');
+$('#nav').innerHTML = Object.entries(TAB).map(([k, [ik]]) => `<button data-tab="${k}" aria-label="${k}">${ikon(ik, 24)}<span>${NAMA_TAB[k]}</span></button>`).join('');
 $('#nav').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) tampil(b.dataset.tab); };
 
 function tampil(nama) {

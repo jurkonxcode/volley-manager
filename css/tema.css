@@ -1,0 +1,64 @@
+/* Tema game modern: gelap, kaca, aksen neon. Dimuat terakhir agar menimpa gaya lama. */
+:root{--malam:#080C20;--panel:#151B3B;--panel-2:#232B58;--garis:rgba(255,255,255,.1);--teks:#F4F6FF;--redup:#9AA3C7;
+--bola:#FFC83D;--baik:#2EE59D;--sedang:#FFC83D;--kritis:#FF4D6D;--biru-luar:#1A2660;--lapangan:#E58A3A;--aksen:linear-gradient(135deg,#FFC83D,#FF5C7A);--r:20px}
+body{background:radial-gradient(900px 500px at 85% -10%,rgba(124,77,255,.35),transparent 60%),radial-gradient(700px 500px at -10% 30%,rgba(0,200,255,.18),transparent 60%),var(--malam);background-attachment:fixed;letter-spacing:.2px}
+.atas{position:relative}
+.koin{justify-self:center;padding:5px 14px 5px 8px;border-radius:999px;font-size:19px;background:rgba(255,255,255,.08);border:1px solid var(--garis);box-shadow:0 0 18px rgba(255,200,61,.25)}
+.logo{filter:drop-shadow(0 0 8px rgba(255,200,61,.6))}
+/* navigasi melayang */
+.nav{position:sticky;bottom:0;margin:0 10px calc(env(safe-area-inset-bottom,0px) + 8px);border:1px solid var(--garis);border-radius:26px;background:rgba(21,27,59,.88);backdrop-filter:blur(14px);padding:0;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.nav button{height:62px;gap:2px;align-content:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;position:relative}
+.nav button svg{width:24px;height:24px}
+.nav button[aria-current="true"]{box-shadow:none;color:#fff;background:linear-gradient(180deg,rgba(255,200,61,.2),transparent)}
+.nav button[aria-current="true"] svg{color:var(--bola);filter:drop-shadow(0 0 8px var(--bola))}
+.nav button[aria-current="true"]::after{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 4px 4px;background:var(--aksen)}
+/* kartu kaca */
+.kartu-klub,.laga-depan,.pengaturan,.detail,.kartu-manajer,.kuat-saya+.lawan-kartu,.lawan-kartu{background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid var(--garis);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.pengaturan{padding:14px;margin-bottom:12px}
+.pengaturan h2,.kartu-klub h2{font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--redup);margin-bottom:10px}
+.kartu-klub{background:linear-gradient(135deg,#2B2A8F,#6B2FB8 60%,#C2347F);border:0;position:relative;overflow:hidden}
+.kartu-klub::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.1)}
+.km-avatar{background:var(--aksen);color:#1A1030;font-weight:800;box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+.km-nama{font-size:22px;font-weight:800}
+.km-level b{font-size:40px;font-weight:800;background:var(--aksen);-webkit-background-clip:text;background-clip:text;color:transparent}
+.km-statistik>div{background:rgba(0,0,0,.25);border-radius:14px}
+.laga-depan{background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(124,77,255,.25));padding:18px}
+.laga-depan small{text-transform:uppercase;letter-spacing:1.4px;color:var(--redup);font-weight:700}
+.vs b{font-size:22px;font-weight:800}
+.vs span{font-weight:800;padding:4px 10px;border-radius:999px;background:rgba(0,0,0,.3);font-size:14px}
+/* tombol aksi utama */
+.tombol-besar{height:60px;border-radius:30px;background:var(--aksen);color:#1A1030;font-weight:800;font-size:18px;text-transform:uppercase;letter-spacing:1px;box-shadow:0 8px 22px rgba(255,92,122,.45),inset 0 1px 0 rgba(255,255,255,.5)}
+.tombol-besar.sekunder{background:var(--panel-2);color:var(--teks);box-shadow:none;border:1px solid var(--garis)}
+.tombol-kecil,.kembali{background:var(--panel-2);border:1px solid var(--garis)}
+.chip-t{background:rgba(255,255,255,.07);border:1px solid var(--garis);color:var(--redup);font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.6px}
+.chip-t.on{background:var(--aksen);color:#1A1030;border-color:transparent;box-shadow:0 4px 14px rgba(255,92,122,.4)}
+/* lapangan */
+.lapangan{background:linear-gradient(180deg,#141C4A,#0E1438);border:1px solid var(--garis);border-radius:24px;padding:12px;box-shadow:0 12px 30px rgba(0,0,0,.45)}
+.arena{border:3px solid rgba(255,255,255,.9);border-radius:6px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 22px,transparent 22px 44px),linear-gradient(180deg,#F29A47,#D77A2E);box-shadow:inset 0 0 40px rgba(0,0,0,.25),0 0 24px rgba(255,160,70,.25)}
+.separuh .baris+.baris{border-top:2px solid rgba(255,255,255,.85)}
+.jaring{background:repeating-linear-gradient(90deg,#fff 0 4px,#9fb0d8 4px 8px);height:7px;border-radius:3px;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+/* kartu pemain */
+.kartu{border-radius:14px}
+.kartu.terpilih{background:rgba(255,255,255,.22);outline:2px solid var(--bola);box-shadow:0 0 16px rgba(255,200,61,.6)}
+.figur{filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
+.lencana{box-shadow:0 2px 6px rgba(0,0,0,.4);border:1px solid rgba(0,0,0,.2)}
+.bangku{background:rgba(255,255,255,.05);border:1px solid var(--garis)}
+.rating-besar{background:var(--aksen);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.batang{height:9px;background:rgba(255,255,255,.1);overflow:hidden}
+/* papan skor & komentar */
+.papan{background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid var(--garis);border-radius:var(--r);padding:12px 8px}
+.papan b{font-size:64px;font-weight:800;text-shadow:0 0 22px rgba(255,200,61,.45)}
+.komentar{padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.3);border:1px solid var(--garis);font-size:15px}
+.pop{box-shadow:0 0 18px currentColor}
+/* tabel & riwayat */
+.tabel th{text-transform:uppercase;letter-spacing:.8px}
+.tabel tr.saya{background:linear-gradient(90deg,rgba(255,200,61,.22),transparent)}
+.tabel tbody tr:nth-child(1) td:first-child{color:var(--bola);font-weight:800}
+.jd{border-bottom:1px solid var(--garis)}.jd:last-child{border:0}
+.hc{border-radius:12px}.hc.m{background:rgba(46,229,157,.18);color:var(--baik)}.hc.k{background:rgba(255,77,109,.18);color:var(--kritis)}
+/* hasil & lembar */
+.hasil.menang>svg{filter:drop-shadow(0 0 20px rgba(255,200,61,.8))}
+.skor-akhir{font-weight:800;text-shadow:0 0 26px rgba(255,200,61,.4)}
+.modal{backdrop-filter:blur(6px)}
+.kartu-lengkap{background:linear-gradient(160deg,#1E2554,#12183A);border:1px solid var(--garis)}
+input{background:rgba(255,255,255,.07);border:1px solid var(--garis);border-radius:12px;color:var(--teks)}
