@@ -50,10 +50,10 @@ export function figur(p, tim, now) {
 <circle class="cincin-isi" cx="28" cy="28" r="26" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - s / 100)).toFixed(1)}" transform="rotate(-90 28 28)"/>
 <svg x="8" y="8" width="40" height="40" viewBox="0 0 48 48">${isiAvatar(p, tim)}</svg></svg>`;
 }
-export function kartuMini(p, { tim = 'A', now, zona = 'lap', interaktif = true } = {}) {
+export function kartuMini(p, { tim = 'A', now, zona = 'lap', interaktif = true, badan = false } = {}) {
   const tag = interaktif ? 'button' : 'div';
   const data = interaktif ? ` data-id="${p.id}" data-zona="${zona}"` : '';
-  return `<${tag} class="kartu"${data} style="--w:${K.warnaPosisi[p.posisi]}">${figur(p, tim, now)}<i class="lencana">${p.posisi}</i><span class="nilai">${ratingPemain(p)}</span>${p.cedera > now ? '<i class="med">+</i>' : ''}</${tag}>`;
+  return `<${tag} class="kartu"${data} style="--w:${K.warnaPosisi[p.posisi]}">${badan ? badanSvg(p, tim, now) : figur(p, tim, now)}<i class="lencana">${p.posisi}</i>${badan ? '' : `<span class="nilai">${ratingPemain(p)}</span>`}${p.cedera > now ? '<i class="med">+</i>' : ''}</${tag}>`;
 }
 export function radar(p) {
   const R = 34, ang = i => (-90 + 72 * i) * Math.PI / 180;
@@ -70,3 +70,18 @@ export function chipStat(p) {
 }
 
 export const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+// Figur seluruh badan untuk layar laga (lengan dianimasikan lewat CSS: .a-smash, .a-blok, .a-servis, .a-dig).
+export function badanSvg(p, tim, now) {
+  const kulit = KULIT[p.kulit % 4], rambut = RAMBUT[p.rambut % 4], a = tim === 'A';
+  const baju = a ? '#2F6BFF' : '#F4F1E8', celana = a ? '#14214D' : '#C0392B', garis = a ? '#FFC83D' : '#C0392B', tulis = a ? '#fff' : '#14214D', s = staminaSekarang(p, now);
+  const lengan = k => { const x = k === 'k' ? 5 : 29; return `<g class="lengan ${k}"><rect x="${x}" y="25" width="6" height="19" rx="3" fill="${kulit}"/><rect x="${x}" y="24" width="6" height="8" rx="3" fill="${baju}"/></g>`; };
+  return `<svg class="badan" viewBox="0 0 40 76" aria-hidden="true">${lengan('k')}${lengan('n')}
+<rect x="14" y="52" width="5" height="19" rx="2.500" fill="${kulit}"/><rect x="21" y="52" width="5" height="19" rx="2.500" fill="${kulit}"/>
+<rect x="13" y="68" width="7" height="5" rx="2" fill="#fff"/><rect x="20" y="68" width="7" height="5" rx="2" fill="#fff"/>
+<path d="M11 44h18l1.500 12H21l-1-3-1 3H9.500z" fill="${celana}"/>
+<path d="M10 25c0-3.500 4.500-5.500 10-5.500S30 21.500 30 25l-1 21H11z" fill="${baju}"/><rect x="10.500" y="40" width="19" height="2.500" fill="${garis}"/>
+<rect x="17" y="17" width="6" height="5" fill="${kulit}"/><circle cx="20" cy="12" r="7.500" fill="${kulit}"/>
+<path d="M12.500 11a7.500 7.500 0 0 1 15 0c-4-3-11-3-15 0z" fill="${rambut}"/>
+<text x="20" y="35" text-anchor="middle" font-size="9" font-weight="800" fill="${tulis}" font-family="sans-serif">${ratingPemain(p)}</text></svg><i class="stm zona-${zonaStamina(s)}"><b style="width:${s.toFixed(0)}%"></b></i>`;
+}

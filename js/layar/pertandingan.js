@@ -33,7 +33,7 @@ function tampilPilih(root, S, aksi) {
 function tampilLapangan(root, S, aksi) {
   const m = P.m, now = sekarang(), A = timSaya(m), B = m.lawan, edit = P.fase === 'siap';
   const titik = n => Array.from({ length: K.set.menang }, (_, i) => `<i class="${i < n ? 'isi' : ''}"></i>`).join('');
-  const baris = (a, tim, inter) => `<div class="baris">${a.map(p => kartuMini(p, { tim, now, zona: 'lap', interaktif: inter })).join('')}</div>`;
+  const baris = (a, tim, inter) => `<div class="baris">${a.map(p => kartuMini(p, { tim, now, zona: 'lap', interaktif: inter, badan: true })).join('')}</div>`;
   const bangku = S.skuad.filter(p => !S.susunan.includes(p.id));
   root.innerHTML = `${edit && m.setKe === 1 ? `<button class="kembali" id="kembali" aria-label="Pilih lawan lain">${ikon('kembali', 22)}</button>` : ''}
 <div class="papan"><div class="sisi"><div class="titik-set">${titik(m.setSaya)}</div><b id="skA">${P.skor.a}</b></div><div class="tengah">${ikon('bola', 30)}</div><div class="sisi lawan"><div class="titik-set">${titik(m.setLawan)}</div><b id="skB">${P.skor.b}</b></div></div>
@@ -56,8 +56,9 @@ function gambarRally(root, r, a, b) {
   skA.textContent = a; skB.textContent = b;
   const A = timSaya(P.m), B = P.m.lawan, pil = t => t[Math.floor(Math.random() * t.length)].nama.split(' ')[0], sk = r.a ? A : B, ls = r.a ? B : A;
   P.kom = { ace: `Ace dari ${pil(sk)}!`, blok: `${pil(sk)} blok kokoh!`, smash: `Smash keras ${pil(sk)}!`, salah: `${pil(ls)} membuat kesalahan` }[r.jenis];
+  beriPose(root, r);
   const kom = root.querySelector('#kom'); if (kom) kom.textContent = P.kom;
-  const el = r.a ? skA : skB; el.classList.remove('naik'); void el.offsetWidth; el.classList.add('naik');
+  const el = r.a ? skA : skB; el.classList.remove('skor-naik'); void el.offsetWidth; el.classList.add('skor-naik');
   const x = 10 + Math.random() * 80, y = r.a ? 6 + Math.random() * 36 : 58 + Math.random() * 36;   // bola jatuh di sisi yang kebobolan
   bola.style.left = x + '%'; bola.style.top = y + '%';
   const bay = root.querySelector('#bay'); if (bay) { bay.style.left = x + '%'; bay.style.top = y + '%'; }
@@ -67,6 +68,16 @@ function gambarRally(root, r, a, b) {
   void pop.offsetWidth; pop.classList.add('muncul');
 }
 
+// Pemain yang terlibat reli bergerak: smash, blok, servis, atau receive.
+function beriPose(root, r) {
+  const k = [...root.querySelectorAll('#arena .badan')]; if (k.length < 12) return;
+  const pil = a => a[Math.floor(Math.random() * a.length)], depan = s => s ? [6, 7, 8] : [3, 4, 5], belakang = s => s ? [9, 10, 11] : [0, 1, 2];
+  const pose = (i, c) => { const e = k[i]; e.classList.remove('a-smash', 'a-blok', 'a-servis', 'a-dig'); void e.getBoundingClientRect(); e.classList.add(c); };
+  if (r.jenis === 'smash') { pose(pil(depan(r.a)), 'a-smash'); pose(pil(belakang(!r.a)), 'a-dig'); }
+  else if (r.jenis === 'blok') { pose(pil(depan(r.a)), 'a-blok'); pose(pil(depan(!r.a)), 'a-smash'); }
+  else if (r.jenis === 'ace') { pose(pil(belakang(r.a)), 'a-servis'); pose(pil(belakang(!r.a)), 'a-dig'); }
+  else pose(pil(belakang(!r.a)), 'a-dig');
+}
 async function mainkan(root, S, aksi) {
   const saya = ++token; P.fase = 'main'; P.cepat = !!S.pengaturan?.animasiCepat;
   tampilLapangan(root, S, aksi);
