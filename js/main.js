@@ -26,6 +26,7 @@ import { bukaOnboarding } from './layar/onboarding.js';
 import { identitasAwal, warnaLawan } from './sistem/identitas.js';
 import { lengkapiPersahabatan, kejarPersahabatan } from './sistem/persahabatan.js';
 import { setWarna3D } from './layar/arena3d.js';
+import { jadwalkanUnggah, sinkronAwal, onStatus, terkonfigurasi } from './inti/cloud.js';
 
 // Game baru dibuat dari isian layar "Buat Klub" (d). Tanpa d (mis. data uji), dipakai identitas bawaan.
 function gameBaru(d) {
@@ -84,7 +85,7 @@ const aksi = {
     if (k === 'help') return alert('Bantuan\n\n• Beranda: ringkasan klub, laga berikutnya, klasemen, dan keuangan.\n• Skuad/Taktik: atur susunan pemain, formasi, dan gaya main.\n• Latihan/Transfer: latih tim, beli, jual, dan scout pemain.\n• Kompetisi: klasemen, jadwal, dan analitik.\n• Game tersimpan otomatis di perangkat ini.');
     it[4]?.(); tampil(it[3], k);
   },
-  simpan: () => simpan(S),
+  simpan: () => { S.diperbarui = Date.now(); simpan(S); jadwalkanUnggah(S); },
   perbaruiKoin: () => {
     const E = S.klub?.ekonomi || [], u = E[E.length - 1], net = u ? u.masuk - u.keluar : 0, M = S.musim;
     const set = (id, h) => { const el = $(id); if (el) el.innerHTML = h; };
@@ -135,6 +136,8 @@ function mulai(data) {
   $('#dk-spd').onclick = () => { S.pengaturan.animasiCepat = !S.pengaturan.animasiCepat; simpan(S); aksi.perbaruiKoin(); };
   aksi.perbaruiKoin();
   tampil('beranda');
+  onStatus(st => { const el = $('#cloud-st'); if (el) { el.textContent = st.teks; el.classList.toggle('on', st.ok); } });
+  if (terkonfigurasi()) sinkronAwal(S).then(r => { if (r === 'cloud') location.reload(); });
 }
 // Ada simpanan: lanjut. Tidak ada: onboarding (sekali), lalu layar Buat Klub.
 const tersimpan = muat();

@@ -21,6 +21,8 @@ Catatan serah-terima: apa yang sudah ada, bagaimana strukturnya, dan jebakan yan
 | v15 | Upgrade visual mode 3D premium procedural: arena parquet, net detail, tribun/crowd instanced, LED, rangka atap, pemain 3D lebih anatomis, bola panel, efek impact, lighting/tone mapping dan kamera isometric mobile. Detail: `docs/V15_3D_PREMIUM_UPGRADE.md`. |
 | v15.1 | Audit v15 (logika + kode): kebocoran memori 3D ditutup (dispose), arah bola blok dan animasi "kesalahan" dibetulkan, bola antar-reli tidak lagi saling menimpa, nomor punggung, bayangan pemain dikurangi (~58%), pemulihan saat WebGL gagal/konteks hilang, guard laga basi di layar laga. Detail dan hal yang belum terverifikasi: `docs/AUDIT_V15_1.md`. |
 
+| v20 | Beranda dashboard + header/sidebar/footer desktop mengikuti mockup (`css/v20-mockup.css`) |
+| v20.1 | Skuad/Kompetisi/Laga/Pengaturan selaras mockup; cloud save Supabase (`js/inti/cloud.js`, `supabase/migrations/`) |
 | v15.4 | Pacing laga: tiap reli bertahap (servis, terima, umpan, serangan; ~2-3 dtk per poin di 3D, 1x/2x/Lewati set), label aksi, papan skor bernama + SET/JEDA, hasil set tidak lagi bocor sebelum diputar. Kartu kelangkaan N/R/SR/SSR dari rating (`js/layar/rarity.js`, ambang bisa diubah). Polesan UI semua tab (`css/pro.css`), kartu pra-laga, kolom Form klasemen. Pemain 3D dari FBX Kenney (`assets/models/kenney/`). Belum diuji di HP: rangkaian animasi 3D. |
 
 
@@ -210,6 +212,13 @@ Referensi: alur Top Eleven (buat klub: nama/negara/kota/lambang/warna; stadion +
 - Removed the profile setting that skipped match animations. Legacy save data may still contain `pengaturan.kec` or `animasiCepat`; these values are ignored and do not affect match pacing.
 - Live match presentation now uses one fixed natural animation tempo and a clear live-status indicator.
 - This iteration does **not** yet claim Top Eleven-style live tactical influence: the current set simulation still calculates its rally sequence before playback. The next engine milestone must make rally outcomes step-based so in-match tactical changes and substitutions can affect subsequent rallies.
+
+## v20.1 — Skuad/Kompetisi/Laga selaras mockup + Supabase
+- **UI:** blok "v20.1" di akhir `css/v20-mockup.css` menyatukan panel (`.page-kpi,.kartu-klub,.pengaturan,.md-kartu,...`), sub-tab biru, tombol utama emas (`.tombol-besar` global jadi pil emas, `.sekunder` biru kaca), klasemen (baris saya solid biru), pra-laga (logo 96px, VS miring). Desktop: konten Laga dibatasi 900px, Pengaturan 2 kolom.
+- **Supabase (local-first):** `js/inti/supabase-config.js` (URL + anon key, kosong = offline), `js/inti/cloud.js`, `js/layar/cloud-ui.js` (kartu di Pengaturan), `supabase/migrations/001_game_saves.sql`. `aksi.simpan` di `main.js` kini mengisi `S.diperbarui` dan memanggil `jadwalkanUnggah` (debounce 5 dtk); `sinkronAwal` jalan sekali saat `mulai()`. Konflik: `S.diperbarui` terbaru menang; cloud lebih baru -> `confirm` lalu muat ulang. Footer menampilkan status (`#cloud-st`).
+- Skema tabel: satu baris per pemain (`user_id` PK, `data` jsonb = seluruh `S`, `versi`, `klub`, `musim`, `updated_at`), RLS hanya milik sendiri. Tabel lain (leaderboard, liga online) tinggal ditambah sebagai migrasi 002+.
+- Jebakan: `S.diperbarui` ikut tersimpan di localStorage; menghapus simpanan lokal lalu masuk akun akan menawarkan data cloud. Kunci `vm-sb-url`/`vm-sb-key` ada di localStorage perangkat. Gagal memuat CDN/offline hanya menampilkan pesan di kartu, game tidak terganggu.
+- **Belum diuji:** koneksi nyata ke proyek Supabase (lingkungan pembuat tanpa internet): uji daftar, masuk, unggah, ambil. Layar Laga saat 3D aktif, Analitik, dan Jadwal belum dicek visual di v20.1.
 
 ## v20 — Beranda & shell mengikuti mockup (Home dashboard)
 - Mockup referensi: gambar dashboard biru/emas (header klub+saldo+tanggal+kecepatan+notifikasi+avatar, sidebar 11 menu, hero stadion, 6 kartu).

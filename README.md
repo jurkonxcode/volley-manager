@@ -51,3 +51,13 @@ Lihat `HANDOFF.md` untuk riwayat versi, struktur, jebakan, dan daftar yang belum
 - **Manajemen Klub**: ringkasan saldo, fans, fasilitas aktif, dan komitmen gaji sebelum tab Stadion/Fasilitas/Akademi/Kas/Identitas.
 - **Desktop**: grid dua kolom untuk modul manajemen, area konten lebih lapang, klasemen memanfaatkan lebar layar. **Mobile**: KPI dua kolom dan tab horizontal yang dapat digeser.
 - Tidak mengubah rumus simulasi, struktur save, maupun sistem navigasi utama.
+
+## Baru di v20 / v20.1 — Tampilan mockup + Supabase
+- **Beranda dashboard** gaya mockup (header klub + saldo + tanggal + kecepatan + notifikasi, sidebar 11 menu, banner stadion, 6 kartu) di desktop >=1024px. Ponsel tetap memakai navigasi bawah. Kode: `css/v20-mockup.css`, `renderBeranda` di `js/layar/klub.js`, daftar menu `DK` di `js/main.js`.
+- **v20.1:** Skuad, Kompetisi, Laga, Pengaturan memakai tema yang sama (panel biru, tab biru, tombol utama emas); layar Pengaturan 2 kolom di desktop.
+- **Cloud save Supabase (opsional, local-first).** Tanpa konfigurasi game tetap jalan dari localStorage.
+  1. Supabase > SQL Editor: jalankan `supabase/migrations/001_game_saves.sql` (tabel `game_saves` + RLS per pemain).
+  2. Supabase > Authentication > Providers: aktifkan Email (untuk uji cepat, matikan Confirm email).
+  3. Isi `js/inti/supabase-config.js` (URL + anon key), atau isi lewat **Pengaturan > Akun & Cloud Save** (disimpan di perangkat).
+  4. Masuk/daftar di kartu yang sama. Progres otomatis diunggah ~5 dtk setelah berubah; saat game dibuka, data yang lebih baru (`S.diperbarui`) menang (ada konfirmasi bila cloud lebih baru).
+  - Kode: `js/inti/cloud.js` (klien + sinkron), `js/layar/cloud-ui.js` (kartu), `supabase-js` dimuat lazy dari CDN jsDelivr hanya bila dikonfigurasi.

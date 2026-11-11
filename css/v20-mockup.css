@@ -93,5 +93,41 @@ body{background:radial-gradient(1000px 520px at 80% -10%,rgba(30,107,255,.26),tr
   .dx-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .dx-hero{min-height:290px}
   .bawah{grid-column:1/-1;grid-row:3;display:flex;align-items:center;gap:22px;padding:0 20px;border-top:1px solid var(--tepi);background:#050F33;font-size:13px;color:var(--redup)}
-  .bawah .ok{margin-left:auto}.bawah .ok::before{content:"";display:inline-block;width:9px;height:9px;margin-right:7px;border-radius:50%;background:var(--baik)}
+  .bawah .ok{margin-left:auto}.bawah .ok::before{content:"";display:inline-block;width:9px;height:9px;margin-right:7px;border-radius:50%;background:#6B7BA8}.bawah .ok.on::before{background:var(--baik)}
+}
+
+/* ---------- v20.1 — Skuad, Kompetisi, Laga, Pengaturan: tema yang sama dengan Beranda ---------- */
+.page-kpi,.kartu-klub,.pengaturan,.detail,.kartu-manajer,.md-kartu,.md-lawan,.papan,.tab-sub{border:1px solid var(--tepi);background:linear-gradient(160deg,rgba(21,56,140,.72),rgba(8,24,72,.9));box-shadow:0 10px 26px rgba(0,0,0,.26),inset 0 1px 0 rgba(130,180,255,.12)}
+.page-kpi,.kartu-klub,.pengaturan,.detail,.kartu-manajer,.md-kartu,.md-lawan{border-radius:16px}
+.page-kpi b{font-weight:800}.page-kpi small,.pengaturan h2,.kartu-klub h2{color:#9DB4E8}
+.page-head .eyebrow{color:var(--emas)}.page-head .head-meta{border-color:var(--tepi);background:rgba(30,107,255,.14);color:#CFE0FF}
+.pengaturan h2{font-size:15px;letter-spacing:.8px}
+/* sub-tab */
+.tab-sub{background:rgba(8,24,72,.9)}
+.tab-sub button,.tab-sub button.on{text-transform:none;letter-spacing:0;font-size:15px;font-weight:700}
+.tab-sub button::before,.tab-sub button::after{display:none!important}
+.tab-sub button.on{color:#fff;background:linear-gradient(180deg,#3A86FF,#1456D6);box-shadow:0 5px 16px rgba(30,107,255,.4)}
+.chip-t.on{background:linear-gradient(180deg,#3A86FF,#1456D6);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(30,107,255,.4)}
+/* tombol utama: pil emas seperti "Ke Pertandingan" */
+.tombol-besar{clip-path:none;border-radius:999px;color:#2A1D00;background:linear-gradient(180deg,#FFD24A,#FF9F0A);box-shadow:0 8px 22px rgba(255,170,10,.4),inset 0 1px 0 rgba(255,255,255,.5)}
+.tombol-besar.sekunder{color:#E6EFFF;background:linear-gradient(180deg,rgba(40,100,220,.35),rgba(15,40,110,.5));border:1px solid var(--tepi);box-shadow:none}
+/* tabel klasemen */
+.tabel td{background:rgba(23,52,138,.32)}
+.tabel tr.saya td{background:#2A74F5;color:#fff}
+.tabel tr.saya td:first-child{box-shadow:none;color:#fff}
+.tabel tbody tr:nth-child(-n+2):not(.saya) td:first-child{color:var(--emas)}
+/* skuad */
+.bangku{border:1px solid var(--tepi);background:rgba(10,30,90,.55);border-radius:14px}
+.lapangan{border:1px solid var(--tepi);background:linear-gradient(180deg,#0F2766,#091B52)}
+/* laga (pra-pertandingan) */
+.md-kartu{background:radial-gradient(110% 80% at 50% 0%,rgba(40,120,255,.32),transparent 70%),linear-gradient(160deg,rgba(21,56,140,.72),rgba(8,24,72,.9))}
+.md-kepala{color:#9DB4E8}
+.md-logo{background:transparent;box-shadow:none}.md-logo img,.md-logo .logo-mini{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 6px 12px rgba(0,0,0,.5))}
+.md-vs{background:none;padding:0;font:italic 800 44px/1 'Barlow Condensed',sans-serif;color:#fff;letter-spacing:0}
+.md-taktik span{background:rgba(30,107,255,.2);border:1px solid var(--tepi);color:#DCE8FF}
+.md-bar{background:rgba(255,255,255,.12)}
+@media(min-width:1024px){
+  #layar[data-layar="tanding"]>*{max-width:900px;margin-inline:auto}
+  #layar[data-layar="profil"]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-content:start}
+  #layar[data-layar="profil"]>*{margin:0}
 }
