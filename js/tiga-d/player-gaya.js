@@ -54,8 +54,15 @@ export function createPlayerGaya(THREE, options = {}) {
   const root = new THREE.Group(); root.name = `Player_${options.number ?? 7}`;
   const warnaJersey = options.role === 'L' ? 0xF2C230 : (options.jerseyColor ?? 0xb51f35);   // libero memakai warna kontras
   const std = (c, r = .7) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: 0 });
-  const jersey = std(warnaJersey, .6), celana = std(options.shortsColor ?? 0x171d28, .75), kulit = std(options.skinColor ?? 0xe6b18d, .8),
-    sepatu = std(0xf1f4f8, .5), sol = std(0x222a35, .7), kaos = std(0xe8ecf1, .7), rambut = std(options.hairColor ?? 0x1b1b1b, .85), pelindung = std(0x2b3345, .8), mata = new THREE.MeshBasicMaterial({ color: 0x111622 });
+  // Celana & sepatu mengikuti warna jersey (lebih gelap) seperti di sample; libero tetap gelap netral.
+  const cJ = new THREE.Color(warnaJersey), libero = options.role === 'L';
+  const warnaCelana = options.shortsColor ?? (libero ? 0x171d28 : cJ.clone().multiplyScalar(.78).getHex());
+  const warnaSepatu = options.shoeColor ?? (libero ? 0x222a35 : cJ.clone().multiplyScalar(.7).getHex());
+  const jersey = std(warnaJersey, .6), celana = std(warnaCelana, .75), kulit = std(options.skinColor ?? 0xe6b18d, .8),
+    sepatu = std(warnaSepatu, .55), sol = std(0xf4f6f9, .6), kaos = std(0xf4f6f9, .75), putih = std(0xf7f9fc, .6),
+    rambut = std(options.hairColor ?? 0x3b2417, .85), pelindung = std(0x2b3345, .8), mata = new THREE.MeshBasicMaterial({ color: 0x111622 }),
+    mataPutih = new THREE.MeshBasicMaterial({ color: 0xffffff }), alis = new THREE.MeshBasicMaterial({ color: 0x2a1a12 }),
+    mulutM = new THREE.MeshBasicMaterial({ color: 0x7a1f2b, side: THREE.DoubleSide }), karet = std(options.pita ?? 0x26c6b8, .6);
   GARIS ??= new THREE.MeshBasicMaterial({ color: 0x0b0f1a, side: THREE.BackSide });
   const garisTipis = options.garis !== false;
 
@@ -82,16 +89,20 @@ export function createPlayerGaya(THREE, options = {}) {
     const lutut = sendi(paha, 0, -.45, 0);
     part(kapsul(.075, .28), kulit, lutut, [0, -.22, 0], { garis: true });
     part(bola(.1), pelindung, lutut, [0, 0, .035], { s: [.95, .85, .6], bayang: false });
-    part(silinder(.08, .085, .17), kaos, lutut, [0, -.33, 0], { bayang: false });
+    part(silinder(.08, .085, .22), kaos, lutut, [0, -.31, 0], { bayang: false });
     const telapak = sendi(lutut, 0, -.45, 0);
     part(geo('sepatu', () => new THREE.BoxGeometry(.2, .12, .34)), sepatu, telapak, [0, -.03, .07], { garis: true, lebar: .015 });
     part(geo('sol', () => new THREE.BoxGeometry(.205, .03, .345)), sol, telapak, [0, -.085, .07], { bayang: false });
+    part(geo('sepatuAksen', () => new THREE.BoxGeometry(.206, .035, .15)), putih, telapak, [0, -.02, .09], { bayang: false });   // aksen putih di sisi sepatu
     kaki.push({ paha, lutut, telapak });
   }
   // ---- Badan atas ----
   const spine = sendi(hips, 0, .12, 0);
-  const dada = part(kapsul(.2, .3), jersey, spine, [0, .3, 0], { s: [1.22, 1, .8], garis: true, lebar: .025 });
-  part(silinder(.22, .2, .12), jersey, spine, [0, .02, 0], { s: [1.18, 1, .82], bayang: false });
+  const dada = part(kapsul(.2, .3), jersey, spine, [0, .3, 0], { s: [1.14, 1, .78], garis: true, lebar: .025 });
+  part(silinder(.22, .2, .12), jersey, spine, [0, .02, 0], { s: [1.1, 1, .8], bayang: false });
+  part(silinder(.226, .224, .035), putih, spine, [0, -.035, 0], { s: [1.1, 1, .8], bayang: false });     // list putih ujung jersey
+  const kerah = part(geo('kerah', () => new THREE.TorusGeometry(.095, .018, 6, 16)), putih, spine, [0, .625, .01], { s: [1.15, 1, 1], bayang: false });
+  kerah.rotation.x = Math.PI / 2;                                                                         // kerah putih
   // Nomor punggung dari kanvas (tajam di semua ukuran); tim A terlihat dari belakang.
   const cv = document.createElement('canvas'); cv.width = cv.height = 128; const cx = cv.getContext('2d');
   cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 92px Arial'; cx.lineWidth = 8; cx.strokeStyle = 'rgba(12,16,26,.7)';
@@ -108,6 +119,7 @@ export function createPlayerGaya(THREE, options = {}) {
     part(bola(.12), jersey, bahu, [0, 0, 0], { s: [1, .9, .95] });
     part(kapsul(.072, .2), kulit, bahu, [0, -.2, 0], { garis: true });
     part(silinder(.1, .112, .15), jersey, bahu, [0, -.1, 0], { bayang: false });
+    part(silinder(.114, .115, .025), putih, bahu, [0, -.165, 0], { bayang: false });                      // list putih ujung lengan
     const siku = sendi(bahu, 0, -.34, 0);
     part(kapsul(.058, .22), kulit, siku, [0, -.17, 0], { garis: true });
     const tangan = part(bola(.075), kulit, siku, [0, -.37, .01], { s: [.85, 1.1, .75], bayang: false });
@@ -117,12 +129,27 @@ export function createPlayerGaya(THREE, options = {}) {
   const leher = sendi(spine, 0, .58, 0);
   part(silinder(.07, .085, .14), kulit, leher, [0, .04, 0], { bayang: false });
   const kepala = part(bola(.21), kulit, leher, [0, .22, 0], { s: [.92, 1.02, .94], garis: true, lebar: .02 });
-  for (const sisi of [-1, 1]) { part(bola(.022), mata, kepala, [sisi * .075, .02, .19], { s: [.8, 1.2, .5], bayang: false }); part(bola(.034), kulit, kepala, [sisi * .185, 0, 0], { s: [.5, 1, .7], bayang: false }); }
+  for (const sisi of [-1, 1]) {
+    part(bola(.03), mataPutih, kepala, [sisi * .075, .02, .19], { s: [.9, 1.15, .45], bayang: false });
+    part(bola(.018), mata, kepala, [sisi * .075, .02, .2], { s: [.8, 1.1, .4], bayang: false });
+    const ab = part(geo('alis', () => new THREE.CapsuleGeometry(.008, .05, 3, 6)), alis, kepala, [sisi * .075, .075, .172], { bayang: false });
+    ab.rotation.z = Math.PI / 2 + sisi * .15;                                                              // alis sedikit naik di ujung luar
+    part(bola(.034), kulit, kepala, [sisi * .185, 0, 0], { s: [.5, 1, .7], bayang: false });
+  }
+  const mulut = part(geo('mulut', () => new THREE.CircleGeometry(.05, 14, Math.PI, Math.PI)), mulutM, kepala, [0, -.045, .182], { bayang: false });
+  mulut.rotation.x = .25;                                                                                  // senyum lebar terbuka
   const gaya = (options.hair ?? 0) % 3;
   part(bola(.215), rambut, kepala, [0, .045, -.02], { s: [.98, .82, 1], bayang: false });
+  let kuncir = null;
+  if (gaya === 0) {                                                                                         // gaya sample: poni + kuncir kuda berikat toska
+    part(geo('poni', () => new THREE.SphereGeometry(.222, 14, 8, Math.PI / 2 - 1.0, 2.0, .55, .75)), rambut, kepala, [0, .02, 0], { s: [.95, 1, .97], bayang: false });
+    kuncir = sendi(kepala, 0, .13, -.2);
+    part(kapsul(.055, .22), rambut, kuncir, [0, -.16, -.01], { bayang: false });
+    part(silinder(.052, .052, .045), karet, kuncir, [0, -.015, 0], { bayang: false });
+  }
   if (gaya === 1) for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2, c = part(geo('cone', () => new THREE.ConeGeometry(.055, .15, 6)), rambut, kepala, [Math.cos(a) * .12, .2, Math.sin(a) * .1], { bayang: false }); c.rotation.z = -Math.cos(a) * .5; c.rotation.x = Math.sin(a) * .4; }
   if (gaya === 2) part(bola(.07), rambut, kepala, [0, .15, -.2], { bayang: false });                 // cepol belakang
-  part(geo('pita', () => new THREE.CylinderGeometry(.205, .205, .035, 14, 1, true)), std(options.pita ?? 0xf7f9fc, .8), kepala, [0, .09, 0], { s: [.98, 1, 1.02], bayang: false });   // ikat kepala
+  if (gaya !== 0 && options.pita != null) part(geo('pita', () => new THREE.CylinderGeometry(.205, .205, .035, 14, 1, true)), std(options.pita, .8), kepala, [0, .09, 0], { s: [.98, 1, 1.02], bayang: false });   // ikat kepala (opsional)
 
   // ---- Animasi ----
   const pose = vec(), dasar = vec(), dari = vec(), tmp = vec();
@@ -158,6 +185,7 @@ export function createPlayerGaya(THREE, options = {}) {
       if (ekor >= 1) mode = 'diam';
     } else pose.set(dasar);
     terapkan(pose);
+    if (kuncir) kuncir.rotation.x = .45 + Math.sin(waktu * 2.6) * .07 + (mode === 'klip' ? .3 * Math.sin(Math.min(t, 1) * Math.PI) : 0);   // kuncir bergoyang & terayun saat aksi
   }
   pose.set(vec()); terapkan(pose);
 
