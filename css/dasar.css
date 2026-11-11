@@ -1,0 +1,15 @@
+:root{
+  --malam:#0C1A2B; --panel:#14304F; --panel-2:#1C406A; --garis:rgba(255,255,255,.14);
+  --teks:#F2EFE6; --redup:#9DB2C9;
+  --bola:#F4C430; --baik:#46C17B; --sedang:#F4C430; --kritis:#EF5B4A;
+  --biru-luar:#1E5A92; --lapangan:#D9803A; --garis-lap:#F6F2E8;
+  --r:16px;
+  --font:'Barlow Semi Condensed',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--malam);color:var(--teks);font-family:var(--font);font-size:16px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+svg{display:block}
+:focus-visible{outline:2px solid var(--bola);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
