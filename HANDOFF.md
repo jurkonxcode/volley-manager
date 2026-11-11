@@ -131,3 +131,17 @@ git add -A && git commit -m "update" && git push
 - Nama per negara: `js/data/negara.js` (ID, JP, BR, IT, PL, TR, KR). Pemain punya `neg`; klub lawan dibuat dari kota x pola; logo lawan dipilih dari hash nama. Negara diganti di Profil; nama pemain berubah langsung, klub lawan di musim berikutnya (atau langsung bila belum ada laga). Pilihan disimpan juga di localStorage `vm-negara` agar tetap saat reset.
 - Belum: analitik lintas musim (data sudah di `S.riwayat`, belum ada grafik), gaji tidak benar-benar dibayar per pemain, tidak ada kontrak habis.
 - Diuji di Chromium headless (390x844): Beranda, Kompetisi, Profil, akhir musim + promosi. Font Google tidak termuat di sandbox, jadi tampilan memakai font cadangan.
+
+## v16.2 — Kontrak, lintas musim, skuad NPC
+- Kontrak: `p.kM` = musim terakhir kontrak (`pastikanKontrak` mengisi pemain lama). Perpanjang +2 musim lewat kartu pemain (biaya 0,7x gaji). Saat `akhiriMusim`, pemain `kM <= musim` pergi, kecuali skuad tinggal `K.pasar.minSkuad` (diperpanjang 1 musim gratis); susunan disusun ulang otomatis.
+- NPC: `js/sistem/lawan.js` membuat 14 pemain per tim secara deterministik (tidak disimpan): 70% negara liga, sisanya asing, ada bintang tiap 5 pemain, profil lengkap. Ketuk baris tim di Klasemen -> `js/layar/tim-lawan.js` -> ketuk pemain untuk kartu profil.
+- Analitik: grafik peringkat tiap musim (10 musim terakhir) + daftar promosi/degradasi dari `S.riwayat`.
+- Pasar transfer: `K.pasar.jumlah` 6 -> 10 (berlaku saat pasar disegarkan).
+- Diuji headless: 2 musim penuh (promosi, degradasi, kontrak habis, susunan tetap 6 unik), lembar NPC, perpanjang kontrak (koin berkurang 70).
+- Belum: NPC belum dipakai di laga live (kekuatan lawan masih dari `tingkat` tim), pemain NPC belum bisa dibeli.
+
+## v16.3 — Stadion Pro (3D)
+- `js/tiga-d/arena.js` ditulis ulang (backup versi lama: `docs/arena_v15_backup.js`). Antarmuka sama (`createArena(THREE, opsi)`), jadi `arena3d.js` hanya ditambah 3 baris: simpan arena di `sc.userData.arena`, panggil `update(dt)` tiap frame, dan `hype=1` tiap reli.
+- Isi: lantai satu tekstur (zona bebas biru + parket + garis resmi, serang 3 m), net + tiang, papan sponsor LED bergulir (nama sponsor game), papan skor gantung 4 sisi (`userData.setSkor(a,b,namaA,namaB,set)`; belum dipanggil dari laga), kursi wasit, hakim garis, meja skor, bangku pemain, tribun landai 4 sisi (~1.500 kursi), penonton instanced (badan+kepala, warna kulit/baju bervariasi, ombak yang makin liar saat `hype` tinggi), dinding penonton jauh, rangka atap + 15 lampu + berkas cahaya.
+- `arena-preview.html` di akar repo: lihat arena saja (seret = putar, tombol "Sorak!").
+- BELUM DIUJI VISUAL: sandbox tanpa Three.js. Hanya diuji sintaks dan jalan-tanpa-error dengan Three.js tiruan. Cek di HP: FPS (penonton diperbarui tiap 3 frame; kurangi `R`/`pj` di array `sisi` bila berat), kecerahan tekstur lantai, posisi kamera `ukuran()` di arena3d.js.

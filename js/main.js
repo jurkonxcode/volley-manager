@@ -15,7 +15,7 @@ import { ikon, LOGO } from './layar/gambar.js';
 import { siapkanSprite } from './layar/sprite.js';
 import { renderSkuad } from './layar/skuad.js';
 import { renderPertandingan, lepasPilihan } from './layar/pertandingan.js';
-import { lengkapiKlub } from './sistem/klub.js';
+import { lengkapiKlub, pastikanKontrak } from './sistem/klub.js';
 import { renderProfil } from './layar/profil.js';
 
 function gameBaru() {
@@ -33,7 +33,7 @@ function lengkapi(S) {
   S.taktik ??= { formasi: '5-1', gaya: 'seimbang' };
   S.musim ??= buatMusim(1, S.manajer.tim, now);
   S.skuad.forEach(p => lengkapiPemain(p, now));
-  S.musim.liga ??= 0; S.musim.neg ??= 'ID'; lengkapiKlub(S);
+  S.musim.liga ??= 0; S.musim.neg ??= 'ID'; lengkapiKlub(S); pastikanKontrak(S);
   return S;
 }
 let S = lengkapi(muat() ?? gameBaru());
@@ -61,6 +61,7 @@ function tampil(nama) {
   layar.dataset.layar = nama;
   document.querySelectorAll('#nav button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === nama));
   if (nama !== 'tanding') { const t = sekarang(); prosesWaktu(S, t); bersihkanSusunan(S, t); if (kejar(S, t, kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), t, S.taktik))) { simpan(S); aksi.perbaruiKoin(); } }
+  pastikanKontrak(S);
   TAB[nama][1](layar, S, aksi);
   layar.scrollTop = 0;
 }

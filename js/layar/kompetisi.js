@@ -1,7 +1,8 @@
 // Kompetisi: tab Klasemen / Jadwal / Analitik. Grafik dibuat dengan SVG.
 import { ikon, esc, logoMini } from './gambar.js';
 import { sekarang } from '../inti/waktu.js';
-import { tabel, akhiriMusim } from '../sistem/musim.js';
+import { bukaTimLawan } from './tim-lawan.js';
+import { tabel, akhiriMusim, LIGA } from '../sistem/musim.js';
 import { analitik } from '../sistem/analitik.js';
 
 let sub = 'klasemen';
@@ -10,7 +11,7 @@ const SUB = { klasemen: 'Klasemen', jadwal: 'Jadwal', analitik: 'Analitik' };
 
 const formTim = (M, i) => M.hasil.filter(r => r.i === i || r.j === i).slice(-5).map(r => { const k = r.i === i, a = k ? r.s1 : r.s2, b = k ? r.s2 : r.s1; return `<i class="fd ${a > b ? 'm' : 'k'}"></i>`; }).join('');
 function klasemen(M) {
-  const baris = tabel(M).map((x, n) => `<tr class="${x.i === 0 ? 'saya' : ''}"><td>${n + 1}</td><td class="tn">${logoMini(M.tim[x.i].nama)+esc(M.tim[x.i].nama)}</td><td>${x.m}</td><td>${x.mn}</td><td>${x.k}</td><td>${x.sm - x.sk}</td><td><b>${x.poin}</b></td><td class="fm">${formTim(M, x.i)}</td></tr>`).join('');
+  const baris = tabel(M).map((x, n) => `<tr class="${x.i === 0 ? 'saya' : 'bisa'}" data-tim="${x.i}"><td>${n + 1}</td><td class="tn">${logoMini(M.tim[x.i].nama)+esc(M.tim[x.i].nama)}</td><td>${x.m}</td><td>${x.mn}</td><td>${x.k}</td><td>${x.sm - x.sk}</td><td><b>${x.poin}</b></td><td class="fm">${formTim(M, x.i)}</td></tr>`).join('');
   return `<section class="pengaturan"><table class="tabel"><thead><tr><th>#</th><th class="tn">Tim</th><th>M</th><th>Mn</th><th>K</th><th>Sel</th><th>Poin</th><th class="fm">Form</th></tr></thead><tbody>${baris}</tbody></table></section>`;
 }
 function jadwal(M) {
@@ -42,20 +43,26 @@ function grafikRank(A, total, jumlahTim) {
   const sb = A.L.map((x, i) => `<text x="${X(i).toFixed(1)}" y="${H - 2}" text-anchor="middle" class="gs">${x.h + 1}</text>`).join('');
   return `<svg class="grafik" viewBox="0 0 ${W} ${H}" role="img" aria-label="Peringkat per pekan">${kisi}<path d="${garis}" class="gl"/>${titik}${sb}</svg>`;
 }
+function riwayatMusim(S) {
+  const R = S.riwayat.slice(-10); if (!R.length) return `<section class="pengaturan"><h2>Lintas musim</h2><small class="redup">Grafik muncul setelah musim pertama selesai.</small></section>`;
+  const W = 320, H = 120, w = W / 10, h = 80, bar = R.map((r, n) => { const t = (9 - r.rank) / 8 * h, x = n * w + 5; return `<rect x="${x}" y="${16 + h - t}" width="${w - 10}" height="${t}" rx="3" fill="${r.naik ? 'var(--baik)' : r.turun ? 'var(--kritis)' : 'var(--bola)'}"/><text x="${x + (w - 10) / 2}" y="${12 + h - t}" text-anchor="middle" class="gv">${r.rank}</text><text x="${x + (w - 10) / 2}" y="${H - 4}" text-anchor="middle" class="gs">M${r.ke}</text>`; }).join('');
+  return `<section class="pengaturan"><h2>Peringkat tiap musim</h2><svg class="grafik" viewBox="0 0 ${W} ${H}" role="img" aria-label="Peringkat tiap musim">${bar}</svg><div class="rw-daftar">${S.riwayat.slice().reverse().map(r => `<div><b>Musim ${r.ke}</b><span>${LIGA[r.liga]}</span><em>#${r.rank} · ${r.poin ?? '-'} poin</em><i class="${r.naik ? 'm' : r.turun ? 'k' : ''}">${r.naik ? 'Promosi' : r.turun ? 'Degradasi' : 'Bertahan'}</i></div>`).join('')}</div></section>`;
+}
 function analitikTab(M, S) {
   const A = analitik(M), K = S.manajer;
-  if (!A.n) return `<section class="pengaturan"><small>Belum ada laga musim ini. Mainkan laga pertama untuk melihat grafik.</small></section>`;
+  if (!A.n) return `<section class="pengaturan"><small>Belum ada laga musim ini. Mainkan laga pertama untuk melihat grafik.</small></section>${riwayatMusim(S)}`;
   const st = A.streak, karier = K.main ? Math.round(K.menang / K.main * 100) : 0;
   return `<section class="pengaturan"><h2>Win rate musim ini</h2><div class="wr-baris">${cincin(A.winRate, 'var(--baik)')}<div class="wr-ket"><div><b class="m">${A.mn}</b> menang</div><div><b class="k">${A.kalah}</b> kalah</div><div class="redup">${st ? `${st.n} ${st.menang ? 'menang' : 'kalah'} beruntun` : ''}</div></div></div></section>
 <section class="pengaturan"><h2>Poin per pekan</h2>${grafikPoin(A, M.jadwal.length)}</section>
 <section class="pengaturan"><h2>Peringkat per pekan</h2>${grafikRank(A, M.jadwal.length, M.tim.length)}</section>
-<section class="pengaturan"><h2>Statistik</h2><div class="km-statistik"><div><b>${A.setRate}%</b><span>Set menang</span></div><div><b>${A.sm}-${A.sk}</b><span>Set</span></div><div><b>${A.rataPoin}</b><span>Poin/laga</span></div><div><b>${karier}%</b><span>Karier</span></div></div></section>`;
+<section class="pengaturan"><h2>Statistik</h2><div class="km-statistik"><div><b>${A.setRate}%</b><span>Set menang</span></div><div><b>${A.sm}-${A.sk}</b><span>Set</span></div><div><b>${A.rataPoin}</b><span>Poin/laga</span></div><div><b>${karier}%</b><span>Karier</span></div></div></section>${riwayatMusim(S)}`;
 }
 export function renderLiga(root, S, aksi) {
   const M = S.musim, selesai = M.hari >= M.jadwal.length;
   const isi = sub === 'jadwal' ? jadwal(M) : sub === 'analitik' ? analitikTab(M, S) : klasemen(M);
   root.innerHTML = `<div class="tab-sub">${Object.entries(SUB).map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-sub="${k}">${n}</button>`).join('')}</div>${isi}${selesai ? `<button class="tombol-besar" id="baru">${ikon('trofi', 30)}</button>` : ''}`;
   root.querySelector('.tab-sub').onclick = e => { const b = e.target.closest('[data-sub]'); if (b) { sub = b.dataset.sub; renderLiga(root, S, aksi); } };
+  root.querySelectorAll('tr[data-tim]').forEach(r => { if (r.dataset.tim !== '0') r.onclick = () => bukaTimLawan(S.musim, +r.dataset.tim, sekarang()); });
   const b = root.querySelector('#baru');
   if (b) b.onclick = () => { const r = akhiriMusim(S, sekarang()); aksi.simpan(); aksi.perbaruiKoin(); alert(`Peringkat ${r.rank}. Hadiah ${r.koin} koin. ${r.ket}. Musim baru dimulai!`); renderLiga(root, S, aksi); };
 }

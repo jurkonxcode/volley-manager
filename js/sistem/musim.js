@@ -5,7 +5,7 @@ import { hadiahPertandingan } from './ekonomi.js';
 import { cederaLaga } from './pasar.js';
 import { expPertandingan, catatHasil } from './manajer.js';
 import { namaKlub } from '../data/negara.js';
-import { akhirLaga, pesan, buatSponsor } from './klub.js';
+import { akhirLaga, pesan, buatSponsor, pastikanKontrak, kontrakSelesai } from './klub.js';
 const NAMA = ['Elang Sakti', 'Badai Timur', 'Macan Putih', 'Naga Laut', 'Rajawali', 'Banteng Muda', 'Cakra Biru'];
 export const LIGA = ['Liga Kelurahan', 'Liga Kota', 'Liga Provinsi', 'Liga Nasional'];
 const jepit = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -66,9 +66,10 @@ export function tabel(M) {
 export function akhiriMusim(S, now) {
   const rank = tabel(S.musim).findIndex(x => x.i === 0) + 1, koin = K.musim.hadiahPeringkat[rank - 1] || 100;
   const M = S.musim, sp = S.klub.sponsor, ok = rank <= sp.target, bonus = ok ? sp.bonus : 0, liga = rank <= 2 && M.liga < LIGA.length - 1 ? M.liga + 1 : rank >= 7 && M.liga > 0 ? M.liga - 1 : M.liga;
-  S.koin += koin + bonus; S.riwayat.push({ ke: M.ke, liga: M.liga, rank, naik: liga > M.liga, turun: liga < M.liga });
-  S.klub.sponsor = buatSponsor(liga, rank);
-  const ket = liga > M.liga ? 'Promosi ke ' + LIGA[liga] : liga < M.liga ? 'Degradasi ke ' + LIGA[liga] : 'Bertahan di ' + LIGA[liga];
+  S.koin += koin + bonus; S.riwayat.push({ ke: M.ke, liga: M.liga, rank, poin: tabel(M).find(x => x.i === 0).poin, naik: liga > M.liga, turun: liga < M.liga });
+  S.klub.sponsor = buatSponsor(liga, rank); pastikanKontrak(S); const kt = kontrakSelesai(S, now);
+  let ket = liga > M.liga ? 'Promosi ke ' + LIGA[liga] : liga < M.liga ? 'Degradasi ke ' + LIGA[liga] : 'Bertahan di ' + LIGA[liga];
+  if (kt.pergi.length) ket += `. ${kt.pergi.length} pemain habis kontrak dan pergi`;
   pesan(S, `Musim ${M.ke} selesai: peringkat ${rank}`, ket + (ok ? `. Target sponsor tercapai, bonus ${bonus} koin.` : `. Target sponsor (peringkat ${sp.target}) belum tercapai.`));
   S.musim = buatMusim(M.ke + 1, S.manajer.tim, now, S.negara, liga);
   return { rank, koin: koin + bonus, ket };

@@ -59,7 +59,7 @@ export function renderSkuad(root, S, aksi, opsi = {}) {
     const b = e.target.closest('[data-kartu]');
     if (!b) return;
     const p = cari(b.dataset.kartu);
-    if (p) bukaKartu(p, sekarang());
+    if (p) bukaKartu(p, sekarang(), S, aksi);
   };
   pasangTukar(root, S, {
     saatFokus: id => { fokusId = id; root.querySelector('#detail').innerHTML = detailHtml(cari(id), sekarang()); },

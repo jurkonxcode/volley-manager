@@ -51,7 +51,7 @@ function rakitRenderer() {
   kunci.shadow.bias = -0.00018; sc.add(kunci);
   const isi = new T.DirectionalLight(0x83baff, .85); isi.position.set(8, 12, -10); sc.add(isi);
   const rim = new T.DirectionalLight(0xffd28a, .55); rim.position.set(0, 10, 15); sc.add(rim);
-  sc.add(createArena(T, { woodColor: 0xE0914A }));
+  const arena = createArena(T, { sponsor: ['GARUDA MUDA', 'VOLLEY MANAGER', 'KOPI NUSANTARA', 'BANK GARUDA', 'SINAR MOTOR', 'TELKO PRIMA'] }); sc.add(arena); sc.userData.arena = arena;
   bola = createVolleyball(T, { radius: .22 }); bola.scale.setScalar(1.7); bola.castShadow = true; sc.add(bola);
 }
 
@@ -97,6 +97,7 @@ function putar(now) {
   for (let i = efek.length - 1; i >= 0; i--) if (!efek[i].userData.update(dt)) { sc.remove(efek[i]); buang(efek[i]); efek.splice(i, 1); }
   for (const t of ['A', 'B']) for (const g of pemain[t]) g.userData.mixer?.update(dt);
   bola.rotation.x += dt * 8; bola.rotation.z += dt * 5;
+  sc.userData.arena?.userData.update?.(dt);
   R.render(sc, cam);
 }
 const anim = (d, f, tunda = 0, mulai = null) => { const w = { t: 0, d, f, tunda, mulai }; tween.push(w); return w; };
@@ -118,6 +119,7 @@ const pil = a => a[Math.floor(Math.random() * a.length)];
 // Reli digambar bertahap: servis -> terima -> umpan -> serangan -> bola mendarat, supaya terbaca seperti pertandingan sungguhan.
 let reliId = 0;
 export function reli(r, k = 1) {
+  if (sc?.userData.arena) sc.userData.arena.userData.hype = 1;
   if (!R || !wadah) return;
   const my = ++reliId, batal = () => my !== reliId;
   const sk = r.a ? 'A' : 'B', ls = r.a ? 'B' : 'A', arah = r.a ? 1 : -1;   // arah +1: bola menuju sisi B (+X)

@@ -1,6 +1,8 @@
 // Keadaan klub di luar lapangan: fans, sponsor, ekonomi mingguan, pesan, pencapaian, ganti negara. Logika murni.
 import { gajiPemain, ratingPemain } from './pemain.js';
 import { buatAcak } from '../inti/acak.js';
+import { K } from '../inti/konfigurasi.js';
+import { autoSusun } from './taktik.js';
 import { namaOrang, asalOrang } from '../data/negara.js';
 const SPONSOR = ['Kopi Nusantara', 'Bank Garuda', 'Sinar Motor', 'Telko Prima', 'Aqua Jaya', 'Toko Bintang'];
 export const CAPAI = [
@@ -31,4 +33,19 @@ export function akhirLaga(S, f, menang, level, h) {
 export function gantiNegara(S, neg) {
   S.negara = neg;
   S.skuad.forEach(p => { const a = buatAcak([...p.id].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7) + neg.charCodeAt(0)); p.nama = namaOrang(neg, a); p.neg = neg; p.asal = asalOrang(neg, a); });
+}
+
+// Kontrak dihitung dalam musim (kM = musim terakhir kontrak). Pemain yang kontraknya habis pergi saat musim berakhir, kecuali skuad tinggal minimal.
+const hashId = s => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+export function pastikanKontrak(S) { S.skuad.forEach(p => { p.kM ??= S.musim.ke + hashId(p.id) % 3; }); }
+export const biayaPerpanjang = p => Math.round(gajiPemain(p) * 0.7);
+export function perpanjang(S, p) {
+  const b = biayaPerpanjang(p); if (S.koin < b) return 'Koin tidak cukup (' + b + ' koin).';
+  S.koin -= b; p.kM = Math.max(p.kM, S.musim.ke) + 2; pesan(S, 'Kontrak diperpanjang', `${p.nama} bertahan sampai musim ${p.kM}.`); return null;
+}
+export function kontrakSelesai(S, now) {
+  const ke = S.musim.ke, pergi = [];
+  S.skuad.filter(p => p.kM <= ke).forEach(p => { if (S.skuad.length - pergi.length > K.pasar.minSkuad) pergi.push(p); else p.kM = ke + 1; });
+  if (pergi.length) { S.skuad = S.skuad.filter(p => !pergi.includes(p)); S.susunan = autoSusun(S, now); }
+  return { pergi: pergi.map(p => p.nama) };
 }
