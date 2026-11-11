@@ -16,6 +16,8 @@ const tunggu = ms => new Promise(r => setTimeout(r, ms));
 
 export function renderPertandingan(root, S, aksi) {
   token++;
+  // Pekan laga ini sudah lewat dan dimainkan otomatis (kejar) saat pindah tab: buang laga lama agar hasilnya tidak tercatat ke lawan lain.
+  if (P.m && P.fase === 'siap' && P.hari !== S.musim.hari) P = baru();
   if (P.fase === 'pilih') return tampilPilih(root, S, aksi);
   if (P.fase === 'selesai') return tampilSelesai(root, S, aksi);
   tampilLapangan(root, S, aksi);
@@ -29,7 +31,7 @@ function tampilPilih(root, S, aksi) {
   root.innerHTML = `<div class="kuat-saya">${ikon('smash', 30)}<span>${saya}</span></div><div class="lawan-kartu"><b class="nama-lawan">${lw.nama}</b><span class="deret">${tim.map(p => figur(p, 'B', now)).join('')}</span><span class="kuat">${ikon('smash', 20)}<span>${Math.round(kekuatanTim(tim, now))}</span></span></div>` +
     (now >= buka ? `<button class="tombol-besar" id="mulai" aria-label="Mulai">${ikon('main', 30)}</button>` : `<div class="kuat-saya">${ikon('jam', 26)}<span>${durasiPendek(buka - now)}</span></div>`);
   const mb = root.querySelector('#mulai');
-  if (mb) mb.onclick = () => { bersihkanSusunan(S, sekarang()); P.level = level; P.m = buatPertandingan(S.skuad, S.susunan, tim, level, S.taktik); P.fase = 'siap'; P.skor = { a: 0, b: 0 }; renderPertandingan(root, S, aksi); };
+  if (mb) mb.onclick = () => { bersihkanSusunan(S, sekarang()); P.level = level; P.hari = f.hari; P.m = buatPertandingan(S.skuad, S.susunan, tim, level, S.taktik); P.fase = 'siap'; P.skor = { a: 0, b: 0 }; renderPertandingan(root, S, aksi); };
 }
 
 // Pergantian di jeda antar-set: pemain di susunan yang tidak main di set terakhir. Dibatasi K.ganti.maks.
@@ -139,7 +141,8 @@ async function mainkan(root, S, aksi) {
   const now = sekarang(), hasil = mainkanSet(P.m, buatAcak(now), now);
   const akhir = () => {
     P.skor = { a: hasil.a, b: hasil.b };
-    if (P.m.selesai) { const r = catatLaga(S, P.m.setSaya, P.m.setLawan); P.hasil = { koin: r.koin, exp: r.exp, naik: r.naik, cedera: r.cedera }; P.fase = 'selesai'; }
+    if (P.m.selesai && P.hari !== S.musim.hari) P = baru();   // pekannya sudah dimainkan otomatis selagi laga ini berjalan: jangan dicatat dua kali
+    else if (P.m.selesai) { const r = catatLaga(S, P.m.setSaya, P.m.setLawan); P.hasil = { koin: r.koin, exp: r.exp, naik: r.naik, cedera: r.cedera }; P.fase = 'selesai'; }
     else P.fase = 'siap';
     aksi.simpan(); aksi.perbaruiKoin();
     if (root.dataset.layar === 'tanding') renderPertandingan(root, S, aksi);

@@ -1,0 +1,17 @@
+{
+  "project": "Volley Manager",
+  "version": "15.0-3d-premium-procedural",
+  "engine": "Three.js 0.160.0",
+  "runtime": "Vanilla JavaScript ES Modules",
+  "assets": [
+    {"path":"js/tiga-d/arena.js","type":"procedural-3d-scene","description":"Indoor arena, parquet court, court markings, net, referee stand, LED boards, tiered stands, instanced seats and crowd, roof trusses."},
+    {"path":"js/tiga-d/player.js","type":"procedural-3d-character","description":"Stylized-realistic volleyball athlete mesh with uniform, limbs, face, hair, shoes, and jersey number texture."},
+    {"path":"js/tiga-d/volleyball.js","type":"procedural-3d-prop","description":"Volleyball shell with curved panel seams."},
+    {"path":"js/tiga-d/effects.js","type":"procedural-3d-effects","description":"Spike impact and landing dust particle effects."},
+    {"path":"js/layar/arena3d.js","type":"renderer-integration","description":"Mobile-tuned Three.js renderer, isometric camera, lighting and rally animation integration."}
+  ],
+  "external_assets_required": false,
+  "uses_existing_three_cdn": true,
+  "mobile_notes": {"max_pixel_ratio": 1.35, "instanced_crowd": true, "crowd_cast_shadows": false},
+  "limitations": ["Player models are procedural meshes, not rigged GLB.", "Current character animation uses group-level movement, not skeletal animation.", "Final GPU rendering must be verified on target Android devices over HTTPS."]
+}

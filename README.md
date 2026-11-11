@@ -16,6 +16,9 @@ Unggah seluruh isi folder ke repo GitHub, lalu aktifkan **Settings → Pages**. 
 ## Menyeimbangkan game
 Semua angka ada di `js/inti/konfigurasi.js`: laju pulih stamina, biaya per posisi, peluang poin, hadiah koin.
 
+## Mode 3D Premium (v15, audit v15.1)
+Mode pertandingan 3D memakai arena indoor procedural dengan lantai parquet, net berjaring, tribun, crowd instanced, LED perimeter, rangka atap, pemain procedural lebih detail, bola dengan panel, dan pencahayaan sinematik yang dioptimalkan untuk HP. Detail pemasangan dan batasan model ada di `docs/V15_3D_PREMIUM_UPGRADE.md`.
+
 ## Sudah ada
 Menu utama, Kelola Tim bertab (Skuad/Strategi/Formasi/Pasar), liga 8 tim + Kompetisi bertab (klasemen, jadwal, analitik dengan grafik performa dan win rate), laga live berperspektif dengan pemain berpose, transfer + scouting, latihan, fasilitas, cedera, profil pemain & manajer.
 

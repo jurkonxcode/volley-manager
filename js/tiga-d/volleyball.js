@@ -1,14 +1,17 @@
+// Detailed volleyball with curved panel seams and a subtle glossy finish.
 export function createVolleyball(THREE, options = {}) {
-  const ball = new THREE.Mesh(
-    new THREE.SphereGeometry(options.radius ?? 0.22, 24, 18),
-    new THREE.MeshStandardMaterial({ color: 0xf4c847, roughness: 0.38, metalness: 0.02 })
-  );
-  ball.name = "VolleyManagerBall";
-  const bluePanel = new THREE.Mesh(
-    new THREE.TorusGeometry((options.radius ?? 0.22) * 0.72, 0.025, 6, 32),
-    new THREE.MeshStandardMaterial({ color: 0x1c5ca4, roughness: 0.42 })
-  );
-  bluePanel.rotation.x = Math.PI / 2;
-  ball.add(bluePanel);
+  const radius=options.radius??.22;
+  const ball=new THREE.Group();ball.name='VolleyManagerProBall';
+  const shell=new THREE.Mesh(new THREE.SphereGeometry(radius,32,24),new THREE.MeshStandardMaterial({color:0xf4f1df,roughness:.34,metalness:.015}));
+  shell.castShadow=true;shell.receiveShadow=true;ball.add(shell);
+  const blue=new THREE.MeshStandardMaterial({color:0x1765b4,roughness:.4});
+  const gold=new THREE.MeshStandardMaterial({color:0xf2c33c,roughness:.38});
+  // Curved seam arcs on the spherical surface.
+  for(let i=0;i<3;i++){
+    const arc=new THREE.Mesh(new THREE.TorusGeometry(radius*.79,.012,6,48,Math.PI*1.42),i===1?gold:blue);
+    arc.rotation.set(Math.PI/2+i*.72,.25+i*.85,.2+i*.55);ball.add(arc);
+  }
+  const center=new THREE.Mesh(new THREE.SphereGeometry(radius*.16,12,10),gold);center.position.set(0,radius*.96,0);ball.add(center);
+  ball.userData.radius=radius;
   return ball;
 }
