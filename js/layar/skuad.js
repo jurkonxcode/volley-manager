@@ -1,4 +1,5 @@
 import { kartuMini, figur, radar, chipStat, ikon } from './gambar.js';
+import { bukaKartu } from './kartu-pemain.js';
 import { sekarang, durasiPendek } from '../inti/waktu.js';
 import { ratingPemain } from '../sistem/pemain.js';
 import { staminaSekarang, zonaStamina, menitPulihPenuh } from '../sistem/stamina.js';
@@ -32,7 +33,8 @@ function detailHtml(p, now) {
 ${radar(p)}${chipStat(p)}
 <div class="baris-info">${ikon('jam', 20)}<div class="batang zona-${zonaStamina(s)}"><i style="width:${s.toFixed(0)}%"></i></div><b>${pulih > 0 ? durasiPendek(pulih) : '100'}</b></div>
 <div class="baris-info">${ikon('jantung', 20)}<div class="batang tahan"><i style="width:${p.tahan}%"></i></div><b>${p.tahan}</b></div>
-<div class="baris-info">${ikon('bintang', 20)}<div class="batang potensi"><i style="width:${r}%"></i><u style="left:${p.potensi}%"></u></div><b>${p.potensi}</b></div>`;
+<div class="baris-info">${ikon('bintang', 20)}<div class="batang potensi"><i style="width:${r}%"></i><u style="left:${p.potensi}%"></u></div><b>${p.potensi}</b></div>
+<button class="tombol-kecil" data-kartu="${p.id}">${ikon('orang', 18)} Profil lengkap</button>`;
 }
 
 export function renderSkuad(root, S, aksi) {
@@ -43,6 +45,13 @@ export function renderSkuad(root, S, aksi) {
   root.innerHTML = `<div class="lapangan"><div class="jaring"></div><div class="arena"><div class="separuh">${baris(lap.slice(0, 3))}${baris(lap.slice(3))}</div></div></div>
 <div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div>
 <section class="detail" id="detail">${detailHtml(cari(fokusId), now)}</section>`;
+  // Tombol "Profil lengkap" di panel detail: didengar sekali di akar, jadi tidak menumpuk.
+  root.onclick = e => {
+    const b = e.target.closest('[data-kartu]');
+    if (!b) return;
+    const p = cari(b.dataset.kartu);
+    if (p) bukaKartu(p, sekarang());
+  };
   pasangTukar(root, S, {
     saatFokus: id => { fokusId = id; root.querySelector('#detail').innerHTML = detailHtml(cari(id), sekarang()); },
     saatUbah: () => { aksi.simpan(); renderSkuad(root, S, aksi); }

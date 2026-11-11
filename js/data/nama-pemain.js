@@ -1,2 +1,4 @@
 export const NAMA_DEPAN = ['Rizky','Dimas','Bagas','Fajar','Arif','Yoga','Wahyu','Eko','Rama','Andi','Tegar','Bayu','Galih','Joko','Dani','Reza'];
 export const NAMA_BELAKANG = ['Pratama','Saputra','Wijaya','Kurniawan','Santoso','Hidayat','Nugroho','Setiawan','Firmansyah','Ramadhan','Permana','Utomo','Maulana','Lestari','Siregar','Hakim'];
+export const ASAL = ['Bandung, Jawa Barat','Surabaya, Jawa Timur','Yogyakarta','Semarang, Jawa Tengah','Medan, Sumatera Utara','Palembang, Sumatera Selatan','Makassar, Sulawesi Selatan','Denpasar, Bali','Malang, Jawa Timur','Padang, Sumatera Barat','Balikpapan, Kalimantan Timur','Manado, Sulawesi Utara','Kupang, NTT','Jayapura, Papua'];
+export const SIFAT = ['Pekerja Keras','Pemimpin','Tenang','Ambisius','Pemberani','Disiplin','Humoris','Pemalu','Perfeksionis','Pejuang'];

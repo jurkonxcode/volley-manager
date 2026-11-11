@@ -23,7 +23,8 @@ const IKON = {
   bintang: '<path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.500 20.200l1-6.200L3 9.600l6.200-.900z"/>',
   jantung: '<path d="M12 20s-7-4.500-7-10a4 4 0 017-2.500A4 4 0 0119 10c0 5.500-7 10-7 10z"/>',
   hapus: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
-  kembali: '<path d="M15 5l-7 7 7 7"/>'
+  kembali: '<path d="M15 5l-7 7 7 7"/>',
+  orang: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>'
 };
 export function ikon(nama, u = 20) {
   return `<svg class="ikon" width="${u}" height="${u}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IKON[nama] || ''}</svg>`;
@@ -66,3 +67,5 @@ export function radar(p) {
 export function chipStat(p) {
   return `<ul class="chip-stat">${URUTAN_STAT.map(st => `<li style="--w:${WARNA_STAT[st]}">${ikon(st, 16)}<b>${p[st]}</b></li>`).join('')}</ul>`;
 }
+
+export const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);

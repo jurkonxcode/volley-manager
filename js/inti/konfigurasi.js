@@ -6,6 +6,8 @@ export const K = {
   skalaPeluang: 0.006, peluangMin: 0.2, peluangMaks: 0.8,
   hadiah: { menang: 100, kalah: 30, perLevel: 40 },
   skuadAwal: { koin: 500, tingkat: 44 },
+  exp: { dasar: 100, tambahPerLevel: 40, menang: 50, kalah: 20, perLevelLawan: 15 },
+  manajer: { namaAwal: 'Manajer Baru', timAwal: 'Garuda Muda' },
   warnaPosisi: { S: '#8E7CF0', OH: '#F4C430', MB: '#46C17B', OP: '#EF5B4A', L: '#4DB6E8' },
   kunciSimpan: 'volley-manager-v1'
 };

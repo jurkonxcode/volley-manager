@@ -83,3 +83,53 @@ button.kartu:active{transform:scale(.95)}
 .rincian span{padding:4px 10px;border-radius:12px;background:var(--panel);font-weight:700}
 .rincian .m{color:var(--baik)}.rincian .k{color:var(--kritis)}
 .hadiah{display:flex;gap:8px;align-items:center;color:var(--bola);font-size:34px;font-weight:700}
+/* tombol kecil & lembar detail */
+.tombol-kecil{display:flex;gap:6px;align-items:center;justify-content:center;height:40px;border-radius:20px;background:var(--panel-2);color:var(--teks);font-size:15px;font-weight:700}
+/* kartu lengkap pemain (lembar di atas layar) */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(5,12,22,.72)}
+.kartu-lengkap{position:relative;width:100%;max-width:420px;max-height:92dvh;overflow-y:auto;display:grid;gap:12px;padding:16px;background:var(--panel);border-radius:var(--r);border-top:4px solid var(--w)}
+.kartu-lengkap .tutup{position:absolute;top:10px;right:10px;display:grid;place-items:center;width:36px;height:36px;border-radius:18px;background:var(--panel-2);color:var(--redup)}
+.kl-kepala{display:flex;align-items:center;gap:12px;padding-right:20px}
+.kl-kepala .figur{width:76px;height:76px;flex:none}
+.kl-kepala .rating-besar{font-size:44px}
+.kl-nama{font-size:21px;font-weight:700}
+.kl-kepala .sub{display:flex;gap:8px;align-items:center;color:var(--redup);margin-top:2px}
+.kl-kepala .lencana{position:static}
+.kl-sifat{margin-top:4px;font-size:14px;color:var(--bola)}
+.data-diri{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sel{display:grid;gap:2px;padding:8px 10px;border-radius:10px;background:var(--panel-2);min-width:0}
+.sel span{font-size:12px;color:var(--redup)}
+.sel b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kl-batang{display:grid;gap:10px}
+/* hasil pertandingan: EXP */
+.hadiah.exp{color:var(--teks);font-size:24px;flex-wrap:wrap;justify-content:center}
+.hadiah.exp b{color:var(--baik)}
+.naik{padding:4px 10px;border-radius:12px;background:var(--bola);color:var(--malam);font-size:15px;font-weight:700}
+/* profil manajer */
+.kartu-manajer{display:grid;gap:14px;margin-top:6px;padding:16px;background:var(--panel);border-radius:var(--r);border-top:4px solid var(--bola)}
+.km-kepala{display:flex;align-items:center;gap:12px}
+.km-avatar{display:grid;place-items:center;flex:none;width:64px;height:64px;border-radius:50%;background:var(--panel-2);border:3px solid var(--bola);font-size:28px;font-weight:700;color:var(--bola)}
+.km-id{min-width:0;flex:1}
+.km-nama{font-size:22px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.km-tim{display:flex;gap:6px;align-items:center;color:var(--redup);margin-top:2px;min-width:0}
+.km-tim span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.km-level{display:grid;justify-items:center;padding:6px 12px;border-radius:12px;background:var(--bola);color:var(--malam)}
+.km-level small{font-size:12px;font-weight:700}
+.km-level b{font-size:30px;line-height:1}
+.baris-exp{display:flex;justify-content:space-between;color:var(--redup);font-size:14px}
+.baris-exp b{color:var(--teks)}
+.exp-batang{height:12px;margin-top:6px}
+.exp-batang i{background:var(--bola)}
+.km-statistik{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.km-statistik div{display:grid;justify-items:center;padding:8px 0;border-radius:10px;background:var(--panel-2)}
+.km-statistik b{font-size:20px}
+.km-statistik span{font-size:12px;color:var(--redup)}
+.km-statistik .m{color:var(--baik)}
+.km-statistik .k{color:var(--kritis)}
+/* pengaturan */
+.pengaturan{margin-top:16px;display:grid;gap:12px;padding:16px;background:var(--panel);border-radius:var(--r)}
+.pengaturan h2{font-size:18px;color:var(--redup);font-weight:700}
+.isian{display:grid;gap:6px;color:var(--redup);font-size:14px}
+.isian input{height:44px;padding:0 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--garis);color:var(--teks);font:inherit;font-size:17px}
+.saklar{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:16px}
+.saklar input{width:44px;height:26px;accent-color:var(--bola)}

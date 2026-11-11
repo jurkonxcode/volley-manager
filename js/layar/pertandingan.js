@@ -6,6 +6,7 @@ import { K } from '../inti/konfigurasi.js';
 import { buatPertandingan, mainkanSet, timSaya, kekuatanTim } from '../sistem/pertandingan.js';
 import { buatLawan } from '../sistem/liga.js';
 import { hadiahPertandingan } from '../sistem/ekonomi.js';
+import { expPertandingan, catatHasil } from '../sistem/manajer.js';
 
 let P = baru(), token = 0;
 function baru() { return { fase: 'pilih', m: null, level: 0, lawan: null, skor: { a: 0, b: 0 }, hasil: null, cepat: false }; }
@@ -69,12 +70,12 @@ function gambarRally(root, r, a, b) {
 }
 
 async function mainkan(root, S, aksi) {
-  const saya = ++token; P.fase = 'main'; P.cepat = false;
+  const saya = ++token; P.fase = 'main'; P.cepat = !!S.pengaturan?.animasiCepat;
   tampilLapangan(root, S, aksi);
   const now = sekarang(), hasil = mainkanSet(P.m, buatAcak(now), now);
   const akhir = () => {
     P.skor = { a: hasil.a, b: hasil.b };
-    if (P.m.selesai) { const h = hadiahPertandingan(P.m.pemenang === 'saya', P.level); S.koin += h; P.hasil = { koin: h }; P.fase = 'selesai'; }
+    if (P.m.selesai) { const menang = P.m.pemenang === 'saya', h = hadiahPertandingan(menang, P.level), xp = expPertandingan(menang, P.level); S.koin += h; const naik = catatHasil(S.manajer, menang, xp); P.hasil = { koin: h, exp: xp, naik }; P.fase = 'selesai'; }
     else P.fase = 'siap';
     aksi.simpan(); aksi.perbaruiKoin();
     if (root.dataset.layar === 'tanding') renderPertandingan(root, S, aksi);
@@ -93,7 +94,7 @@ function tampilSelesai(root, S, aksi) {
   root.innerHTML = `<div class="hasil ${menang ? 'menang' : 'kalah'}">${ikon(menang ? 'trofi' : 'silang', 80)}
 <div class="skor-akhir"><b>${m.setSaya}</b><span>-</span><b>${m.setLawan}</b></div>
 <div class="rincian">${m.riwayat.map(r => `<span class="${r.a > r.b ? 'm' : 'k'}">${r.a}-${r.b}</span>`).join('')}</div>
-<div class="hadiah">${ikon('koin', 32)}<b>+${P.hasil.koin}</b></div></div>
+<div class="hadiah">${ikon('koin', 32)}<b>+${P.hasil.koin}</b></div><div class="hadiah exp">${ikon('bintang', 26)}<b>+${P.hasil.exp} EXP</b>${P.hasil.naik ? `<span class="naik">Level ${P.hasil.naik}!</span>` : ''}</div></div>
 <button class="tombol-besar" id="lagi" aria-label="Main lagi">${ikon('ulang', 30)}</button>`;
   root.querySelector('#lagi').onclick = () => { P = baru(); renderPertandingan(root, S, aksi); };
 }

@@ -4,6 +4,6 @@
 .koin{display:flex;gap:6px;align-items:center;font-weight:700;font-size:22px;color:var(--bola)}
 #reset{justify-self:end;opacity:.45}
 #layar{overflow-y:auto;padding:4px 14px 20px}
-.nav{display:grid;grid-template-columns:1fr 1fr;background:var(--panel);border-top:1px solid var(--garis);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav{display:grid;grid-template-columns:repeat(3,1fr);background:var(--panel);border-top:1px solid var(--garis);padding-bottom:env(safe-area-inset-bottom,0px)}
 .nav button{display:grid;place-items:center;height:58px;color:var(--redup)}
 .nav button[aria-current="true"]{color:var(--bola);box-shadow:inset 0 3px var(--bola)}

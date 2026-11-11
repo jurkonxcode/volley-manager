@@ -14,5 +14,10 @@ Unggah seluruh isi folder ke repo GitHub, lalu aktifkan **Settings → Pages**. 
 ## Menyeimbangkan game
 Semua angka ada di `js/inti/konfigurasi.js`: laju pulih stamina, biaya per posisi, peluang poin, hadiah koin.
 
+## Sudah ada
+- Profil pemain lengkap (tinggi, berat, asal, sifat, kontrak, gaji, nilai pasar), dibuka dari panel detail skuad
+- Profil manajer: nama, nama tim, level, EXP, statistik, dan pengaturan
+- EXP dari setiap pertandingan, dengan notifikasi kenaikan level
+
 ## Tahap berikutnya
 Rekrut + scouting, basecamp (upgrade waktu nyata), jenjang liga naik, cedera.
