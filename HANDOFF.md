@@ -12,12 +12,13 @@ Catatan serah-terima: apa yang sudah ada, bagaimana strukturnya, dan jebakan yan
 | v6 | Realisme level 1: lapangan berperspektif, jaring berdiri, bola melambung (`css/realistis.css`) |
 | v7 | Realisme level 2: pemain berbadan penuh + pose (smash/blok/servis/receive); perbaikan kotak kuning di skor dan rating terpotong |
 | v8 | Menu utama (profil + hero + Mulai Game + daftar menu), Kelola Tim bertab (Skuad/Strategi/Formasi/Pasar), navigasi jadi 5 tab, HANDOFF.md |
+| v9 | Kompetisi bertab (Klasemen/Jadwal/Analitik): cincin win rate, grafik poin per pekan, grafik peringkat per pekan, statistik set; menu Beranda +Analitik |
 
 ## Struktur
 - `js/inti/` konfigurasi (semua angka keseimbangan di `konfigurasi.js`), waktu, simpan (localStorage, kunci `volley-manager-v2`, `versi: 2`), acak ber-seed
-- `js/sistem/` logika murni tanpa HTML: pemain, stamina, pertandingan, musim (liga/jadwal/klasemen), taktik, pasar (transfer/latihan/fasilitas/cedera), manajer, ekonomi
-- `js/layar/` tampilan: klub (beranda + liga), tim (Kelola Tim), skuad, pasar, pertandingan, profil, kartu-pemain, gambar (ikon + avatar + badan SVG)
-- `css/` dasar, tata-letak, komponen, tambahan, tema, realistis, menu (dimuat berurutan; yang belakang menimpa)
+- `js/sistem/` logika murni tanpa HTML: analitik (statistik + data grafik dari `musim.hasil`), pemain, stamina, pertandingan, musim (liga/jadwal/klasemen), taktik, pasar (transfer/latihan/fasilitas/cedera), manajer, ekonomi
+- `js/layar/` tampilan: klub (beranda), kompetisi (klasemen/jadwal/analitik, grafik SVG), tim (Kelola Tim), skuad, pasar, pertandingan, profil, kartu-pemain, gambar (ikon + avatar + badan SVG)
+- `css/` dasar, tata-letak, komponen, tambahan, tema, realistis, menu, kompetisi (dimuat berurutan; yang belakang menimpa)
 - Semua renderer berbentuk `render*(root, S, aksi)`. `aksi` = `simpan`, `perbaruiKoin`, `pindah(tab)`, `reset`.
 
 ## Bentuk state `S`
@@ -30,8 +31,11 @@ Catatan serah-terima: apa yang sudah ada, bagaimana strukturnya, dan jebakan yan
 - Pemain cedera diganti otomatis oleh `bersihkanSusunan` saat laga dimulai dan saat berpindah tab.
 - Tampilan baru belum selalu diverifikasi di browser oleh pembuatnya; cek visual di HP.
 
+- Analitik dihitung ulang dari `musim.hasil` tiap dibuka, tidak disimpan. Saat `akhiriMusim` memulai musim baru, grafik kembali kosong.
+- Sub-tab Kompetisi (`setSubLiga`) dan Kelola Tim (`setSub`) adalah dua variabel terpisah; menu Beranda memilih sesuai tujuan.
+
 ## Belum dikerjakan
-Kompetisi + Analitik (grafik, win rate), logo klub SVG, profil pemain lebih kaya, aset ilustrasi (hero, stadion), promosi/degradasi, sponsor, gaji pemain, Supabase (online).
+Analitik lintas musim (sekarang hanya musim berjalan; riwayat musim lama belum disimpan), logo klub SVG, profil pemain lebih kaya, aset ilustrasi (hero, stadion), promosi/degradasi, sponsor, gaji pemain, Supabase (online).
 
 ## Memasang (Codespace)
 ```bash

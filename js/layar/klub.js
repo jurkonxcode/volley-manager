@@ -3,14 +3,15 @@ import { ikon, esc } from './gambar.js';
 import { sekarang, durasiPendek } from '../inti/waktu.js';
 import { levelDari } from '../sistem/manajer.js';
 import { setSub } from './tim.js';
-import { tabel, fixtureSaya, kickoff, akhiriMusim } from '../sistem/musim.js';
+import { tabel, fixtureSaya, kickoff } from '../sistem/musim.js';
+import { setSubLiga } from './kompetisi.js';
 
 function hasilSaya(M) {
   return M.hasil.filter(r => r.i === 0 || r.j === 0).map(r => { const k = r.i === 0, sa = k ? r.s1 : r.s2, sb = k ? r.s2 : r.s1; return { sa, sb, lw: M.tim[k ? r.j : r.i].nama, menang: sa > sb }; });
 }
 function menuAtas(S) {
   const L = levelDari(S.manajer.exp);
-  const baris = [['tim', 'skuad', 'Kelola Tim', 'skuad'], ['tim', 'koin', 'Transfer Pemain', 'pasar'], ['liga', 'trofi', 'Peringkat', ''], ['profil', 'gerigi', 'Pengaturan', '']]
+  const baris = [['tim', 'skuad', 'Kelola Tim', 'skuad'], ['tim', 'koin', 'Transfer Pemain', 'pasar'], ['liga', 'trofi', 'Peringkat', 'klasemen'], ['liga', 'bintang', 'Analitik', 'analitik'], ['profil', 'gerigi', 'Pengaturan', '']]
     .map(([ke, ik, nama, sub]) => `<button class="menu-baris" data-ke="${ke}" ${sub ? `data-sub="${sub}"` : ''}>${ikon(ik, 22)}<span>${nama}</span>${ikon('kembali', 18)}</button>`).join('');
   return `<section class="profil-atas"><div class="km-avatar">${esc((S.manajer.nama[0] || 'M').toUpperCase())}</div><div class="pa-id"><b>${esc(S.manajer.nama)}</b><small>Level ${L.level}</small><div class="batang exp-batang"><i style="width:${L.persen.toFixed(0)}%"></i></div></div></section>
 <section class="hero"><div class="hero-bola">${ikon('bola', 72)}</div><h1>VOLLEY<br>MANAGER</h1><p>Build. Manage. Win.</p><button class="tombol-besar" data-ke="tanding">Mulai Game ${ikon('main', 22)}</button></section><div class="menu-daftar">${baris}</div>`;
@@ -26,14 +27,5 @@ export function renderBeranda(root, S, aksi) {
 <div class="km-statistik"><div><b>${me.m}</b><span>Main</span></div><div><b class="m">${me.mn}</b><span>Menang</span></div><div><b class="k">${me.k}</b><span>Kalah</span></div><div><b>${me.poin}</b><span>Poin</span></div></div></section>
 ${kartu}
 <section class="pengaturan"><h2>Hasil terakhir</h2><div class="riwayat">${riwayat.map(r => `<span class="hc ${r.menang ? 'm' : 'k'}">${r.sa}-${r.sb}<small>${esc(r.lw)}</small></span>`).join('') || '<small>Belum ada laga</small>'}</div></section>`;
-  root.querySelectorAll('[data-ke]').forEach(b => b.onclick = () => { if (b.dataset.sub) setSub(b.dataset.sub); aksi.pindah(b.dataset.ke); });
-}
-export function renderLiga(root, S, aksi) {
-  const M = S.musim, t = tabel(M), selesai = M.hari >= M.jadwal.length, pekan = Math.max(0, M.hari - 1);
-  const baris = t.map((x, n) => `<tr class="${x.i === 0 ? 'saya' : ''}"><td>${n + 1}</td><td class="tn">${esc(M.tim[x.i].nama)}</td><td>${x.m}</td><td>${x.mn}</td><td>${x.k}</td><td>${x.sm - x.sk}</td><td><b>${x.poin}</b></td></tr>`).join('');
-  const jadwal = M.jadwal[pekan].map(([i, j]) => { const r = M.hasil.find(r => r.h === pekan && r.i === i); return `<div class="jd ${i === 0 || j === 0 ? 'saya' : ''}"><span>${esc(M.tim[i].nama)}</span><b>${r ? r.s1 + ' - ' + r.s2 : '-'}</b><span>${esc(M.tim[j].nama)}</span></div>`; }).join('');
-  root.innerHTML = `<section class="pengaturan"><table class="tabel"><thead><tr><th>#</th><th class="tn">Tim</th><th>M</th><th>Mn</th><th>K</th><th>Sel</th><th>Poin</th></tr></thead><tbody>${baris}</tbody></table></section>
-<section class="pengaturan"><h2>Pekan ${pekan + 1}</h2>${jadwal}</section>${selesai ? `<button class="tombol-besar" id="baru">${ikon('trofi', 30)}</button>` : ''}`;
-  const b = root.querySelector('#baru');
-  if (b) b.onclick = () => { const r = akhiriMusim(S, sekarang()); aksi.simpan(); aksi.perbaruiKoin(); alert(`Peringkat ${r.rank}. Hadiah ${r.koin} koin. Musim baru dimulai!`); renderLiga(root, S, aksi); };
+  root.querySelectorAll('[data-ke]').forEach(b => b.onclick = () => { if (b.dataset.sub) (b.dataset.ke === 'liga' ? setSubLiga : setSub)(b.dataset.sub); aksi.pindah(b.dataset.ke); });
 }

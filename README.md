@@ -15,7 +15,7 @@ Unggah seluruh isi folder ke repo GitHub, lalu aktifkan **Settings → Pages**. 
 Semua angka ada di `js/inti/konfigurasi.js`: laju pulih stamina, biaya per posisi, peluang poin, hadiah koin.
 
 ## Sudah ada
-Menu utama, Kelola Tim bertab (Skuad/Strategi/Formasi/Pasar), liga 8 tim + klasemen, laga live berperspektif dengan pemain berpose, transfer + scouting, latihan, fasilitas, cedera, profil pemain & manajer.
+Menu utama, Kelola Tim bertab (Skuad/Strategi/Formasi/Pasar), liga 8 tim + Kompetisi bertab (klasemen, jadwal, analitik dengan grafik performa dan win rate), laga live berperspektif dengan pemain berpose, transfer + scouting, latihan, fasilitas, cedera, profil pemain & manajer.
 
 ## Riwayat & serah-terima
 Lihat `HANDOFF.md` untuk riwayat versi, struktur, jebakan, dan daftar yang belum dikerjakan.

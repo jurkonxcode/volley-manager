@@ -1,0 +1,16 @@
+/* Kompetisi: jadwal dan analitik */
+.jd3{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--garis);font-size:15px}
+.jd3:last-child{border:0}.jd3 small{color:var(--redup);font-weight:700}
+.jd3.kini{color:var(--bola)}.jd3 .belum{color:var(--redup);padding:6px 10px}
+.wr-baris{display:flex;align-items:center;gap:18px}
+.cincin-wr{width:112px;height:112px;flex:none}
+.cincin-wr .alas{fill:none;stroke:rgba(255,255,255,.14);stroke-width:10}
+.cincin-wr .isi{fill:none;stroke-width:10;stroke-linecap:round}
+.cincin-wr text{fill:var(--teks);font-size:22px;font-weight:800}
+.wr-ket{display:grid;gap:6px;font-size:16px}.wr-ket b{font-size:22px}
+.wr-ket .m{color:var(--baik)}.wr-ket .k{color:var(--kritis)}.wr-ket .redup{color:var(--redup);font-size:14px}
+.grafik{width:100%;height:auto;display:block}
+.grafik .gg{stroke:var(--garis);stroke-width:1}
+.grafik .gl{fill:none;stroke:var(--bola);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.grafik .gs{fill:var(--redup);font-size:9px}
+.grafik .gv{fill:var(--teks);font-size:10px;font-weight:700}
