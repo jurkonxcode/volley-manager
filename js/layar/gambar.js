@@ -53,7 +53,7 @@ export function figur(p, tim, now) {
 export function kartuMini(p, { tim = 'A', now, zona = 'lap', interaktif = true } = {}) {
   const tag = interaktif ? 'button' : 'div';
   const data = interaktif ? ` data-id="${p.id}" data-zona="${zona}"` : '';
-  return `<${tag} class="kartu"${data} style="--w:${K.warnaPosisi[p.posisi]}">${figur(p, tim, now)}<i class="lencana">${p.posisi}</i><span class="nilai">${ratingPemain(p)}</span></${tag}>`;
+  return `<${tag} class="kartu"${data} style="--w:${K.warnaPosisi[p.posisi]}">${figur(p, tim, now)}<i class="lencana">${p.posisi}</i><span class="nilai">${ratingPemain(p)}</span>${p.cedera > now ? '<i class="med">+</i>' : ''}</${tag}>`;
 }
 export function radar(p) {
   const R = 34, ang = i => (-90 + 72 * i) * Math.PI / 180;

@@ -6,6 +6,9 @@ import { buatSkuadAwal, lengkapiPemain } from './sistem/pemain.js';
 import { buatManajer } from './sistem/manajer.js';
 import { buatMusim, kejar } from './sistem/musim.js';
 import { kekuatanTim, timSaya } from './sistem/pertandingan.js';
+import { renderPasar } from './layar/pasar.js';
+import { prosesWaktu } from './sistem/pasar.js';
+import { bersihkanSusunan } from './sistem/taktik.js';
 import { renderBeranda, renderLiga } from './layar/klub.js';
 import { ikon } from './layar/gambar.js';
 import { renderSkuad } from './layar/skuad.js';
@@ -22,6 +25,8 @@ function lengkapi(S) {
   const now = sekarang();
   S.manajer ??= buatManajer(now);
   S.pengaturan ??= { animasiCepat: false };
+  S.fasilitas ??= { latihan: 0, medis: 0, stadion: 0, bangun: null };
+  S.latihan ??= null; S.pasar ??= null;
   S.taktik ??= { formasi: '5-1', gaya: 'seimbang' };
   S.musim ??= buatMusim(1, S.manajer.tim, now);
   S.skuad.forEach(p => lengkapiPemain(p, now));
@@ -37,8 +42,8 @@ const aksi = {
   pindah: n => tampil(n),
   reset: () => { if (confirm('Mulai dari awal? Semua data manajer dan pemain akan hilang.')) { hapus(); location.reload(); } }
 };
-const NAMA_TAB = { beranda: 'Klub', liga: 'Liga', skuad: 'Skuad', tanding: 'Laga', profil: 'Profil' };
-const TAB = { beranda: ['rumah', renderBeranda], liga: ['trofi', renderLiga], skuad: ['skuad', renderSkuad], tanding: ['jaring', renderPertandingan], profil: ['orang', renderProfil] };
+const NAMA_TAB = { beranda: 'Klub', liga: 'Liga', skuad: 'Skuad', pasar: 'Pasar', tanding: 'Laga', profil: 'Profil' };
+const TAB = { beranda: ['rumah', renderBeranda], liga: ['trofi', renderLiga], skuad: ['skuad', renderSkuad], pasar: ['koin', renderPasar], tanding: ['jaring', renderPertandingan], profil: ['orang', renderProfil] };
 
 $('#logo').innerHTML = ikon('bola', 28);
 $('#reset').innerHTML = ikon('hapus', 22);
@@ -50,7 +55,7 @@ function tampil(nama) {
   lepasPilihan();
   layar.dataset.layar = nama;
   document.querySelectorAll('#nav button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === nama));
-  if (nama !== 'tanding') { const t = sekarang(); if (kejar(S, t, kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), t, S.taktik))) { simpan(S); aksi.perbaruiKoin(); } }
+  if (nama !== 'tanding') { const t = sekarang(); prosesWaktu(S, t); bersihkanSusunan(S, t); if (kejar(S, t, kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), t, S.taktik))) { simpan(S); aksi.perbaruiKoin(); } }
   TAB[nama][1](layar, S, aksi);
   layar.scrollTop = 0;
 }

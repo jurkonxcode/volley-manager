@@ -2,6 +2,7 @@
 import { K } from '../inti/konfigurasi.js';
 import { buatAcak } from '../inti/acak.js';
 import { hadiahPertandingan } from './ekonomi.js';
+import { cederaLaga } from './pasar.js';
 import { expPertandingan, catatHasil } from './manajer.js';
 const NAMA = ['Elang Sakti', 'Badai Timur', 'Macan Putih', 'Naga Laut', 'Rajawali', 'Banteng Muda', 'Cakra Biru'];
 const jepit = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -35,9 +36,9 @@ export function catatLaga(S, sa, sb) {
     M.hasil.push({ h, i, j, s1, s2 });
   });
   M.hari++;
-  const menang = sa > sb, level = levelLawan(lw.tingkat), koin = hadiahPertandingan(menang, level), exp = expPertandingan(menang, level);
+  const menang = sa > sb, level = levelLawan(lw.tingkat), koin = Math.round(hadiahPertandingan(menang, level) * (1 + 0.1 * (S.fasilitas?.stadion || 0))), exp = expPertandingan(menang, level);
   S.koin += koin;
-  return { menang, koin, exp, naik: catatHasil(S.manajer, menang, exp) };
+  return { menang, koin, exp, naik: catatHasil(S.manajer, menang, exp), cedera: S.fasilitas ? cederaLaga(S, acak, Date.now()) : [] };
 }
 // Pekan yang terlewat (kick-off pekan berikutnya sudah lewat) dimainkan otomatis dengan susunan saat ini.
 export function kejar(S, now, kekSaya) {

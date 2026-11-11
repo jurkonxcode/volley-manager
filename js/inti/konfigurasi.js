@@ -10,6 +10,8 @@ export const K = {
   manajer: { namaAwal: 'Manajer Baru', timAwal: 'Garuda Muda' },
   warnaPosisi: { S: '#8E7CF0', OH: '#F4C430', MB: '#46C17B', OP: '#EF5B4A', L: '#4DB6E8' },
   musim: { menitAntarPekan: 20, hadiahPeringkat: [1500, 900, 600, 400, 300, 200, 150, 100] },
+  pasar: { jumlah: 6, menitSegar: 30, maksSkuad: 18, minSkuad: 10, biayaScout: 40 },
+  latihan: { biaya: 80, menit: 10 }, cedera: { dasar: 0.04, lelah: 0.06 }, fasilitas: { maks: 5 },
   kunciSimpan: 'volley-manager-v2'
 };
 export const URUTAN_STAT = ['servis', 'smash', 'blok', 'receive', 'umpan'];

@@ -18,10 +18,20 @@ export function pengaliTaktik(tk) {
 }
 // Pilih pemain terbaik (rating x stamina) untuk tiap slot formasi.
 export function autoSusun(S, now) {
-  const sisa = [...S.skuad], nilai = p => ratingPemain(p) * faktorStamina(staminaSekarang(p, now));
+  const sehat = S.skuad.filter(p => !(p.cedera > now)), sisa = sehat.length >= 6 ? sehat : [...S.skuad], nilai = p => ratingPemain(p) * faktorStamina(staminaSekarang(p, now));
   return FORMASI[S.taktik.formasi].slot.map(pos => {
     const kand = sisa.filter(p => p.posisi === pos), pool = kand.length ? kand : sisa;
     const p = pool.reduce((x, y) => nilai(y) > nilai(x) ? y : x);
     sisa.splice(sisa.indexOf(p), 1); return p.id;
+  });
+}
+// Ganti pemain cedera di susunan dengan pemain sehat terbaik (posisi sama dulu).
+export function bersihkanSusunan(S, now) {
+  const ok = p => p && !(p.cedera > now), pakai = new Set(S.susunan), slot = FORMASI[S.taktik.formasi].slot;
+  S.susunan = S.susunan.map((id, i) => {
+    if (ok(S.skuad.find(x => x.id === id))) return id;
+    const pool = S.skuad.filter(x => ok(x) && !pakai.has(x.id)), c = pool.filter(x => x.posisi === slot[i]);
+    const pil = (c.length ? c : pool).sort((a, b) => ratingPemain(b) - ratingPemain(a))[0];
+    if (!pil) return id; pakai.add(pil.id); return pil.id;
   });
 }
