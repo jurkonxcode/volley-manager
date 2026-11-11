@@ -16,6 +16,7 @@ Catatan serah-terima: apa yang sudah ada, bagaimana strukturnya, dan jebakan yan
 | v10 | Aset gambar: logo Garuda Muda (header, kartu klub, hero), foto hero, latar stadion di Beranda, 6 pose sprite pemain di laga (`css/aset.css`, `js/layar/sprite.js`) |
 | v11 | Tim saya dilihat dari belakang (`belakang-*.png`), tim lawan dari depan; lantai lapangan bergambar (`lantai.webp`), garis serang dipindah ke 1/3 dari jaring, angka peringkat terbaca |
 | v12 | Mode 3D opsional di layar laga (Three.js, dari asset pack ChatGPT): `js/tiga-d/` (arena, pemain, bola, efek bawaan pack) + `js/layar/arena3d.js` (penghubung). Tombol "3D" di pojok lapangan; aktif saat set berjalan, mode atur susunan tetap 2D. Gagal muat Three/WebGL => otomatis 2D. Ikon SVG pack disalin ke `assets/ui/` (belum dipakai) |
+| v13 | Mesin reli berbasis statistik (`sistem/pertandingan.js`): servis vs receive, umpan, smash vs blok/dig, balas menyerang; penalti pemain di posisi salah; mental berpengaruh saat skor ketat; komentar dan pose memakai pemain yang benar-benar mencetak poin |
 
 ## Struktur
 - `js/inti/` konfigurasi (semua angka keseimbangan di `konfigurasi.js`), waktu, simpan (localStorage, kunci `volley-manager-v2`, `versi: 2`), acak ber-seed
@@ -81,3 +82,13 @@ git add -A && git commit -m "update" && git push
 - Pemain 3D masih placeholder primitif bawaan pack (tanpa animasi lengan, hanya lompat/jongkok). Ganti nanti dengan model .glb lewat `createPlayer()` di `js/tiga-d/player.js`.
 - Belum diuji dengan Three.js asli di browser sungguhan oleh pembuatnya (sandbox tanpa CDN): cek visual di HP, terutama posisi kamera (`ukuran()` di `arena3d.js`) dan performa.
 - `assets/ui/*.svg` (ikon + template kartu dari pack) belum dipakai; ikon game tetap dari `gambar.js`.
+
+
+## Mesin reli (v13)
+- Satu reli = servis (bisa salah/ace) -> terima -> umpan -> smash vs blok & dig -> bila bola diselamatkan, lawan membalas menyerang (maks `K.reli.maksPertukaran`). Pemenang reli melayani berikutnya.
+- Pencetak poin ada di `rally[i]`: `{a, jenis, ti, pi, qi}` (tim & indeks pemain pelaku; `qi` = lawan yang terlibat). Dipakai komentar, `beriPose`, dan `arena3d.reli`.
+- Penalti: pemain di slot bukan posisinya x`K.posisi.salah`; libero di baris depan x`K.posisi.liberoDepan` untuk smash/blok. Berlaku juga di `kekuatanTim` (angka kekuatan di layar).
+- Mental: saat poin ketat (salah satu tim dalam 5 poin dari target dan selisih <=3) performa dikali `1 + (mental-50)/400`.
+- Disimulasikan 1500 laga per kasus: seimbang 50%; +3 kekuatan ~72% menang laga, +6 ~86%, +10 ~96%. Poin: ace ~5%, blok ~11%, kesalahan ~20%. Angka ada di `K.reli`.
+- Simulasi antar-AI di `musim.js` masih memakai model peluang lama (`K.skalaPeluang`), bukan mesin ini. Sensitivitasnya mirip, tapi belum identik.
+- Opponent: stamina penuh dan tanpa taktik (belum diubah).

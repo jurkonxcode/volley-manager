@@ -95,11 +95,13 @@ export function reli(r) {
   const sk = r.a ? 'A' : 'B', ls = r.a ? 'B' : 'A', arah = r.a ? 1 : -1;   // arah +1: bola menuju sisi B (+X)
   const depan = t => pemain[t].slice(0, 3), belakang = t => pemain[t].slice(3);
   const mendarat = new T.Vector3(arah * (2 + Math.random() * 6.5), .25, (Math.random() - .5) * 7.4);
+  const ada = (t, i) => (i != null ? pemain[t][i] : null);
+  const dr = r.ti === sk ? ada(sk, r.pi) : null;   // pemain pencetak sesungguhnya (bila poin dari tim pencetak)
   let mulai;
-  if (r.jenis === 'ace') { const s = pil(belakang(sk)); lompat(s, .5, .5); mulai = s.position.clone().setY(2.2); }
-  else { const s = pil(depan(sk)); lompat(s, 1.15, .55); mulai = s.position.clone().setY(3.1); }
+  if (r.jenis === 'ace') { const s = dr || pil(belakang(sk)); lompat(s, .5, .5); mulai = s.position.clone().setY(2.2); }
+  else { const s = (r.jenis === 'smash' || r.jenis === 'blok') && dr ? dr : pil(depan(sk)); lompat(s, 1.15, .55); mulai = s.position.clone().setY(3.1); }
   if (r.jenis === 'blok') { depan(ls).slice(0, 2).forEach(g => lompat(g, 1.0, .5)); mendarat.set(-arah * (1.2 + Math.random() * 1.2), .25, (Math.random() - .5) * 6); }
-  else jongkok(pil(belakang(ls)));
+  else jongkok(ada(ls, r.ti === sk ? r.qi : r.pi) || pil(belakang(ls)));
   if (r.jenis === 'smash' || r.jenis === 'blok') { const fx = createSpikeEffect(T, new T.Vector3(0, 2.7, mulai.z * .6)); sc.add(fx); efek.push(fx); }
   terbang(mulai, mendarat, r.jenis === 'ace' ? 3.2 : .8, r.jenis === 'ace' ? .38 : .26);
 }

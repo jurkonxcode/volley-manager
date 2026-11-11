@@ -73,8 +73,9 @@ function gambarRally(root, r, a, b) {
   const skA = root.querySelector('#skA'), skB = root.querySelector('#skB'), bola = root.querySelector('#bola'), pop = root.querySelector('#pop');
   if (!skA) return;
   skA.textContent = a; skB.textContent = b;
-  const A = timSaya(P.m), B = P.m.lawan, pil = t => t[Math.floor(Math.random() * t.length)].nama.split(' ')[0], sk = r.a ? A : B, ls = r.a ? B : A;
-  P.kom = { ace: `Ace dari ${pil(sk)}!`, blok: `${pil(sk)} blok kokoh!`, smash: `Smash keras ${pil(sk)}!`, salah: `${pil(ls)} membuat kesalahan` }[r.jenis];
+  const A = timSaya(P.m), B = P.m.lawan, nm = (ti, i) => (ti === 'A' ? A : B)[i]?.nama.split(' ')[0] ?? '';
+  const pelaku = nm(r.ti, r.pi), lawan = nm(r.ti === 'A' ? 'B' : 'A', r.qi);
+  P.kom = { ace: `Ace dari ${pelaku}!`, blok: `${pelaku} blok kokoh!`, smash: `Smash keras ${pelaku}!`, salah: `${pelaku} membuat kesalahan` }[r.jenis];
   const kom = root.querySelector('#kom'); if (kom) kom.textContent = P.kom;
   const el = r.a ? skA : skB; el.classList.remove('skor-naik'); void el.offsetWidth; el.classList.add('skor-naik');
   if (!bola) { if (siap3d) D3.reli(r); return; }   // mode 3D: animasi digambar arena3d.js
@@ -88,19 +89,23 @@ function gambarRally(root, r, a, b) {
   void pop.offsetWidth; pop.classList.add('muncul');
 }
 
-// Pemain yang terlibat reli bergerak: smash, blok, servis, atau receive.
+// Pemain yang benar-benar terlibat reli bergerak (r.ti/r.pi = pelaku, r.qi = lawan yang terlibat).
+// Urutan elemen .badan di arena: lawan belakang (0-2), lawan depan (3-5), saya depan (6-8), saya belakang (9-11).
+const dom = (ti, i) => ti === 'A' ? 6 + i : (i < 3 ? 3 + i : i - 3);
 function beriPose(root, r) {
   const k = [...root.querySelectorAll('#arena .badan')]; if (k.length < 12) return;
-  const pil = a => a[Math.floor(Math.random() * a.length)], depan = s => s ? [6, 7, 8] : [3, 4, 5], belakang = s => s ? [9, 10, 11] : [0, 1, 2];
   const PM = { 'a-smash': 'smash', 'a-blok': 'blok', 'a-servis': 'servis', 'a-dig': 'receive', 'a-umpan': 'umpan' };
-  const pose = (i, c) => { const e = k[i]; e.classList.remove(...Object.keys(PM)); void e.getBoundingClientRect(); e.classList.add(c); setPose(e, PM[c] === 'receive' && i >= 6 && Math.random() < .3 ? 'dive' : PM[c]); };
-  if (r.jenis === 'smash') { pose(pil(belakang(r.a)), 'a-umpan'); pose(pil(depan(r.a)), 'a-smash'); pose(pil(belakang(!r.a)), 'a-dig'); }
-  else if (r.jenis === 'blok') { pose(pil(depan(r.a)), 'a-blok'); pose(pil(depan(!r.a)), 'a-smash'); }
-  else if (r.jenis === 'ace') { pose(pil(belakang(r.a)), 'a-servis'); pose(pil(belakang(!r.a)), 'a-dig'); }
-  else pose(pil(belakang(!r.a)), 'a-dig');
+  const pose = (i, c) => { const e = k[i]; if (!e) return; e.classList.remove(...Object.keys(PM)); void e.getBoundingClientRect(); e.classList.add(c); setPose(e, PM[c] === 'receive' && i >= 6 && Math.random() < .3 ? 'dive' : PM[c]); };
+  const lw = r.ti === 'A' ? 'B' : 'A', pil = a => a[Math.floor(Math.random() * a.length)];
+  if (r.jenis === 'ace') { pose(dom(r.ti, r.pi), 'a-servis'); pose(dom(lw, r.qi), 'a-dig'); }
+  else if (r.jenis === 'smash') { pose(dom(r.ti, 3 + Math.floor(Math.random() * 3)), 'a-umpan'); pose(dom(r.ti, r.pi), 'a-smash'); pose(dom(lw, r.qi), 'a-dig'); }
+  else if (r.jenis === 'blok') { pose(dom(r.ti, r.pi), 'a-blok'); pose(dom(lw, r.qi), 'a-smash'); }
+  else if (r.pi < 3 && r.qi != null) { pose(dom(r.ti, r.pi), 'a-smash'); pose(dom(lw, r.qi), 'a-dig'); }   // serangan keluar/gagal
+  else pose(dom(r.ti, r.pi), 'a-servis');   // servis gagal
   const tim = s => s ? [6, 7, 8, 9, 10, 11] : [0, 1, 2, 3, 4, 5];   // 6-11 tim saya, 0-5 lawan
-  if (Math.random() < .5) setPose(k[pil(tim(r.a))], 'selebrasi');
-  if (Math.random() < .35) setPose(k[pil(tim(!r.a))], 'kecewa');
+  const menang = r.a;   // yang mencetak poin kadang selebrasi, yang kehilangan poin kadang kecewa
+  if (Math.random() < .5) setPose(k[pil(tim(menang))], 'selebrasi');
+  if (Math.random() < .35) setPose(k[pil(tim(!menang))], 'kecewa');
 }
 async function mainkan(root, S, aksi) {
   const saya = ++token; P.fase = 'main'; P.cepat = !!S.pengaturan?.animasiCepat;
