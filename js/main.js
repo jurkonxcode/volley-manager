@@ -6,7 +6,7 @@ import { buatSkuadAwal, lengkapiPemain } from './sistem/pemain.js';
 import { buatManajer } from './sistem/manajer.js';
 import { buatMusim, kejar } from './sistem/musim.js';
 import { kekuatanTim, timSaya } from './sistem/pertandingan.js';
-import { renderPasar } from './layar/pasar.js';
+import { renderTim } from './layar/tim.js';
 import { prosesWaktu } from './sistem/pasar.js';
 import { bersihkanSusunan } from './sistem/taktik.js';
 import { renderBeranda, renderLiga } from './layar/klub.js';
@@ -42,8 +42,8 @@ const aksi = {
   pindah: n => tampil(n),
   reset: () => { if (confirm('Mulai dari awal? Semua data manajer dan pemain akan hilang.')) { hapus(); location.reload(); } }
 };
-const NAMA_TAB = { beranda: 'Klub', liga: 'Liga', skuad: 'Skuad', pasar: 'Pasar', tanding: 'Laga', profil: 'Profil' };
-const TAB = { beranda: ['rumah', renderBeranda], liga: ['trofi', renderLiga], skuad: ['skuad', renderSkuad], pasar: ['koin', renderPasar], tanding: ['jaring', renderPertandingan], profil: ['orang', renderProfil] };
+const NAMA_TAB = { beranda: 'Beranda', liga: 'Kompetisi', tim: 'Tim', tanding: 'Laga', profil: 'Profil' };
+const TAB = { beranda: ['rumah', renderBeranda], liga: ['trofi', renderLiga], tim: ['skuad', renderTim], tanding: ['jaring', renderPertandingan], profil: ['orang', renderProfil] };
 
 $('#logo').innerHTML = ikon('bola', 28);
 $('#reset').innerHTML = ikon('hapus', 22);

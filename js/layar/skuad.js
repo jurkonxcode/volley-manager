@@ -39,18 +39,18 @@ ${radar(p)}${chipStat(p)}
 <button class="tombol-kecil" data-kartu="${p.id}">${ikon('orang', 18)} Profil lengkap</button>`;
 }
 
-export function renderSkuad(root, S, aksi) {
+export function renderSkuad(root, S, aksi, opsi = {}) {
   const now = sekarang(), cari = id => S.skuad.find(p => p.id === id);
   if (!fokusId || !cari(fokusId)) fokusId = S.susunan[0];
   const lap = S.susunan.map(cari), bangku = S.skuad.filter(p => !S.susunan.includes(p.id));
   const baris = a => `<div class="baris">${a.map(p => kartuMini(p, { tim: 'A', now, zona: 'lap' })).join('')}</div>`;
-  root.innerHTML = `${taktikHtml(S)}<div class="lapangan"><div class="jaring"></div><div class="arena"><div class="separuh">${baris(lap.slice(0, 3))}${baris(lap.slice(3))}</div></div></div>
+  root.innerHTML = `${opsi.taktik === false ? '' : taktikHtml(S)}<div class="lapangan"><div class="jaring"></div><div class="arena"><div class="separuh">${baris(lap.slice(0, 3))}${baris(lap.slice(3))}</div></div></div>
 <div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div>
 <section class="detail" id="detail">${detailHtml(cari(fokusId), now)}</section>`;
   // Tombol "Profil lengkap" di panel detail: didengar sekali di akar, jadi tidak menumpuk.
   root.onclick = e => {
     const f = e.target.closest('[data-formasi],[data-gaya],[data-auto]');
-    if (f) { if (f.dataset.formasi) S.taktik.formasi = f.dataset.formasi; if (f.dataset.gaya) S.taktik.gaya = f.dataset.gaya; else S.susunan = autoSusun(S, sekarang()); aksi.simpan(); return renderSkuad(root, S, aksi); }
+    if (f) { if (f.dataset.formasi) S.taktik.formasi = f.dataset.formasi; if (f.dataset.gaya) S.taktik.gaya = f.dataset.gaya; else S.susunan = autoSusun(S, sekarang()); aksi.simpan(); return renderSkuad(root, S, aksi, opsi); }
     const b = e.target.closest('[data-kartu]');
     if (!b) return;
     const p = cari(b.dataset.kartu);
@@ -58,6 +58,6 @@ export function renderSkuad(root, S, aksi) {
   };
   pasangTukar(root, S, {
     saatFokus: id => { fokusId = id; root.querySelector('#detail').innerHTML = detailHtml(cari(id), sekarang()); },
-    saatUbah: () => { aksi.simpan(); renderSkuad(root, S, aksi); }
+    saatUbah: () => { aksi.simpan(); renderSkuad(root, S, aksi, opsi); }
   });
 }

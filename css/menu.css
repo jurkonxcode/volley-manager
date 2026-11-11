@@ -1,0 +1,21 @@
+/* Menu utama + Kelola Tim bertab */
+.profil-atas{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.pa-id{flex:1;display:grid;gap:3px}.pa-id b{font-size:18px;font-weight:800}.pa-id small{color:var(--redup)}
+.hero{display:grid;justify-items:center;text-align:center;padding:18px 10px 14px;margin-bottom:12px;border-radius:24px;background:radial-gradient(80% 70% at 50% 0%,rgba(124,77,255,.45),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid var(--garis)}
+.hero-bola{color:var(--bola);filter:drop-shadow(0 0 18px rgba(255,200,61,.7))}
+.hero h1{font-size:44px;line-height:.95;font-weight:800;font-style:italic;letter-spacing:1px;margin:8px 0 6px;background:linear-gradient(180deg,#fff,#B9C4FF);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 rgba(0,0,0,.35))}
+.hero p{color:var(--redup);font-style:italic;margin-bottom:6px}
+.hero .tombol-besar{display:flex;gap:8px;align-items:center;justify-content:center;max-width:320px}
+.menu-daftar{display:grid;gap:8px;margin-bottom:14px}
+.menu-baris{display:flex;align-items:center;gap:12px;height:52px;padding:0 14px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid var(--garis);font-weight:700;font-size:16px;text-align:left}
+.menu-baris span{flex:1}.menu-baris svg:last-child{transform:rotate(180deg);color:var(--redup)}.menu-baris:active{background:rgba(255,255,255,.13)}
+.km-statistik.tiga{grid-template-columns:repeat(3,1fr)}
+.tab-sub{display:flex;gap:4px;padding:4px;margin-bottom:10px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid var(--garis)}
+.tab-sub button{flex:1;height:36px;border-radius:10px;color:var(--redup);font-weight:700;font-size:14px}
+.tab-sub button.on{background:var(--aksen);color:#1A1030;box-shadow:0 4px 14px rgba(255,92,122,.35)}
+.opsi{display:grid;gap:6px;width:100%;margin-bottom:10px;padding:14px;border-radius:var(--r);background:rgba(255,255,255,.06);border:1px solid var(--garis);text-align:left}
+.opsi b{font-size:20px;font-weight:800}.opsi small{color:var(--redup)}
+.opsi.on{border-color:var(--bola);box-shadow:0 0 0 1px var(--bola),0 0 22px rgba(255,200,61,.3);background:rgba(255,200,61,.08)}
+.mini{display:grid;gap:5px;justify-items:center;padding:8px;border-radius:12px;background:rgba(229,138,58,.35)}
+.mini div{display:flex;gap:10px}
+.mini i{display:grid;place-items:center;width:34px;height:22px;border-radius:11px;background:var(--w);color:#14214D;font-style:normal;font-size:11px;font-weight:800}

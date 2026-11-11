@@ -14,13 +14,8 @@ Unggah seluruh isi folder ke repo GitHub, lalu aktifkan **Settings → Pages**. 
 ## Menyeimbangkan game
 Semua angka ada di `js/inti/konfigurasi.js`: laju pulih stamina, biaya per posisi, peluang poin, hadiah koin.
 
-## Sudah ada (Fase 1, gaya Top Eleven)
-- Beranda klub: peringkat, laga berikutnya + hitung mundur, hasil terakhir
-- Liga 8 tim, 14 pekan (dua putaran), klasemen, jadwal, hadiah akhir musim; pekan terlewat dimainkan otomatis
-- Taktik: formasi (5-1, 4-2, Tembok), gaya main, susun otomatis; ganti pemain di jeda set
-- Laga live poin demi poin dengan komentar
-- Profil pemain, profil manajer, EXP
+## Sudah ada
+Menu utama, Kelola Tim bertab (Skuad/Strategi/Formasi/Pasar), liga 8 tim + klasemen, laga live berperspektif dengan pemain berpose, transfer + scouting, latihan, fasilitas, cedera, profil pemain & manajer.
 
-## Tahap berikutnya
-Fase 2: transfer + scouting, latihan, cedera, fasilitas, sponsor, promosi/degradasi. Fase 3: Supabase.
-Interval antar pekan: `K.musim.menitAntarPekan` di konfigurasi.js (20 menit; naikkan untuk ritme harian).
+## Riwayat & serah-terima
+Lihat `HANDOFF.md` untuk riwayat versi, struktur, jebakan, dan daftar yang belum dikerjakan.
