@@ -124,8 +124,6 @@ function tampil(nama, kunci) {
 function mulai(data) {
   S = lengkapi(data);
   aksi.identitas(); siapkanSprite();
-  $('#reset').innerHTML = ikon('hapus', 22);
-  $('#reset').onclick = aksi.reset;
   $('#nav').innerHTML = Object.entries(TAB).map(([k, [ik]]) => `<button class="mb" data-tab="${k}" aria-label="${NAMA_TAB[k]}">${ikon(ik, 24)}<span>${NAMA_TAB[k]}</span></button>`).join('')
     + DK.filter(x => !x[5]).map(x => `<button class="dkn" data-key="${x[0]}" aria-label="${x[1]}">${ikon(x[2], 22)}<span>${x[1]}</span></button>`).join('')
     + `<div class="dk-promo">${ikon('bola', 40)}<b>Bermimpilah Besar,<br>Menang Bersama!</b></div>`;

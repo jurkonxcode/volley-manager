@@ -1,0 +1,329 @@
+/* ==========================================================================
+   v21 — Tim & Pemain: identitas visual Volley Manager
+   Biru malam + emas (warna logo), kartu pemain berbingkai kelangkaan,
+   lapangan biru hardcourt dengan garis putih. Hanya layar Tim.
+   Dimuat paling akhir di index.html.
+   ========================================================================== */
+
+:root {
+  --vm-ink: #EAF2FF;
+  --vm-mute: #8FA8DD;
+  --vm-emas-glow: rgba(255, 194, 26, .35);
+  --vm-kaca: linear-gradient(160deg, rgba(24, 62, 150, .78), rgba(8, 24, 72, .94));
+  --vm-judul: 'Barlow Condensed', 'Barlow Semi Condensed', system-ui, sans-serif;
+}
+
+/* ---------- Kepala halaman ---------- */
+#layar[data-layar="tim"] .page-head {
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+#layar[data-layar="tim"] .page-head .eyebrow {
+  letter-spacing: .24em;
+  font-size: 11px;
+  font-weight: 800;
+}
+#layar[data-layar="tim"] .page-head h1 {
+  font-family: var(--vm-judul);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 40px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  margin: 4px 0 6px;
+  background: linear-gradient(90deg, #FFFFFF 30%, #FFD766);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#layar[data-layar="tim"] .page-head p {
+  color: var(--vm-mute);
+}
+#layar[data-layar="tim"] .head-meta {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 194, 26, .45);
+  background: linear-gradient(180deg, rgba(255, 194, 26, .16), rgba(255, 194, 26, .03));
+  color: var(--emas);
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
+/* ---------- KPI ---------- */
+#layar[data-layar="tim"] .page-kpis {
+  gap: 10px;
+}
+#layar[data-layar="tim"] .page-kpi {
+  position: relative;
+  overflow: hidden;
+  padding: 14px 14px 12px;
+  border-radius: 16px;
+  background: var(--vm-kaca);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(130, 180, 255, .14);
+}
+#layar[data-layar="tim"] .page-kpi::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--biru), var(--emas));
+}
+#layar[data-layar="tim"] .page-kpi small {
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--vm-mute);
+  font-size: 11px;
+  font-weight: 800;
+}
+#layar[data-layar="tim"] .page-kpi b {
+  display: block;
+  margin: 6px 0 2px;
+  font-family: var(--vm-judul);
+  font-style: italic;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+}
+#layar[data-layar="tim"] .page-kpi em {
+  font-style: normal;
+  color: var(--vm-mute);
+  font-size: 12px;
+}
+
+/* ---------- Kartu klub ---------- */
+#layar[data-layar="tim"] .kartu-klub {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--vm-kaca);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .34), inset 0 1px 0 rgba(130, 180, 255, .16);
+}
+#layar[data-layar="tim"] .kartu-klub::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  top: -80px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 194, 26, .22), transparent 70%);
+  pointer-events: none;
+}
+#layar[data-layar="tim"] .km-avatar {
+  box-shadow: 0 0 0 2px var(--vm-emas-glow), 0 10px 24px rgba(0, 0, 0, .45);
+}
+#layar[data-layar="tim"] .km-nama {
+  font-family: var(--vm-judul);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 26px;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+#layar[data-layar="tim"] .km-level {
+  border: 1px solid rgba(255, 194, 26, .5);
+  background: linear-gradient(180deg, rgba(255, 194, 26, .16), rgba(255, 194, 26, .02));
+  box-shadow: 0 0 18px rgba(255, 194, 26, .15);
+}
+#layar[data-layar="tim"] .km-level b {
+  color: var(--emas);
+  font-family: var(--vm-judul);
+  font-style: italic;
+  font-size: 34px;
+}
+#layar[data-layar="tim"] .km-statistik > div {
+  position: relative;
+  padding: 12px 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(110, 160, 255, .2);
+  background: rgba(7, 21, 58, .6);
+}
+#layar[data-layar="tim"] .km-statistik b {
+  font-family: var(--vm-judul);
+  font-style: italic;
+  font-size: 30px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+#layar[data-layar="tim"] .km-statistik > div:nth-child(3) b {
+  color: var(--emas);
+}
+
+/* ---------- Tab segmen ---------- */
+#layar[data-layar="tim"] .tab-sub {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 5px;
+  border-radius: 14px;
+  background: rgba(5, 15, 51, .7);
+}
+#layar[data-layar="tim"] .tab-sub button {
+  padding: 10px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+  color: var(--vm-mute);
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+#layar[data-layar="tim"] .tab-sub button.on {
+  color: #FFFFFF;
+  background: linear-gradient(180deg, #2F7BFF, #1A56D6);
+  box-shadow: inset 0 -3px 0 var(--emas), 0 6px 16px rgba(30, 107, 255, .4);
+}
+
+/* ---------- Lapangan (biru hardcourt, garis putih) ---------- */
+#layar[data-layar="tim"] .lapangan {
+  position: relative;
+  padding: 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(110, 160, 255, .25);
+  background: radial-gradient(120% 80% at 50% 0%, #1D4FBF, #0C2470 70%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .08);
+  overflow: hidden;
+}
+#layar[data-layar="tim"] .lapangan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .08), transparent 40%);
+  pointer-events: none;
+}
+#layar[data-layar="tim"] .arena {
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, .9);
+  border-radius: 6px;
+  background: linear-gradient(180deg, #1F5BD6, #1749B0);
+}
+#layar[data-layar="tim"] .separuh .baris + .baris {
+  border-top: 2px solid rgba(255, 255, 255, .7);
+}
+#layar[data-layar="tim"] .jaring {
+  height: 8px;
+  margin: 0 -12px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(90deg, #FFFFFF 0 4px, #C8D6F2 4px 8px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .5);
+}
+
+/* ---------- Kartu pemain ---------- */
+#layar[data-layar="tim"] .kartu {
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+#layar[data-layar="tim"] .kartu:active {
+  transform: scale(.96);
+}
+#layar[data-layar="tim"] .kartu .nilai {
+  font-family: var(--vm-judul);
+  font-style: italic;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+#layar[data-layar="tim"] .kartu.terpilih {
+  box-shadow: 0 0 0 2px var(--emas), 0 0 22px rgba(255, 194, 26, .55);
+}
+
+/* ---------- Bangku cadangan ---------- */
+#layar[data-layar="tim"] .bangku {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(110, 160, 255, .2);
+  background: rgba(7, 21, 58, .65);
+}
+#layar[data-layar="tim"] .bangku::before {
+  content: "Bangku cadangan";
+  grid-column: 1 / -1;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--vm-mute);
+  padding: 0 4px 6px;
+}
+
+/* ---------- Panel detail pemain ---------- */
+#layar[data-layar="tim"] .detail {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--vm-kaca);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .34), inset 0 1px 0 rgba(130, 180, 255, .16);
+}
+#layar[data-layar="tim"] .detail .rating-besar {
+  font-family: var(--vm-judul);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 56px;
+  line-height: 1;
+  color: var(--emas);
+  text-shadow: 0 0 18px rgba(255, 194, 26, .35);
+}
+#layar[data-layar="tim"] .detail .nama {
+  font-family: var(--vm-judul);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 26px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+}
+#layar[data-layar="tim"] .detail .baris-info {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(110, 160, 255, .12);
+}
+#layar[data-layar="tim"] .detail .tombol-kecil {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #2F7BFF, #1A56D6);
+  color: #FFFFFF;
+  font-weight: 800;
+  border: 0;
+  box-shadow: inset 0 -3px 0 var(--emas);
+}
+
+/* ---------- Desktop (>= 1024px): kolom lapangan + detail berdampingan ---------- */
+@media (min-width: 1024px) {
+  #layar[data-layar="tim"] .page-head h1 {
+    font-size: 52px;
+  }
+  #layar[data-layar="tim"] .page-kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  #layar[data-layar="tim"] .kartu-klub {
+    padding: 22px 24px;
+  }
+  #layar[data-layar="tim"] .lapangan {
+    max-width: none;
+  }
+}
+
+/* ---------- Bingkai kartu kelangkaan (assets/ui/frame-*.svg) ---------- */
+#layar[data-layar="tim"] .kartu { position: relative; }
+#layar[data-layar="tim"] .kartu::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 14px;
+  background: var(--vm-bingkai, none) center / 100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 2;
+}
+#layar[data-layar="tim"] .kartu.r-N::before  { --vm-bingkai: url("../assets/ui/frame-N.svg"); }
+#layar[data-layar="tim"] .kartu.r-R::before  { --vm-bingkai: url("../assets/ui/frame-R.svg"); }
+#layar[data-layar="tim"] .kartu.r-SR::before { --vm-bingkai: url("../assets/ui/frame-SR.svg"); }
+#layar[data-layar="tim"] .kartu.r-SSR::before { --vm-bingkai: url("../assets/ui/frame-SSR.svg"); }
+
+/* ---------- Tombol "Mulai dari awal" di Pengaturan: tampil sebagai zona berbahaya ---------- */
+#layar[data-layar="set"] #ulang,
+#ulang {
+  color: #FF8A95;
+  border: 1px solid rgba(255, 77, 94, .45);
+  background: rgba(255, 77, 94, .08);
+  box-shadow: none;
+}
