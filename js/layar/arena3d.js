@@ -93,17 +93,19 @@ function putar(now) {
   if (!wadah || !wadah.isConnected) return lepas();   // layar sudah berganti: hentikan loop (hemat baterai)
   raf = requestAnimationFrame(putar);
   const dt = Math.min((now - jam) / 1000, .05); jam = now;
-  for (let i = tween.length - 1; i >= 0; i--) { const w = tween[i]; w.t += dt; const k = Math.min(w.t / w.d, 1); w.f(k); if (k >= 1) tween.splice(i, 1); }
+  for (let i = tween.length - 1; i >= 0; i--) { const w = tween[i]; if (w.tunda > 0) { w.tunda -= dt; continue; } if (w.mulai) { w.mulai(); w.mulai = null; } w.t += dt; const k = Math.min(w.t / w.d, 1); w.f(k); if (k >= 1) { const j = tween.indexOf(w); if (j >= 0) tween.splice(j, 1); } }
   for (let i = efek.length - 1; i >= 0; i--) if (!efek[i].userData.update(dt)) { sc.remove(efek[i]); buang(efek[i]); efek.splice(i, 1); }
   for (const t of ['A', 'B']) for (const g of pemain[t]) g.userData.mixer?.update(dt);
   bola.rotation.x += dt * 8; bola.rotation.z += dt * 5;
   R.render(sc, cam);
 }
-const anim = (d, f) => { const w = { t: 0, d, f }; tween.push(w); return w; };
-function lompat(g, tinggi = 1.1, d = .5) {
-  g.userData.main?.('lompat'); anim(d, k => { g.position.y = g.userData.dasar.y + Math.sin(k * Math.PI) * tinggi; }); }
-function jongkok(g, d = .45) {
-  g.userData.main?.('terima'); anim(d, k => { g.scale.y = 1 - Math.sin(k * Math.PI) * .16; }); }   // tidak menyentuh position.y: bisa bentrok dengan lompat
+const anim = (d, f, tunda = 0, mulai = null) => { const w = { t: 0, d, f, tunda, mulai }; tween.push(w); return w; };
+function lompat(g, tinggi = 1.1, d = .5, tunda = 0) {
+  anim(d, k => { g.position.y = g.userData.dasar.y + Math.sin(k * Math.PI) * tinggi; }, tunda, () => g.userData.main?.('lompat'));
+}
+function jongkok(g, d = .45, tunda = 0) {   // tidak menyentuh position.y: bisa bentrok dengan lompat
+  anim(d, k => { g.scale.y = 1 - Math.sin(k * Math.PI) * .16; }, tunda, () => g.userData.main?.('terima'));
+}
 function terbang(dari, ke, tinggi, d, selesai) {
   const a = dari.clone(), b = ke.clone();
   // Reli berikutnya datang tiap ~150 ms, lebih cepat dari durasi terbang: gerakan bola lama dibatalkan supaya tidak menimpa yang baru.
@@ -112,29 +114,53 @@ function terbang(dari, ke, tinggi, d, selesai) {
 }
 const pil = a => a[Math.floor(Math.random() * a.length)];
 
-// r = { a: true bila tim saya mencetak poin, jenis: 'ace' | 'blok' | 'smash' | 'salah' } (dari mainkanSet).
-export function reli(r) {
+// r = { a, jenis: 'ace' | 'blok' | 'smash' | 'salah', ti, pi, qi } (dari mainkanSet). k = skala waktu (1 = normal ~2.4 dtk per reli, .5 = 2x).
+// Reli digambar bertahap: servis -> terima -> umpan -> serangan -> bola mendarat, supaya terbaca seperti pertandingan sungguhan.
+let reliId = 0;
+export function reli(r, k = 1) {
   if (!R || !wadah) return;
+  const my = ++reliId, batal = () => my !== reliId;
   const sk = r.a ? 'A' : 'B', ls = r.a ? 'B' : 'A', arah = r.a ? 1 : -1;   // arah +1: bola menuju sisi B (+X)
   const depan = t => pemain[t].slice(0, 3), belakang = t => pemain[t].slice(3);
   const mendarat = new T.Vector3(arah * (2 + Math.random() * 6.5), .25, (Math.random() - .5) * 7.4);
   const ada = (t, i) => (i != null ? pemain[t][i] : null);
-  const dr = r.ti === sk ? ada(sk, r.pi) : null;   // pemain pencetak sesungguhnya (bila poin dari tim pencetak)
-  let mulai;
+  const dr = r.ti === sk ? ada(sk, r.pi) : null;
+  const pos = (g, y) => g.position.clone().setY(y);
+
   if (r.jenis === 'salah') {
-    // Tim yang kehilangan poin (ls) membuat kesalahan: servis/serangannya keluar lapangan di sisi tim pencetak.
-    // (Mesin reli: untuk 'salah', r.ti = tim pembuat kesalahan, r.pi = pemainnya, r.qi = penerima/penjaga di tim pencetak.)
     const servis = r.pi >= 3, s = ada(ls, r.pi) || pil(servis ? belakang(ls) : depan(ls));
-    lompat(s, servis ? .5 : 1.15, .55); mulai = s.position.clone().setY(servis ? 2.2 : 3.1);
-    mendarat.set(-arah * (1 + Math.random() * 8.5), .25, (Math.random() < .5 ? -1 : 1) * (4.9 + Math.random() * .4));   // melebar keluar garis samping (papan LED di z=±5.5)
-    jongkok(ada(sk, r.qi) || pil(belakang(sk)));
-    return terbang(mulai, mendarat, servis ? 3.2 : .8, servis ? .38 : .26);
+    lompat(s, servis ? .5 : 1.15, .7 * k);
+    mendarat.set(-arah * (1 + Math.random() * 8.5), .25, (Math.random() < .5 ? -1 : 1) * (4.9 + Math.random() * .4));   // keluar garis samping (papan LED di z=±5.5)
+    jongkok(ada(sk, r.qi) || pil(belakang(sk)), .6 * k, .4 * k);
+    return terbang(pos(s, servis ? 2.2 : 3.1), mendarat, servis ? 3.2 : .8, (servis ? 1.1 : .7) * k);
   }
-  if (r.jenis === 'ace') { const s = dr || pil(belakang(sk)); lompat(s, .5, .5); mulai = s.position.clone().setY(2.2); }
-  else { const s = (r.jenis === 'smash' || r.jenis === 'blok') && dr ? dr : pil(depan(sk)); lompat(s, 1.15, .55); mulai = s.position.clone().setY(3.1); }
-  // Blok: bola dipantulkan jatuh dekat jaring di sisi penyerang (tim yang kehilangan poin), bukan di sisi pemblok.
-  if (r.jenis === 'blok') { depan(ls).slice(0, 2).forEach(g => lompat(g, 1.0, .5)); mendarat.set(arah * (1.2 + Math.random() * 1.2), .25, (Math.random() - .5) * 6); }
-  else jongkok(ada(ls, r.ti === sk ? r.qi : r.pi) || pil(belakang(ls)));
-  if (r.jenis === 'smash' || r.jenis === 'blok') { const fx = createSpikeEffect(T, new T.Vector3(0, 2.7, mulai.z * .6)); sc.add(fx); efek.push(fx); }
-  terbang(mulai, mendarat, r.jenis === 'ace' ? 3.2 : .8, r.jenis === 'ace' ? .38 : .26);
+  if (r.jenis === 'ace') {
+    const s = dr || pil(belakang(sk)); lompat(s, .5, .7 * k);
+    jongkok(pil(belakang(ls)), .6 * k, .5 * k);
+    return terbang(pos(s, 2.2), mendarat, 3.2, 1.1 * k);
+  }
+  // Smash / blok: lawan (ls) melayani, sk menerima, mengumpan, lalu menyerang.
+  const srv = pil(belakang(ls)), rcv = pil(belakang(sk)), setter = depan(sk)[1] || depan(sk)[0], atk = (dr && r.pi < 3 ? dr : null) || pil([depan(sk)[0], depan(sk)[2]].filter(Boolean));
+  const bertahan = ada(ls, r.ti === sk ? r.qi : r.pi) || pil(belakang(ls));
+  const t1 = .8 * k, t2 = .5 * k, t3 = .45 * k, t4 = .3 * k;
+  lompat(srv, .45, .55 * k);
+  jongkok(rcv, .6 * k, t1 * .55);
+  const selesaiSpike = () => {
+    if (batal()) return;
+    if (r.jenis === 'blok') {
+      depan(ls).slice(0, 2).forEach(g => lompat(g, 1.0, .5 * k, 0));
+      mendarat.set(arah * (1.2 + Math.random() * 1.2), .25, (Math.random() - .5) * 6);   // bola dipantulkan jatuh di sisi penyerang
+    }
+    const fx = createSpikeEffect(T, new T.Vector3(0, 2.7, atk.position.z * .6)); sc.add(fx); efek.push(fx);
+    if (r.jenis !== 'blok') jongkok(bertahan, .5 * k, 0);
+    terbang(pos(atk, 3.1), mendarat, .8, t4);
+  };
+  terbang(pos(srv, 2.2), pos(rcv, .9), 3.2, t1, () => {                                 // servis
+    if (batal()) return;
+    lompat(atk, 1.15, (t3 + t4 + .1) * 1.4, t2 * .2);
+    terbang(pos(rcv, .9), pos(setter, 2.4), 1.8, t2, () => {                            // terima
+      if (batal()) return;
+      terbang(pos(setter, 2.4), pos(atk, 2.9), 1.1, t3, selesaiSpike);                   // umpan lalu serangan
+    });
+  });
 }

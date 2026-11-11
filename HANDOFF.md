@@ -21,6 +21,8 @@ Catatan serah-terima: apa yang sudah ada, bagaimana strukturnya, dan jebakan yan
 | v15 | Upgrade visual mode 3D premium procedural: arena parquet, net detail, tribun/crowd instanced, LED, rangka atap, pemain 3D lebih anatomis, bola panel, efek impact, lighting/tone mapping dan kamera isometric mobile. Detail: `docs/V15_3D_PREMIUM_UPGRADE.md`. |
 | v15.1 | Audit v15 (logika + kode): kebocoran memori 3D ditutup (dispose), arah bola blok dan animasi "kesalahan" dibetulkan, bola antar-reli tidak lagi saling menimpa, nomor punggung, bayangan pemain dikurangi (~58%), pemulihan saat WebGL gagal/konteks hilang, guard laga basi di layar laga. Detail dan hal yang belum terverifikasi: `docs/AUDIT_V15_1.md`. |
 
+| v15.4 | Pacing laga: tiap reli bertahap (servis, terima, umpan, serangan; ~2-3 dtk per poin di 3D, 1x/2x/Lewati set), label aksi, papan skor bernama + SET/JEDA, hasil set tidak lagi bocor sebelum diputar. Kartu kelangkaan N/R/SR/SSR dari rating (`js/layar/rarity.js`, ambang bisa diubah). Polesan UI semua tab (`css/pro.css`), kartu pra-laga, kolom Form klasemen. Pemain 3D dari FBX Kenney (`assets/models/kenney/`). Belum diuji di HP: rangkaian animasi 3D. |
+
 ## Struktur
 - `js/inti/` konfigurasi (semua angka keseimbangan di `konfigurasi.js`), waktu, simpan (localStorage, kunci `volley-manager-v2`, `versi: 2`), acak ber-seed
 - `js/sistem/` logika murni tanpa HTML: analitik (statistik + data grafik dari `musim.hasil`), pemain, stamina, pertandingan, musim (liga/jadwal/klasemen), taktik, pasar (transfer/latihan/fasilitas/cedera), manajer, ekonomi

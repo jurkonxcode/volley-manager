@@ -73,3 +73,51 @@ input[type=checkbox]::after{content:"";position:absolute;top:2px;left:2px;width:
 input[type=checkbox]:checked{background:var(--baik)}
 input[type=checkbox]:checked::after{transform:translateX(20px)}
 .tabel td.tn{white-space:nowrap;max-width:112px;overflow:hidden;text-overflow:ellipsis}
+
+/* ===== Kartu kelangkaan (SSR / SR / R / N) ===== */
+:root{--r-SSR:#FFC83D;--r-SR:#B07CFF;--r-R:#4FA3FF;--r-N:#6FD6A0}
+.kartu{position:relative}
+.kartu.r-SSR{box-shadow:0 0 0 2px var(--r-SSR),0 0 14px rgba(255,200,61,.55)}
+.kartu.r-SR{box-shadow:0 0 0 2px var(--r-SR),0 0 12px rgba(176,124,255,.45)}
+.kartu.r-R{box-shadow:0 0 0 2px var(--r-R),0 0 8px rgba(79,163,255,.35)}
+.kartu.r-N{box-shadow:0 0 0 1.5px var(--r-N)}
+.kartu .rar{position:absolute;top:-6px;left:-4px;z-index:2;padding:1px 6px;border-radius:7px;font:800 10px/14px var(--font);font-style:normal;letter-spacing:.5px;color:#1A1030}
+.kartu.r-SSR .rar{background:linear-gradient(135deg,#FFE27A,#FF9F3D)}
+.kartu.r-SR .rar{background:linear-gradient(135deg,#D3B3FF,#8E5CFF);color:#fff}
+.kartu.r-R .rar{background:linear-gradient(135deg,#8FC4FF,#3D86F0);color:#fff}
+.kartu.r-N .rar{background:linear-gradient(135deg,#9BE8BE,#46B884)}
+.kartu.r-SSR::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);background-size:250% 100%;animation:kilau 3.2s ease-in-out infinite}
+@keyframes kilau{0%{background-position:150% 0}60%,100%{background-position:-50% 0}}
+
+/* Kartu lengkap (modal) bergaya koleksi */
+.kartu-lengkap{position:relative;border:2px solid var(--warna-r,var(--tepi))}
+.kartu-lengkap.r-SSR{--warna-r:var(--r-SSR);box-shadow:0 0 34px rgba(255,200,61,.35)}
+.kartu-lengkap.r-SR{--warna-r:var(--r-SR);box-shadow:0 0 28px rgba(176,124,255,.3)}
+.kartu-lengkap.r-R{--warna-r:var(--r-R)}
+.kartu-lengkap.r-N{--warna-r:var(--r-N)}
+.kl-rar{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+.kl-rar b{padding:3px 12px;border-radius:9px;font-size:20px;font-weight:800;letter-spacing:1px;color:#1A1030;background:var(--warna-r)}
+.kl-rar span{color:var(--warna-r);letter-spacing:2px;font-size:16px}
+.kartu-lengkap .potret{border:2px solid var(--warna-r);box-shadow:0 0 18px color-mix(in srgb,var(--warna-r) 55%,transparent)}
+
+/* ===== Papan skor laga ===== */
+.papan{position:relative}
+.papan .sisi{display:grid;justify-items:center;gap:2px}
+.papan .nm{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--redup);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.papan .tengah{display:grid;justify-items:center;gap:2px}
+.papan .tengah small{font-size:11px;font-weight:800;letter-spacing:1.4px;color:var(--bola)}
+
+/* Label aksi di atas lapangan (mis. "Smash!") */
+.lapangan{position:relative}
+.aksi-label{position:absolute;left:12px;bottom:14px;z-index:6;padding:6px 16px 6px 12px;border-radius:0 99px 99px 0;font:800 17px/1 var(--font);letter-spacing:.8px;text-transform:uppercase;color:#fff;background:linear-gradient(90deg,rgba(8,12,32,.88),rgba(8,12,32,.35));border-left:4px solid var(--bola);opacity:0;transform:translateX(-14px);pointer-events:none;transition:opacity .25s,transform .25s}
+.aksi-label.tampil{opacity:1;transform:none}
+.aksi-label.smash{border-color:var(--kritis)}.aksi-label.blok{border-color:var(--baik)}.aksi-label.ace{border-color:var(--bola)}.aksi-label.salah{border-color:var(--redup);color:var(--redup)}
+
+/* Kontrol kecepatan */
+.kec{display:grid;grid-template-columns:64px 64px 1fr;gap:8px;margin-top:10px}
+.kec button{height:46px;border-radius:14px;font-weight:800;letter-spacing:.6px;background:rgba(255,255,255,.07);border:1px solid var(--tepi);color:var(--redup);display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s,color .2s}
+.kec button.on{background:var(--aksen);color:#1A1030;border-color:transparent}
+.kec #lompat{font-size:13px;text-transform:uppercase}
+
+/* Bola 2D: terbang lebih pelan mengikuti kecepatan */
+[data-layar="tanding"] .bola.terbang svg{animation-duration:calc(.9s*var(--kt,1))}

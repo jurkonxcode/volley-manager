@@ -1,4 +1,5 @@
 // Pembantu gambar: ikon, avatar, cincin stamina, radar. Hanya menghasilkan HTML/SVG.
+import { rarity } from './rarity.js';
 import { K, URUTAN_STAT, WARNA_STAT } from '../inti/konfigurasi.js';
 import { staminaSekarang, zonaStamina } from '../sistem/stamina.js';
 import { ratingPemain } from '../sistem/pemain.js';
@@ -56,7 +57,8 @@ export function figur(p, tim, now) {
 export function kartuMini(p, { tim = 'A', now, zona = 'lap', interaktif = true, badan = false } = {}) {
   const tag = interaktif ? 'button' : 'div';
   const data = interaktif ? ` data-id="${p.id}" data-zona="${zona}"` : '';
-  return `<${tag} class="kartu"${data} style="--w:${K.warnaPosisi[p.posisi]}">${badan ? badanGambar(p, tim, now) : figur(p, tim, now)}<i class="lencana">${p.posisi}</i>${badan ? '' : `<span class="nilai">${ratingPemain(p)}</span>`}${p.cedera > now ? '<i class="med">+</i>' : ''}</${tag}>`;
+  const rr = rarity(p);
+  return `<${tag} class="kartu r-${rr.kode}"${data} style="--w:${K.warnaPosisi[p.posisi]}">${badan ? badanGambar(p, tim, now) : figur(p, tim, now)}${badan ? '' : `<i class="rar">${rr.kode}</i>`}<i class="lencana">${p.posisi}</i>${badan ? '' : `<span class="nilai">${ratingPemain(p)}</span>`}${p.cedera > now ? '<i class="med">+</i>' : ''}</${tag}>`;
 }
 export function radar(p) {
   const R = 34, ang = i => (-90 + 72 * i) * Math.PI / 180;

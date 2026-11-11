@@ -1,5 +1,6 @@
 // Kartu profil lengkap pemain, tampil sebagai lembar di atas layar.
 import { potret, radar, chipStat, ikon, esc } from './gambar.js';
+import { rarity } from './rarity.js';
 import { K } from '../inti/konfigurasi.js';
 import { ratingPemain, gajiPemain, nilaiPasar } from '../sistem/pemain.js';
 import { staminaSekarang, zonaStamina } from '../sistem/stamina.js';
@@ -8,13 +9,14 @@ const rp = n => n.toLocaleString('id-ID');
 const sel = (label, nilai) => `<div class="sel"><span>${label}</span><b>${nilai}</b></div>`;
 
 export function bukaKartu(p, now) {
-  const s = staminaSekarang(p, now), r = ratingPemain(p);
+  const s = staminaSekarang(p, now), r = ratingPemain(p), rr = rarity(p);
   const el = document.createElement('div');
   el.className = 'modal';
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
-  el.innerHTML = `<article class="kartu-lengkap" style="--w:${K.warnaPosisi[p.posisi]}">
+  el.innerHTML = `<article class="kartu-lengkap r-${rr.kode}" style="--w:${K.warnaPosisi[p.posisi]}">
 <button class="tutup" data-tutup aria-label="Tutup">${ikon('silang', 20)}</button>
+<div class="kl-rar"><b>${rr.kode}</b><span>${'★'.repeat(rr.bintang)}${'☆'.repeat(5 - rr.bintang)}</span></div>
 <header class="kl-kepala">${potret(p)}<div><div class="kl-nama">${esc(p.nama)}</div><div class="sub"><i class="lencana">${p.posisi}</i><span>#${p.nomor} · ${p.umur} tahun</span></div><div class="kl-sifat">${esc(p.sifat)}</div></div><div class="rating-besar">${r}</div></header>
 ${radar(p)}
 ${chipStat(p)}
