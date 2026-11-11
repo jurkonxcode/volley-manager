@@ -2,6 +2,7 @@
 import { K, URUTAN_STAT, WARNA_STAT } from '../inti/konfigurasi.js';
 import { staminaSekarang, zonaStamina } from '../sistem/stamina.js';
 import { ratingPemain } from '../sistem/pemain.js';
+import { spriteSrc } from './sprite.js';
 
 const IKON = {
   bola: '<circle cx="12" cy="12" r="9"/><path d="M3.5 9.5c5 1 11 1 17 0M3.5 14.5c5-1 11-1 17 0M12 3c-3 4-3 14 0 18"/>',
@@ -54,7 +55,7 @@ export function figur(p, tim, now) {
 export function kartuMini(p, { tim = 'A', now, zona = 'lap', interaktif = true, badan = false } = {}) {
   const tag = interaktif ? 'button' : 'div';
   const data = interaktif ? ` data-id="${p.id}" data-zona="${zona}"` : '';
-  return `<${tag} class="kartu"${data} style="--w:${K.warnaPosisi[p.posisi]}">${badan ? badanSvg(p, tim, now) : figur(p, tim, now)}<i class="lencana">${p.posisi}</i>${badan ? '' : `<span class="nilai">${ratingPemain(p)}</span>`}${p.cedera > now ? '<i class="med">+</i>' : ''}</${tag}>`;
+  return `<${tag} class="kartu"${data} style="--w:${K.warnaPosisi[p.posisi]}">${badan ? badanGambar(p, tim, now) : figur(p, tim, now)}<i class="lencana">${p.posisi}</i>${badan ? '' : `<span class="nilai">${ratingPemain(p)}</span>`}${p.cedera > now ? '<i class="med">+</i>' : ''}</${tag}>`;
 }
 export function radar(p) {
   const R = 34, ang = i => (-90 + 72 * i) * Math.PI / 180;
@@ -86,3 +87,11 @@ export function badanSvg(p, tim, now) {
 <path d="M12.500 11a7.500 7.500 0 0 1 15 0c-4-3-11-3-15 0z" fill="${rambut}"/>
 <text x="20" y="35" text-anchor="middle" font-size="9" font-weight="800" fill="${tulis}" font-family="sans-serif">${ratingPemain(p)}</text></svg><i class="stm zona-${zonaStamina(s)}"><b style="width:${s.toFixed(0)}%"></b></i>`;
 }
+
+// Pemain di laga: gambar pose (assets/pose/) + bar stamina. Pose diganti lewat sprite.js (setPose).
+export function badanGambar(p, tim, now) {
+  const s = staminaSekarang(p, now);
+  return `<span class="badan"><img class="sprite" data-tim="${tim}" data-pose="siap" src="${spriteSrc('siap', tim)}" alt="" draggable="false"></span><i class="stm zona-${zonaStamina(s)}"><b style="width:${s.toFixed(0)}%"></b></i>`;
+}
+export const LOGO = 'assets/logo/logo-garuda-muda.png';
+export const logoTim = () => `<img class="logo-img" src="${LOGO}" alt="" draggable="false">`;

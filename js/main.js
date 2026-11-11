@@ -11,7 +11,8 @@ import { prosesWaktu } from './sistem/pasar.js';
 import { bersihkanSusunan } from './sistem/taktik.js';
 import { renderBeranda } from './layar/klub.js';
 import { renderLiga } from './layar/kompetisi.js';
-import { ikon } from './layar/gambar.js';
+import { ikon, LOGO } from './layar/gambar.js';
+import { siapkanSprite } from './layar/sprite.js';
 import { renderSkuad } from './layar/skuad.js';
 import { renderPertandingan, lepasPilihan } from './layar/pertandingan.js';
 import { renderProfil } from './layar/profil.js';
@@ -46,7 +47,8 @@ const aksi = {
 const NAMA_TAB = { beranda: 'Beranda', liga: 'Kompetisi', tim: 'Tim', tanding: 'Laga', profil: 'Profil' };
 const TAB = { beranda: ['rumah', renderBeranda], liga: ['trofi', renderLiga], tim: ['skuad', renderTim], tanding: ['jaring', renderPertandingan], profil: ['orang', renderProfil] };
 
-$('#logo').innerHTML = ikon('bola', 28);
+$('#logo').innerHTML = `<img src="${LOGO}" alt="" height="36" draggable="false">`;
+siapkanSprite();
 $('#reset').innerHTML = ikon('hapus', 22);
 $('#reset').onclick = aksi.reset;
 $('#nav').innerHTML = Object.entries(TAB).map(([k, [ik]]) => `<button data-tab="${k}" aria-label="${k}">${ikon(ik, 24)}<span>${NAMA_TAB[k]}</span></button>`).join('');

@@ -1,5 +1,5 @@
 // Kelola Tim: kartu ringkasan + tab Skuad / Strategi / Formasi / Pasar.
-import { ikon, esc } from './gambar.js';
+import { ikon, esc, logoTim } from './gambar.js';
 import { renderSkuad } from './skuad.js';
 import { renderPasar } from './pasar.js';
 import { levelDari } from '../sistem/manajer.js';
@@ -22,7 +22,7 @@ const formasi = S => Object.entries(FORMASI).map(([k, f]) => {
 }).join('') + `<button class="tombol-besar sekunder" data-auto>${ikon('ulang', 24)} Susun otomatis</button>`;
 export function renderTim(root, S, aksi) {
   const L = levelDari(S.manajer.exp), st = ringkas(S);
-  root.innerHTML = `<section class="kartu-klub"><div class="km-kepala"><div class="km-avatar">${esc((S.manajer.tim[0] || 'T').toUpperCase())}</div><div class="km-id"><div class="km-nama">${esc(S.manajer.tim)}</div><div class="batang exp-batang"><i style="width:${L.persen.toFixed(0)}%"></i></div></div><div class="km-level"><small>LV</small><b>${L.level}</b></div></div>
+  root.innerHTML = `<section class="kartu-klub"><div class="km-kepala"><div class="km-avatar logo">${logoTim()}</div><div class="km-id"><div class="km-nama">${esc(S.manajer.tim)}</div><div class="batang exp-batang"><i style="width:${L.persen.toFixed(0)}%"></i></div></div><div class="km-level"><small>LV</small><b>${L.level}</b></div></div>
 <div class="km-statistik tiga"><div><b>${st.atk}</b><span>Attack</span></div><div><b>${st.def}</b><span>Defense</span></div><div><b>${st.ovr}</b><span>Overall</span></div></div></section>
 <div class="tab-sub">${Object.entries(SUB).map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-sub="${k}">${n}</button>`).join('')}</div><div id="isi"></div>`;
   const isi = root.querySelector('#isi');

@@ -11,6 +11,8 @@ Unggah seluruh isi folder ke repo GitHub, lalu aktifkan **Settings → Pages**. 
 - `js/sistem/` logika murni (tanpa HTML): pemain, stamina, pertandingan, liga, ekonomi
 - `js/layar/` tampilan saja: skuad, pertandingan, pembantu gambar
 
+- `assets/` gambar: logo, hero, stadion, pose pemain (lihat `HANDOFF.md` untuk nama file)
+
 ## Menyeimbangkan game
 Semua angka ada di `js/inti/konfigurasi.js`: laju pulih stamina, biaya per posisi, peluang poin, hadiah koin.
 
