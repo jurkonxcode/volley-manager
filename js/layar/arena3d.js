@@ -10,6 +10,8 @@ import { createSpikeEffect } from '../tiga-d/effects.js';
 const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const KULIT = [0xF1C9A5, 0xE0A878, 0xC68642, 0x8D5524];
 const WARNA = { A: 0xB51F35, B: 0x245A9A };
+// Warna jersey 3D mengikuti warna klub (hex '#RRGGBB'); dipanggil dari main.js saat identitas dimuat/diganti.
+export function setWarna3D(a, b) { WARNA.A = parseInt(a.slice(1), 16); WARNA.B = parseInt(b.slice(1), 16); }
 // Slot 0-2 baris depan (dekat jaring), 3-5 belakang; kiri ke kanan seperti tampilan 2D.
 const Z = [-3, 0, 3], X_DEPAN = 2.4, X_BELAKANG = 6.6;
 

@@ -15,6 +15,14 @@ export const K = {
   musim: { menitAntarPekan: 20, hadiahPeringkat: [1500, 900, 600, 400, 300, 200, 150, 100] },
   pasar: { jumlah: 10, menitSegar: 30, maksSkuad: 18, minSkuad: 10, biayaScout: 40 },
   latihan: { biaya: 80, menit: 10 }, cedera: { dasar: 0.04, lelah: 0.06 }, fasilitas: { maks: 5 },
+  // v17 (ala Top Eleven): token, stadion & tiket, toko/parkir, akademi, persahabatan, semangat tim
+  token: { awal: 3, juara: 5, tiga: 3, lain: 1, capai: 1, menitPercepat: 15 },
+  stadion: { kapAwal: 600, kapPerLevel: 500, minat: { liga: 0.4, persahabatan: 0.25 } },
+  tiket: [{ n: 'Murah', h: 1, m: 1.35 }, { n: 'Normal', h: 2, m: 1 }, { n: 'Mahal', h: 3, m: 0.72 }, { n: 'Premium', h: 4, m: 0.45 }],   // h = koin per 10 tiket, m = pengali minat penonton
+  toko: { perLevel: 2 }, parkir: { perLevel: 3 },
+  akademi: { menitSegar: 45, jumlah: 3 },
+  persahabatan: { maksJadwal: 3, maksPerHari: 8, menitTunggu: 30, menitSegar: 30, slot: [0, 10, 30, 60, 180], hadiah: 0.5, exp: 0.5 },
+  semangat: { awal: 50, bonusMaks: 0.03, menang: 5, kalah: -5, fMenang: 4, fKalah: 2 },
   kunciSimpan: 'volley-manager-v2'
 };
 export const URUTAN_STAT = ['servis', 'smash', 'blok', 'receive', 'umpan'];

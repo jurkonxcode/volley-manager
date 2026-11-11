@@ -5,11 +5,12 @@ import { hadiahPertandingan } from './ekonomi.js';
 import { cederaLaga } from './pasar.js';
 import { expPertandingan, catatHasil } from './manajer.js';
 import { namaKlub } from '../data/negara.js';
-import { akhirLaga, pesan, buatSponsor, pastikanKontrak, kontrakSelesai } from './klub.js';
+import { akhirLaga, pesan, buatSponsor, pastikanKontrak, kontrakSelesai, catatKas } from './klub.js';
+import { perkembanganMusim } from './akademi.js';
 const NAMA = ['Elang Sakti', 'Badai Timur', 'Macan Putih', 'Naga Laut', 'Rajawali', 'Banteng Muda', 'Cakra Biru'];
 export const LIGA = ['Liga Kelurahan', 'Liga Kota', 'Liga Provinsi', 'Liga Nasional'];
 const jepit = (n, a, b) => Math.max(a, Math.min(b, n));
-const peluang = d => jepit(0.5 + d * K.skalaPeluang, K.peluangMin, K.peluangMaks);
+export const peluang = d => jepit(0.5 + d * K.skalaPeluang, K.peluangMin, K.peluangMaks);
 function putaran(n) {
   const t = [...Array(n).keys()], ps = [];
   for (let r = 0; r < n - 1; r++) { ps.push(Array.from({ length: n / 2 }, (_, i) => [t[i], t[n - 1 - i]])); t.splice(1, 0, t.pop()); }
@@ -28,7 +29,7 @@ export function fixtureSaya(M) {
   return { hari: M.hari, lawan: f[0] === 0 ? f[1] : f[0], kandang: f[0] === 0 };
 }
 function simSet(p, acak, target) { let a = 0, b = 0; while (!((a >= target || b >= target) && Math.abs(a - b) >= 2) && a + b < 200) acak() < p ? a++ : b++; return a > b; }
-function simLaga(p, acak) { let a = 0, b = 0; while (a < 3 && b < 3) simSet(p, acak, a + b === 4 ? 15 : 25) ? a++ : b++; return [a, b]; }
+export function simLaga(p, acak) { let a = 0, b = 0; while (a < 3 && b < 3) simSet(p, acak, a + b === 4 ? 15 : 25) ? a++ : b++; return [a, b]; }
 // Catat hasil laga saya (set menang, set kalah), simulasikan laga tim lain di pekan itu, lalu maju satu pekan.
 export function catatLaga(S, sa, sb) {
   const M = S.musim, h = M.hari, acak = buatAcak(M.ke * 7919 + h), f = fixtureSaya(M), lw = M.tim[f.lawan];
@@ -40,7 +41,7 @@ export function catatLaga(S, sa, sb) {
   });
   M.hari++;
   const menang = sa > sb, level = levelLawan(lw.tingkat), koin = Math.round(hadiahPertandingan(menang, level) * (1 + 0.1 * (S.fasilitas?.stadion || 0))), exp = expPertandingan(menang, level);
-  S.koin += koin;
+  S.koin += koin; catatKas(S, 'hadiah', koin);
   const ek = akhirLaga(S, f, menang, level, h);
   pesan(S, (menang ? 'Menang ' : 'Kalah ') + sa + '-' + sb + ' vs ' + lw.nama, `Hadiah ${koin} koin. Pemasukan ${ek.masuk}, gaji ${ek.gaji} koin pekan ini.`);
   return { menang, koin, exp, naik: catatHasil(S.manajer, menang, exp), cedera: S.fasilitas ? cederaLaga(S, acak, Date.now()) : [] };
@@ -66,11 +67,13 @@ export function tabel(M) {
 export function akhiriMusim(S, now) {
   const rank = tabel(S.musim).findIndex(x => x.i === 0) + 1, koin = K.musim.hadiahPeringkat[rank - 1] || 100;
   const M = S.musim, sp = S.klub.sponsor, ok = rank <= sp.target, bonus = ok ? sp.bonus : 0, liga = rank <= 2 && M.liga < LIGA.length - 1 ? M.liga + 1 : rank >= 7 && M.liga > 0 ? M.liga - 1 : M.liga;
-  S.koin += koin + bonus; S.riwayat.push({ ke: M.ke, liga: M.liga, rank, poin: tabel(M).find(x => x.i === 0).poin, naik: liga > M.liga, turun: liga < M.liga });
-  S.klub.sponsor = buatSponsor(liga, rank); pastikanKontrak(S); const kt = kontrakSelesai(S, now);
+  S.koin += koin + bonus; catatKas(S, 'hadiah', koin); catatKas(S, 'sponsor', bonus);
+  const tk = rank === 1 ? K.token.juara : rank <= 3 ? K.token.tiga : K.token.lain; S.token = (S.token || 0) + tk;
+  S.riwayat.push({ ke: M.ke, liga: M.liga, rank, poin: tabel(M).find(x => x.i === 0).poin, naik: liga > M.liga, turun: liga < M.liga });
+  S.klub.sponsor = buatSponsor(liga, rank); perkembanganMusim(S, M.ke * 4099 + rank); pastikanKontrak(S); const kt = kontrakSelesai(S, now);
   let ket = liga > M.liga ? 'Promosi ke ' + LIGA[liga] : liga < M.liga ? 'Degradasi ke ' + LIGA[liga] : 'Bertahan di ' + LIGA[liga];
   if (kt.pergi.length) ket += `. ${kt.pergi.length} pemain habis kontrak dan pergi`;
-  pesan(S, `Musim ${M.ke} selesai: peringkat ${rank}`, ket + (ok ? `. Target sponsor tercapai, bonus ${bonus} koin.` : `. Target sponsor (peringkat ${sp.target}) belum tercapai.`));
+  pesan(S, `Musim ${M.ke} selesai: peringkat ${rank}`, ket + (ok ? `. Target sponsor tercapai, bonus ${bonus} koin.` : `. Target sponsor (peringkat ${sp.target}) belum tercapai.`) + ` Hadiah musim: +${tk} token.`);
   S.musim = buatMusim(M.ke + 1, S.manajer.tim, now, S.negara, liga);
-  return { rank, koin: koin + bonus, ket };
+  return { rank, koin: koin + bonus, ket, token: tk };
 }

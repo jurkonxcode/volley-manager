@@ -23,7 +23,7 @@ export function renderProfil(root, S, aksi) {
 <button class="tombol-besar sekunder" id="ulang">${ikon('hapus', 24)} Mulai dari awal</button>
 </section>`;
   root.querySelector('#nm').onchange = e => { m.nama = e.target.value.trim() || 'Manajer'; e.target.value = m.nama; aksi.simpan(); renderProfil(root, S, aksi); };
-  root.querySelector('#nt').onchange = e => { m.tim = e.target.value.trim() || 'Tim Tanpa Nama'; e.target.value = m.tim; aksi.simpan(); };
+  root.querySelector('#nt').onchange = e => { m.tim = e.target.value.trim() || 'Tim Tanpa Nama'; e.target.value = m.tim; S.musim.tim[0].nama = m.tim; aksi.identitas(); };
   root.querySelector('#anim').onchange = e => { pengaturan.animasiCepat = e.target.checked; aksi.simpan(); };
   root.querySelector('#neg').onchange = e => { const v = e.target.value; gantiNegara(S, v); try { localStorage.setItem('vm-negara', v); } catch (x) {} if (!S.musim.hasil.length) S.musim = buatMusim(S.musim.ke, m.tim, sekarang(), v, S.musim.liga || 0); aksi.simpan(); alert('Nama pemain diganti. Nama klub lawan berubah di musim baru' + (S.musim.hasil.length ? '.' : ' (sudah berlaku).')); renderProfil(root, S, aksi); };
   root.querySelector('#ulang').onclick = () => aksi.reset();

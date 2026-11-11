@@ -19,6 +19,12 @@ Semua angka ada di `js/inti/konfigurasi.js`: laju pulih stamina, biaya per posis
 ## Mode 3D Premium (v15, audit v15.1)
 Mode pertandingan 3D memakai arena indoor procedural dengan lantai parquet, net berjaring, tribun, crowd instanced, LED perimeter, rangka atap, pemain procedural lebih detail, bola dengan panel, dan pencahayaan sinematik yang dioptimalkan untuk HP. Detail pemasangan dan batasan model ada di `docs/V15_3D_PREMIUM_UPGRADE.md`.
 
+## Baru di v17 (skema ala Top Eleven)
+- **Buat Klub** (layar awal game baru): nama manajer/klub/singkatan, negara + kota, lambang (9 pilihan), warna jersey kandang/tandang, nama stadion.
+- **Tab Klub**: Stadion (kapasitas + harga tiket), Fasilitas (Latihan, Medis, Akademi, Toko, Parkir), Akademi Muda, Kas (keuangan), Identitas.
+- **Persahabatan** (Kompetisi > Persahabatan): cari lawan, pilih waktu kick-off dan kandang/tandang, laga terjadwal tampil di Beranda dan layar Laga.
+- Token (mempercepat pembangunan/latihan, menyegarkan pasar), semangat tim, perkembangan pemain tiap akhir musim.
+
 ## Sudah ada
 Menu utama, Kelola Tim bertab (Skuad/Strategi/Formasi/Pasar), liga 8 tim + Kompetisi bertab (klasemen, jadwal, analitik dengan grafik performa dan win rate), laga live berperspektif dengan pemain berpose, transfer + scouting, latihan, fasilitas, cedera, profil pemain & manajer.
 

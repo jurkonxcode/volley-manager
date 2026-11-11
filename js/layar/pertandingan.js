@@ -8,37 +8,51 @@ import { buatPertandingan, mainkanSet, timSaya, kekuatanTim } from '../sistem/pe
 import { buatLawan } from '../sistem/liga.js';
 import { bersihkanSusunan, FORMASI, GAYA, autoSusun } from '../sistem/taktik.js';
 import { fixtureSaya, kickoff, catatLaga, levelLawan } from '../sistem/musim.js';
+import { catatPersahabatan } from '../sistem/persahabatan.js';
 import * as D3 from './arena3d.js';
 
-let P = baru(), token = 0, gagal3d = false;
-function baru() { return { fase: 'pilih', m: null, level: 0, lawan: null, skor: { a: 0, b: 0 }, hasil: null, cepat: false }; }
+let P = baru(), token = 0, gagal3d = false, pilihTab = 'liga', pilihF = null;
+const hashId = s => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+function baru() { return { fase: 'pilih', jenis: 'liga', fid: null, m: null, level: 0, lawan: null, skor: { a: 0, b: 0 }, hasil: null, cepat: false }; }
 const tunggu = ms => new Promise(r => setTimeout(r, ms));
 
 export function renderPertandingan(root, S, aksi) {
   token++;
   // Pekan laga ini sudah lewat dan dimainkan otomatis (kejar) saat pindah tab: buang laga lama agar hasilnya tidak tercatat ke lawan lain.
-  if (P.m && P.fase === 'siap' && P.hari !== S.musim.hari) P = baru();
+  if (P.m && P.fase === 'siap' && (P.jenis === 'persahabatan' ? !S.persahabatan.daftar.some(f => f.id === P.fid) : P.hari !== S.musim.hari)) P = baru();
   if (P.fase === 'pilih') return tampilPilih(root, S, aksi);
   if (P.fase === 'selesai') return tampilSelesai(root, S, aksi);
   tampilLapangan(root, S, aksi);
 }
 
 function tampilPilih(root, S, aksi) {
-  const M = S.musim, now = sekarang(), f = fixtureSaya(M);
-  if (!f) { root.innerHTML = `<button class="tombol-besar" id="ke">${ikon('trofi', 30)}</button>`; root.querySelector('#ke').onclick = () => aksi.pindah('liga'); return; }
-  const buka = kickoff(M, f.hari), lw = M.tim[f.lawan], tim = buatLawan(lw.tingkat, buatAcak(M.ke * 1000 + f.lawan * 20 + f.hari), now);
-  const saya = Math.round(kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), now, S.taktik)), level = levelLawan(lw.tingkat);
+  const M = S.musim, now = sekarang(), f = fixtureSaya(M), PF = S.persahabatan.daftar;
+  if (!f && !PF.length) { root.innerHTML = `<button class="tombol-besar" id="ke">${ikon('trofi', 30)}</button>`; root.querySelector('#ke').onclick = () => aksi.pindah('liga'); return; }
+  let tab = pilihTab; if (tab === 'persahabatan' && !PF.length) tab = 'liga'; if (tab === 'liga' && !f) tab = 'persahabatan';
+  const pf = tab === 'persahabatan' ? (PF.find(x => x.id === pilihF) || PF[0]) : null;
+  // Satu bentuk data untuk liga dan persahabatan: lawan, kekuatan, level, jam kick-off, kandang/tandang, tim lawan.
+  const lw = pf ? pf.lawan : M.tim[f.lawan], level = pf ? pf.lawan.level : levelLawan(lw.tingkat), buka = pf ? pf.kickoff : kickoff(M, f.hari), kandang = pf ? pf.kandang : f.kandang;
+  const tim = buatLawan(lw.tingkat, buatAcak(pf ? hashId(pf.id) : M.ke * 1000 + f.lawan * 20 + f.hari), now);
+  const saya = Math.round(kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), now, S.taktik));
   const lwKuat = Math.round(kekuatanTim(tim, now)), total = Math.max(saya + lwKuat, 1), selisih = saya - lwKuat;
   const nada = selisih > 3 ? 'unggul' : selisih < -3 ? 'tertinggal' : 'imbang', teksNada = selisih > 3 ? `Unggul ${selisih}` : selisih < -3 ? `Tertinggal ${-selisih}` : 'Seimbang';
-  root.innerHTML = `<section class="md-kartu"><div class="md-kepala"><span>Musim ${M.ke}</span><span>Pekan ${f.hari + 1} / ${M.jadwal.length}</span><span>${f.kandang ? 'Kandang' : 'Tandang'}</span></div>
+  const seg = f && PF.length ? `<div class="tab-sub"><button class="${tab === 'liga' ? 'on' : ''}" data-pt="liga">Liga</button><button class="${tab === 'persahabatan' ? 'on' : ''}" data-pt="persahabatan">Persahabatan (${PF.length})</button></div>` : '';
+  const pilih = pf && PF.length > 1 ? `<div class="taktik">${PF.map(x => `<button class="chip-t ${x.id === pf.id ? 'on' : ''}" data-pf="${x.id}">${esc(x.lawan.nama)}</button>`).join('')}</div>` : '';
+  const kepala = pf ? `<span>Persahabatan</span><span>Tidak masuk klasemen</span><span>${kandang ? 'Kandang' : 'Tandang'}</span>` : `<span>Musim ${M.ke}</span><span>Pekan ${f.hari + 1} / ${M.jadwal.length}</span><span>${kandang ? 'Kandang' : 'Tandang'}</span>`;
+  root.innerHTML = `${seg}${pilih}<section class="md-kartu"><div class="md-kepala">${kepala}</div>
 <div class="md-tim"><div class="md-sisi"><div class="md-logo">${logoTim()}</div><b>${esc(S.manajer.tim)}</b></div><div class="md-vs">VS</div><div class="md-sisi"><div class="md-logo">${logoMini(lw.nama)}</div><b>${esc(lw.nama)}</b></div></div>
 <div class="md-kuat"><b>${saya}</b><div class="md-bar" role="img" aria-label="Perbandingan kekuatan"><i style="width:${(saya / total * 100).toFixed(1)}%"></i></div><b>${lwKuat}</b></div>
 <div class="md-nada ${nada}">${teksNada} · kekuatan tim</div>
-<div class="md-taktik"><span>${esc(S.taktik.formasi)}</span><span>${esc(GAYA[S.taktik.gaya]?.nama || S.taktik.gaya)}</span></div></section>
+<div class="md-taktik"><span>${esc(S.taktik.formasi)}</span><span>${esc(GAYA[S.taktik.gaya]?.nama || S.taktik.gaya)}</span><span>Semangat ${Math.round(S.klub.semangat)}</span></div></section>
 <section class="md-lawan"><small>Susunan lawan</small><span class="deret">${tim.map(p => figur(p, 'B', now)).join('')}</span></section>` +
     (now >= buka ? `<button class="tombol-besar" id="mulai" aria-label="Mulai laga">${ikon('main', 26)} Mulai Laga</button>` : `<div class="md-hitung">${ikon('jam', 22)}<span>Kickoff dalam ${durasiPendek(buka - now)}</span></div>`);
+  root.querySelectorAll('[data-pt]').forEach(b => b.onclick = () => { pilihTab = b.dataset.pt; renderPertandingan(root, S, aksi); });
+  root.querySelectorAll('[data-pf]').forEach(b => b.onclick = () => { pilihF = b.dataset.pf; renderPertandingan(root, S, aksi); });
   const mb = root.querySelector('#mulai');
-  if (mb) mb.onclick = () => { bersihkanSusunan(S, sekarang()); P.level = level; P.lawan = lw.nama; P.hari = f.hari; P.m = buatPertandingan(S.skuad, S.susunan, tim, level, S.taktik); P.fase = 'siap'; P.skor = { a: 0, b: 0 }; renderPertandingan(root, S, aksi); };
+  if (mb) mb.onclick = () => {
+    bersihkanSusunan(S, sekarang()); P.level = level; P.lawan = lw.nama; P.jenis = pf ? 'persahabatan' : 'liga'; P.fid = pf ? pf.id : null; P.hari = pf ? null : f.hari;
+    P.m = buatPertandingan(S.skuad, S.susunan, tim, level, S.taktik); P.fase = 'siap'; P.skor = { a: 0, b: 0 }; renderPertandingan(root, S, aksi);
+  };
 }
 
 // Pergantian di jeda antar-set: pemain di susunan yang tidak main di set terakhir. Dibatasi K.ganti.maks.
@@ -161,8 +175,9 @@ async function mainkan(root, S, aksi) {
   const now = sekarang(), hasil = mainkanSet(P.m, buatAcak(now), now);
   const akhir = () => {
     P.skor = { a: hasil.a, b: hasil.b };
-    if (P.m.selesai && P.hari !== S.musim.hari) P = baru();   // pekannya sudah dimainkan otomatis selagi laga ini berjalan: jangan dicatat dua kali
-    else if (P.m.selesai) { const r = catatLaga(S, P.m.setSaya, P.m.setLawan); P.hasil = { koin: r.koin, exp: r.exp, naik: r.naik, cedera: r.cedera }; P.fase = 'selesai'; }
+    const basi = P.jenis === 'persahabatan' ? !S.persahabatan.daftar.some(f => f.id === P.fid) : P.hari !== S.musim.hari;   // sudah dimainkan otomatis selagi laga ini berjalan: jangan dicatat dua kali
+    if (P.m.selesai && basi) P = baru();
+    else if (P.m.selesai) { const r = P.jenis === 'persahabatan' ? catatPersahabatan(S, P.fid, P.m.setSaya, P.m.setLawan) : catatLaga(S, P.m.setSaya, P.m.setLawan); P.hasil = { koin: r.koin, exp: r.exp, naik: r.naik, cedera: r.cedera }; P.fase = 'selesai'; }
     else P.fase = 'siap';
     aksi.simpan(); aksi.perbaruiKoin();
     if (root.dataset.layar === 'tanding') renderPertandingan(root, S, aksi);
@@ -187,7 +202,7 @@ function tampilSelesai(root, S, aksi) {
 <div class="skor-akhir"><b>${m.setSaya}</b><span>-</span><b>${m.setLawan}</b></div>
 <div class="rincian">${m.riwayat.map(r => `<span class="${r.a > r.b ? 'm' : 'k'}">${r.a}-${r.b}</span>`).join('')}</div>
 <div class="hadiah">${ikon('koin', 32)}<b>+${P.hasil.koin}</b></div><div class="hadiah exp">${ikon('bintang', 26)}<b>+${P.hasil.exp} EXP</b>${P.hasil.naik ? `<span class="naik">Level ${P.hasil.naik}!</span>` : ''}</div></div>
-${P.hasil.cedera?.length ? `<div class="komentar">Cedera: ${P.hasil.cedera.join(', ')}</div>` : ''}<button class="tombol-besar" id="lagi" aria-label="Main lagi">${ikon('ulang', 30)}</button>`;
+${P.jenis === 'persahabatan' ? '<div class="komentar">Laga persahabatan: tidak masuk klasemen. Semangat tim dan fans naik.</div>' : ''}${P.hasil.cedera?.length ? `<div class="komentar">Cedera: ${P.hasil.cedera.join(', ')}</div>` : ''}<button class="tombol-besar" id="lagi" aria-label="Main lagi">${ikon('ulang', 30)}</button>`;
   root.querySelector('#lagi').onclick = () => { P = baru(); renderPertandingan(root, S, aksi); };
 }
 export { lepasPilihan };

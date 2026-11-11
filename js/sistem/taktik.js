@@ -14,6 +14,7 @@ export const GAYA = {
 export function pengaliTaktik(tk) {
   const a = FORMASI[tk.formasi]?.m || {}, b = GAYA[tk.gaya]?.m || {}, h = {};
   for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) h[k] = (a[k] || 1) * (b[k] || 1);
+  if (tk.semangat && tk.semangat !== 1) for (const k of ['servis', 'smash', 'blok', 'receive', 'umpan']) h[k] = (h[k] || 1) * tk.semangat;   // semangat tim (v17)
   return h;
 }
 // Pilih pemain terbaik (rating x stamina) untuk tiap slot formasi.

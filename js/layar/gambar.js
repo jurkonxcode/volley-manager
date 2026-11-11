@@ -4,6 +4,7 @@ import { K, URUTAN_STAT, WARNA_STAT } from '../inti/konfigurasi.js';
 import { staminaSekarang, zonaStamina } from '../sistem/stamina.js';
 import { ratingPemain } from '../sistem/pemain.js';
 import { spriteSrc } from './sprite.js';
+import { warnaTeks } from '../sistem/identitas.js';
 
 const IKON = {
   bola: '<circle cx="12" cy="12" r="9"/><path d="M3.5 9.5c5 1 11 1 17 0M3.5 14.5c5-1 11-1 17 0M12 3c-3 4-3 14 0 18"/>',
@@ -29,7 +30,13 @@ const IKON = {
   gerigi: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.100 2.100M16.300 16.300l2.100 2.100M18.400 5.600l-2.100 2.100M7.700 16.300l-2.100 2.100"/>',
   rumah: '<path d="M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6"/>',
   kubus: '<path d="M12 3l8 4.500v9L12 21l-8-4.500v-9zM12 12l8-4.500M12 12v9M12 12L4 7.500"/>',
-  orang: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>'
+  orang: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>',
+  stadion: '<ellipse cx="12" cy="12" rx="9.500" ry="6.500"/><ellipse cx="12" cy="12" rx="5" ry="3"/><path d="M12 9v6"/>',
+  permata: '<path d="M6 4h12l3.500 5L12 21 2.500 9z"/><path d="M2.500 9h19M9 4l-2 5 5 12 5-12-2-5"/>',
+  palu: '<path d="M14 4l6 6-3 3-6-6zM12 9L4 17l3 3 8-8"/>',
+  buku: '<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3zM5 17a3 3 0 013-3h11"/>',
+  kalender: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  jabat: '<path d="M3 12l4-4 4 3 4-3 6 5-5 5-3-2-2 2-3-1-5-3z"/>'
 };
 export function ikon(nama, u = 20) {
   return `<svg class="ikon" width="${u}" height="${u}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IKON[nama] || ''}</svg>`;
@@ -38,7 +45,7 @@ export function ikon(nama, u = 20) {
 const KULIT = ['#F1C9A5', '#E0A878', '#C68642', '#8D5524'];
 const RAMBUT = ['#1B1B1B', '#3B2417', '#6B4423', '#B5651D'];
 function isiAvatar(p, tim) {
-  const baju = tim === 'A' ? '#102A4A' : '#F6F2E8', angka = tim === 'A' ? '#F6F2E8' : '#102A4A';
+  const baju = tim === 'A' ? WARNA_SAYA : '#F6F2E8', angka = tim === 'A' ? warnaTeks(WARNA_SAYA) : '#102A4A';
   const kulit = KULIT[p.kulit % 4], rambut = RAMBUT[p.rambut % 4];
   const gaya = [
     `<path d="M15 21a9 9 0 0 1 18 0c-4-3-14-3-18 0z" fill="${rambut}"/>`,
@@ -96,13 +103,23 @@ export function badanGambar(p, tim, now) {
   const s = staminaSekarang(p, now);
   return `<span class="badan"><img class="sprite" data-tim="${tim}" data-pose="siap" src="${spriteSrc('siap', tim)}" alt="" draggable="false"></span><i class="stm zona-${zonaStamina(s)}"><b style="width:${s.toFixed(0)}%"></b></i>`;
 }
-export const LOGO = 'assets/logo/logo-garuda-muda.png';
+// Identitas tim kita (diisi main.js lewat setIdentitasGambar): lambang dan warna jersey tampil di seluruh game.
+export let LOGO = 'assets/logo/logo-garuda-muda.png';
+let NAMA_SAYA = '', WARNA_SAYA = '#102A4A', KODE_LOGO = 'garuda-muda';
+export function setIdentitasGambar(nama, id) { NAMA_SAYA = nama; WARNA_SAYA = id.warnaA; KODE_LOGO = id.logo; LOGO = `assets/logo/logo-${id.logo}.png`; }
 export const logoTim = () => `<img class="logo-img" src="${LOGO}" alt="" draggable="false">`;
 
 // Logo tiap tim lawan (nama tim -> berkas); tim sendiri atau nama lain memakai LOGO.
 const LOGO_TIM = { 'Elang Sakti': 'elang', 'Badai Timur': 'petir', 'Macan Putih': 'singa', 'Naga Laut': 'naga', 'Rajawali': 'api', 'Banteng Muda': 'banteng', 'Cakra Biru': 'ombak' };
 const LOGO_LIST = ['elang', 'petir', 'singa', 'naga', 'api', 'banteng', 'ombak'];
 const hashNama = n => [...n].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
-export const logoMini = nama => `<img class="logo-mini" src="assets/logo/logo-${LOGO_TIM[nama] || LOGO_LIST[hashNama(nama) % 7]}.png" alt="" draggable="false">`;
+function kodeLogo(nama) {
+  if (nama === NAMA_SAYA) return KODE_LOGO;
+  let k = LOGO_TIM[nama] || LOGO_LIST[hashNama(nama) % 7];
+  if (k === KODE_LOGO) k = LOGO_LIST[(LOGO_LIST.indexOf(k) + 1) % 7];   // lawan tidak memakai lambang yang sama dengan kita
+  return k;
+}
+export const logoMini = nama => `<img class="logo-mini" src="assets/logo/logo-${kodeLogo(nama)}.png" alt="" draggable="false">`;
+export const logoKode = k => `<img class="logo-mini" src="assets/logo/logo-${k}.png" alt="" draggable="false">`;
 // Potret pemain: 12 wajah, dipilih tetap dari id pemain.
 export const potret = p => `<img class="potret" src="assets/potret/p${String(([...String(p.id)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % 12) + 1).padStart(2, '0')}.png" alt="" draggable="false">`;

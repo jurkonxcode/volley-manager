@@ -4,10 +4,11 @@ import { sekarang } from '../inti/waktu.js';
 import { bukaTimLawan } from './tim-lawan.js';
 import { tabel, akhiriMusim, LIGA } from '../sistem/musim.js';
 import { analitik } from '../sistem/analitik.js';
+import { renderPersahabatan } from './persahabatan.js';
 
 let sub = 'klasemen';
 export const setSubLiga = s => { sub = s; };
-const SUB = { klasemen: 'Klasemen', jadwal: 'Jadwal', analitik: 'Analitik' };
+const SUB = { klasemen: 'Klasemen', jadwal: 'Jadwal', persahabatan: 'Persahabatan', analitik: 'Analitik' };
 
 const formTim = (M, i) => M.hasil.filter(r => r.i === i || r.j === i).slice(-5).map(r => { const k = r.i === i, a = k ? r.s1 : r.s2, b = k ? r.s2 : r.s1; return `<i class="fd ${a > b ? 'm' : 'k'}"></i>`; }).join('');
 function klasemen(M) {
@@ -59,10 +60,11 @@ function analitikTab(M, S) {
 }
 export function renderLiga(root, S, aksi) {
   const M = S.musim, selesai = M.hari >= M.jadwal.length;
-  const isi = sub === 'jadwal' ? jadwal(M) : sub === 'analitik' ? analitikTab(M, S) : klasemen(M);
-  root.innerHTML = `<div class="tab-sub">${Object.entries(SUB).map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-sub="${k}">${n}</button>`).join('')}</div>${isi}${selesai ? `<button class="tombol-besar" id="baru">${ikon('trofi', 30)}</button>` : ''}`;
+  const isi = sub === 'jadwal' ? jadwal(M) : sub === 'analitik' ? analitikTab(M, S) : sub === 'persahabatan' ? '<div id="pf"></div>' : klasemen(M);
+  root.innerHTML = `<div class="tab-sub tab-scroll">${Object.entries(SUB).map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-sub="${k}">${n}</button>`).join('')}</div>${isi}${selesai && sub !== 'persahabatan' ? `<button class="tombol-besar" id="baru">${ikon('trofi', 30)}</button>` : ''}`;
+  if (sub === 'persahabatan') renderPersahabatan(root.querySelector('#pf'), S, aksi);
   root.querySelector('.tab-sub').onclick = e => { const b = e.target.closest('[data-sub]'); if (b) { sub = b.dataset.sub; renderLiga(root, S, aksi); } };
   root.querySelectorAll('tr[data-tim]').forEach(r => { if (r.dataset.tim !== '0') r.onclick = () => bukaTimLawan(S.musim, +r.dataset.tim, sekarang()); });
   const b = root.querySelector('#baru');
-  if (b) b.onclick = () => { const r = akhiriMusim(S, sekarang()); aksi.simpan(); aksi.perbaruiKoin(); alert(`Peringkat ${r.rank}. Hadiah ${r.koin} koin. ${r.ket}. Musim baru dimulai!`); renderLiga(root, S, aksi); };
+  if (b) b.onclick = () => { const r = akhiriMusim(S, sekarang()); aksi.simpan(); aksi.perbaruiKoin(); alert(`Peringkat ${r.rank}. Hadiah ${r.koin} koin dan ${r.token} token. ${r.ket}. Musim baru dimulai!`); renderLiga(root, S, aksi); };
 }
