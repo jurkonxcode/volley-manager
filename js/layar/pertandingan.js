@@ -8,8 +8,9 @@ import { buatPertandingan, mainkanSet, timSaya, kekuatanTim } from '../sistem/pe
 import { buatLawan } from '../sistem/liga.js';
 import { bersihkanSusunan } from '../sistem/taktik.js';
 import { fixtureSaya, kickoff, catatLaga, levelLawan } from '../sistem/musim.js';
+import * as D3 from './arena3d.js';
 
-let P = baru(), token = 0;
+let P = baru(), token = 0, gagal3d = false;
 function baru() { return { fase: 'pilih', m: null, level: 0, lawan: null, skor: { a: 0, b: 0 }, hasil: null, cepat: false }; }
 const tunggu = ms => new Promise(r => setTimeout(r, ms));
 
@@ -32,34 +33,52 @@ function tampilPilih(root, S, aksi) {
 }
 
 function tampilLapangan(root, S, aksi) {
-  const m = P.m, now = sekarang(), A = timSaya(m), B = m.lawan, edit = P.fase === 'siap';
+  const m = P.m, now = sekarang(), A = timSaya(m), B = m.lawan, edit = P.fase === 'siap', d3 = P.fase === 'main' && !!S.pengaturan?.tiga3d && !gagal3d;
   const titik = n => Array.from({ length: K.set.menang }, (_, i) => `<i class="${i < n ? 'isi' : ''}"></i>`).join('');
   const baris = (a, tim, inter) => `<div class="baris">${a.map(p => kartuMini(p, { tim, now, zona: 'lap', interaktif: inter, badan: true })).join('')}</div>`;
   const bangku = S.skuad.filter(p => !S.susunan.includes(p.id));
   root.innerHTML = `${edit && m.setKe === 1 ? `<button class="kembali" id="kembali" aria-label="Pilih lawan lain">${ikon('kembali', 22)}</button>` : ''}
 <div class="papan"><div class="sisi"><div class="titik-set">${titik(m.setSaya)}</div><b id="skA">${P.skor.a}</b></div><div class="tengah">${ikon('bola', 30)}</div><div class="sisi lawan"><div class="titik-set">${titik(m.setLawan)}</div><b id="skB">${P.skor.b}</b></div></div>
-<div class="lapangan"><div class="arena" id="arena">
+<div class="lapangan"><button class="tiga-btn ${S.pengaturan?.tiga3d && !gagal3d ? 'on' : ''}" id="tiga" aria-label="Mode 3D">${ikon('kubus', 20)}<span>3D</span></button>${d3 ? '<div class="arena3d" id="arena3d"></div>' : `<div class="arena" id="arena">
 <div class="separuh">${baris(B.slice(3), 'B', false)}${baris(B.slice(0, 3), 'B', false)}</div><div class="jaring"></div>
 <div class="separuh">${baris(A.slice(0, 3), 'A', edit)}${baris(A.slice(3), 'A', edit)}</div>
-<div class="bayangan" id="bay" style="left:50%;top:50%"></div><div class="bola" id="bola" style="left:50%;top:50%">${ikon('bola', 22)}</div><div class="pop" id="pop"></div></div></div>
+<div class="bayangan" id="bay" style="left:50%;top:50%"></div><div class="bola" id="bola" style="left:50%;top:50%">${ikon('bola', 22)}</div><div class="pop" id="pop"></div></div>`}</div>
 <div class="komentar" id="kom">${P.kom || ''}</div>
 ${edit ? `<div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div><button class="tombol-besar" id="main" aria-label="Main set">${ikon('main', 30)}</button>`
        : `<button class="tombol-besar sekunder" id="lompat" aria-label="Lewati animasi">${ikon('lompat', 28)}</button>`}`;
   const k = root.querySelector('#kembali'); if (k) k.onclick = () => { P = baru(); renderPertandingan(root, S, aksi); };
   const mn = root.querySelector('#main'); if (mn) mn.onclick = () => mainkan(root, S, aksi);
+  const tg = root.querySelector('#tiga'); if (tg) tg.onclick = () => { S.pengaturan.tiga3d = !S.pengaturan.tiga3d; gagal3d = false; aksi.simpan(); tampilLapangan(root, S, aksi); if (P.fase === 'main' && root.querySelector('#arena3d')) mulai3D(root, S, aksi); };
   const lm = root.querySelector('#lompat'); if (lm) lm.onclick = () => { P.cepat = true; };
   if (edit) pasangTukar(root, S, { saatUbah: () => { aksi.simpan(); renderPertandingan(root, S, aksi); } });
 }
 
+// Siapkan tampilan 3D (muat Three.js lalu pasang pemain). Gagal => tampilan 2D otomatis.
+let siap3d = false;
+async function mulai3D(root, S, aksi) {
+  const wadah = root.querySelector('#arena3d'); siap3d = false;
+  if (!wadah) return;
+  try {
+    await D3.muatThree();
+    if (!wadah.isConnected) return;
+    D3.pasang(wadah, timSaya(P.m), P.m.lawan); siap3d = true;
+  } catch (e) {
+    console.warn('Mode 3D tidak tersedia, kembali ke 2D:', e);
+    gagal3d = true; siap3d = false;
+    if (root.dataset.layar === 'tanding' && P.fase === 'main') tampilLapangan(root, S, aksi);
+    const kom = root.querySelector('#kom'); if (kom && !kom.textContent) kom.textContent = '3D tidak tersedia, memakai 2D';
+  }
+}
 function gambarRally(root, r, a, b) {
   const skA = root.querySelector('#skA'), skB = root.querySelector('#skB'), bola = root.querySelector('#bola'), pop = root.querySelector('#pop');
-  if (!skA || !bola) return;
+  if (!skA) return;
   skA.textContent = a; skB.textContent = b;
   const A = timSaya(P.m), B = P.m.lawan, pil = t => t[Math.floor(Math.random() * t.length)].nama.split(' ')[0], sk = r.a ? A : B, ls = r.a ? B : A;
   P.kom = { ace: `Ace dari ${pil(sk)}!`, blok: `${pil(sk)} blok kokoh!`, smash: `Smash keras ${pil(sk)}!`, salah: `${pil(ls)} membuat kesalahan` }[r.jenis];
-  beriPose(root, r);
   const kom = root.querySelector('#kom'); if (kom) kom.textContent = P.kom;
   const el = r.a ? skA : skB; el.classList.remove('skor-naik'); void el.offsetWidth; el.classList.add('skor-naik');
+  if (!bola) { if (siap3d) D3.reli(r); return; }   // mode 3D: animasi digambar arena3d.js
+  beriPose(root, r);
   const x = 10 + Math.random() * 80, y = r.a ? 6 + Math.random() * 36 : 58 + Math.random() * 36;   // bola jatuh di sisi yang kebobolan
   bola.style.left = x + '%'; bola.style.top = y + '%';
   const bay = root.querySelector('#bay'); if (bay) { bay.style.left = x + '%'; bay.style.top = y + '%'; }
@@ -86,6 +105,7 @@ function beriPose(root, r) {
 async function mainkan(root, S, aksi) {
   const saya = ++token; P.fase = 'main'; P.cepat = !!S.pengaturan?.animasiCepat;
   tampilLapangan(root, S, aksi);
+  if (root.querySelector('#arena3d')) { await mulai3D(root, S, aksi); if (saya !== token) return; }
   const now = sekarang(), hasil = mainkanSet(P.m, buatAcak(now), now);
   const akhir = () => {
     P.skor = { a: hasil.a, b: hasil.b };

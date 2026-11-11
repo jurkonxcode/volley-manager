@@ -28,3 +28,8 @@
 /* logo tim kecil di klasemen & jadwal, potret pemain di kartu */
 .logo-mini{width:18px;height:18px;object-fit:contain;vertical-align:-4px;margin-right:6px}
 .potret{display:block;flex:none;width:72px;height:72px;border-radius:50%;object-fit:cover;object-position:50% 18%;background:linear-gradient(180deg,#2a3a7a,#141c4a);border:2px solid rgba(255,255,255,.28)}
+/* mode 3D opsional (Three.js): wadah canvas + tombol */
+[data-layar="tanding"] .lapangan{position:relative}
+.arena3d{position:relative;height:310px;border-radius:12px;overflow:hidden;background:#081426}
+.tiga-btn{position:absolute;top:8px;right:8px;z-index:6;display:flex;align-items:center;gap:4px;height:30px;padding:0 10px;border-radius:15px;border:1px solid rgba(255,255,255,.25);background:rgba(8,12,32,.7);color:#cfd8ee;font:700 12px/1 inherit;cursor:pointer}
+.tiga-btn.on{background:linear-gradient(90deg,#FFC83D,#FF5E7E);color:#14214D;border-color:transparent}
