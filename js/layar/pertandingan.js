@@ -13,7 +13,7 @@ import * as D3 from './arena3d.js';
 
 let P = baru(), token = 0, gagal3d = false, pilihTab = 'liga', pilihF = null;
 const hashId = s => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
-function baru() { return { fase: 'pilih', jenis: 'liga', fid: null, m: null, level: 0, lawan: null, skor: { a: 0, b: 0 }, hasil: null, cepat: false }; }
+function baru() { return { fase: 'pilih', jenis: 'liga', fid: null, m: null, level: 0, lawan: null, skor: { a: 0, b: 0 }, hasil: null }; }
 const tunggu = ms => new Promise(r => setTimeout(r, ms));
 
 export function renderPertandingan(root, S, aksi) {
@@ -62,7 +62,7 @@ const taktikBaris = (S, m, A, B, now) => `<div class="taktik" id="taktik">${Obje
 
 function tampilLapangan(root, S, aksi) {
   P.m.susunan = S.susunan; P.m.taktik = S.taktik;   // susunan/taktik bisa diganti (mis. susun otomatis membuat array baru): selalu pakai yang terkini
-  const m = P.m, now = sekarang(), A = timSaya(m), B = m.lawan, kec = S.pengaturan?.kec === 2 ? 2 : 1, edit = P.fase === 'siap', d3 = P.fase === 'main' && !!S.pengaturan?.tiga3d && !gagal3d;
+  const m = P.m, now = sekarang(), A = timSaya(m), B = m.lawan, edit = P.fase === 'siap', d3 = P.fase === 'main' && !!S.pengaturan?.tiga3d && !gagal3d;
   const sebelum = P.fase === 'main' ? m.riwayat.slice(0, P.nSebelum) : m.riwayat;   // mainkanSet sudah mengisi hasil set ini di awal: jangan dibocorkan sebelum diputar
   const setSaya = sebelum.filter(x => x.a > x.b).length, setLawan = sebelum.length - setSaya, setTampil = P.fase === 'main' ? `SET ${P.setAktif}` : m.setKe > 1 ? 'JEDA' : 'SET 1';
   const titik = n => Array.from({ length: K.set.menang }, (_, i) => `<i class="${i < n ? 'isi' : ''}"></i>`).join('');
@@ -76,12 +76,10 @@ function tampilLapangan(root, S, aksi) {
 <div class="bayangan" id="bay" style="left:50%;top:50%"></div><div class="bola" id="bola" style="left:50%;top:50%">${ikon('bola', 22)}</div><div class="pop" id="pop"></div></div>`}</div>
 <div class="komentar" id="kom">${P.kom || ''}</div>
 ${edit ? `${taktikBaris(S, m, A, B, now)}<div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div><button class="tombol-besar" id="main" aria-label="Main set">${ikon('main', 30)}</button>`
-       : `<div class="kec" id="kec"><button data-kec="1" class="${kec === 1 ? 'on' : ''}">1×</button><button data-kec="2" class="${kec === 2 ? 'on' : ''}">2×</button><button id="lompat" aria-label="Lewati ke hasil set">${ikon('lompat', 22)} Lewati set</button></div>`}`;
+       : `<div class="vm-live-status"><span class="vm-live-dot"></span><b>PERTANDINGAN BERLANGSUNG</b><span>Ikuti setiap reli</span></div>`}`;
   const k = root.querySelector('#kembali'); if (k) k.onclick = () => { P = baru(); renderPertandingan(root, S, aksi); };
   const mn = root.querySelector('#main'); if (mn) mn.onclick = () => mainkan(root, S, aksi);
   const tg = root.querySelector('#tiga'); if (tg) tg.onclick = () => { S.pengaturan.tiga3d = !S.pengaturan.tiga3d; gagal3d = false; aksi.simpan(); tampilLapangan(root, S, aksi); if (P.fase === 'main' && root.querySelector('#arena3d')) mulai3D(root, S, aksi); };
-  const lm = root.querySelector('#lompat'); if (lm) lm.onclick = () => { P.cepat = true; };
-  const kc = root.querySelector('#kec'); if (kc) kc.onclick = e => { const b = e.target.closest('[data-kec]'); if (!b) return; S.pengaturan.kec = +b.dataset.kec; aksi.simpan(); kc.querySelectorAll('[data-kec]').forEach(x => x.classList.toggle('on', x === b)); };
   if (edit) {
     const tk = root.querySelector('#taktik');
     tk.onclick = e => {
@@ -169,7 +167,7 @@ function beriPose(root, r) {
 }
 async function mainkan(root, S, aksi) {
   const saya = ++token; P.fase = 'main'; P.m.kickoff = [...S.susunan];   // susunan yang main set ini: patokan hitungan pergantian di jeda berikutnya
-  P.cepat = !!S.pengaturan?.animasiCepat; P.skor = { a: 0, b: 0 }; P.setAktif = P.m.setKe; P.nSebelum = P.m.riwayat.length;
+  P.skor = { a: 0, b: 0 }; P.setAktif = P.m.setKe; P.nSebelum = P.m.riwayat.length;
   tampilLapangan(root, S, aksi);
   if (root.querySelector('#arena3d')) { await mulai3D(root, S, aksi); if (saya !== token) return; }
   const now = sekarang(), hasil = mainkanSet(P.m, buatAcak(now), now);
@@ -185,11 +183,10 @@ async function mainkan(root, S, aksi) {
   let a = 0, b = 0;
   for (const r of hasil.rally) {
     if (saya !== token) return akhir();
-    if (P.cepat) break;
-    const k = S.pengaturan?.kec === 2 ? .5 : 1, tiga = siap3d && !root.querySelector('#bola');
-    // Lama sampai bola mendarat (detik, skala k): ace/kesalahan = satu terbang panjang, smash/blok = servis+terima+umpan+serangan.
+    const k = 1, tiga = siap3d && !root.querySelector('#bola');
+    // Tempo natural: tidak ada percepatan, lompatan set, atau skip animasi.
     const sampai = tiga ? (r.jenis === 'smash' || r.jenis === 'blok' ? 2.15 : (r.jenis === 'salah' && r.pi < 3 ? .8 : 1.15)) : 1.0;
-    mulaiReli(root, r, k); await tunggu(sampai * k * 1000);
+    mulaiReli(root, r, k); await tunggu(sampai * 1000);
     if (saya !== token) return akhir();
     r.a ? a++ : b++; P.skor = { a, b }; gambarRally(root, r, a, b); await tunggu(.85 * k * 1000);
   }

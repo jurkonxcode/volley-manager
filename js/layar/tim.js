@@ -22,7 +22,10 @@ const formasi = S => Object.entries(FORMASI).map(([k, f]) => {
 }).join('') + `<button class="tombol-besar sekunder" data-auto>${ikon('ulang', 24)} Susun otomatis</button>`;
 export function renderTim(root, S, aksi) {
   const L = levelDari(S.manajer.exp), st = ringkas(S);
-  root.innerHTML = `<section class="kartu-klub"><div class="km-kepala"><div class="km-avatar logo">${logoTim()}</div><div class="km-id"><div class="km-nama">${esc(S.manajer.tim)}</div><div class="batang exp-batang"><i style="width:${L.persen.toFixed(0)}%"></i></div></div><div class="km-level"><small>LV</small><b>${L.level}</b></div></div>
+  const jumlah = S.skuad.length, starter = S.susunan.length;
+  root.innerHTML = `<header class="page-head"><div><span class="eyebrow">SQUAD & PERFORMANCE</span><h1>Tim & Pemain</h1><p>Kelola komposisi pemain, susunan utama, strategi, dan kebutuhan transfer klub.</p></div><span class="head-meta">Level manajer ${L.level}</span></header>
+<div class="page-kpis"><div class="page-kpi"><small>Total pemain</small><b>${jumlah}</b><em>Terdaftar di klub</em></div><div class="page-kpi"><small>Starter</small><b>${starter}</b><em>Susunan utama</em></div><div class="page-kpi"><small>Overall</small><b>${st.ovr}</b><em>Rata-rata rating pemain</em></div><div class="page-kpi"><small>Level manajer</small><b>${L.level}</b><em>${Math.round(L.persen)}% menuju level berikutnya</em></div></div>
+<section class="kartu-klub"><div class="km-kepala"><div class="km-avatar logo">${logoTim()}</div><div class="km-id"><div class="km-nama">${esc(S.manajer.tim)}</div><div class="batang exp-batang"><i style="width:${L.persen.toFixed(0)}%"></i></div></div><div class="km-level"><small>LV</small><b>${L.level}</b></div></div>
 <div class="km-statistik tiga"><div><b>${st.atk}</b><span>Attack</span></div><div><b>${st.def}</b><span>Defense</span></div><div><b>${st.ovr}</b><span>Overall</span></div></div></section>
 <div class="tab-sub">${Object.entries(SUB).map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-sub="${k}">${n}</button>`).join('')}</div><div id="isi"></div>`;
   const isi = root.querySelector('#isi');

@@ -1,0 +1,101 @@
+/* Volley Manager — responsive shell & desktop dashboard */
+#app{width:100%;max-width:560px;margin:0 auto;min-height:100dvh}
+.atas{min-height:66px;gap:10px}
+.atas .logo{display:flex;align-items:center;min-width:0}
+.atas .logo img{display:block;width:min(100%,178px);height:48px;object-fit:contain;object-position:left center}
+.koin{font-size:clamp(15px,3.8vw,21px);white-space:nowrap}
+.koin svg{flex:none}
+.nav{grid-template-columns:repeat(6,minmax(0,1fr))}
+.nav button{min-width:0}
+.nav button span{font-size:10px;letter-spacing:.25px;text-transform:none}
+#layar{min-width:0}
+.logo-img{object-fit:contain}
+@media(min-width:760px){
+  html,body{min-height:100%;height:100%;overflow:hidden}
+  body{background:radial-gradient(ellipse at 78% -10%,rgba(38,105,164,.2),transparent 40%),var(--malam)}
+  #app{height:100dvh;max-width:none;margin:0;display:grid;grid-template-columns:228px minmax(0,1fr);grid-template-rows:76px minmax(0,1fr);gap:0}
+  .atas{grid-column:1/-1;grid-row:1;display:grid;grid-template-columns:228px minmax(0,1fr) auto;gap:24px;padding:10px 28px;border-bottom:1px solid var(--tepi);background:rgba(8,19,34,.94);backdrop-filter:blur(18px);z-index:5}
+  .atas .logo{height:54px;padding-left:8px}
+  .atas .logo img{width:184px;height:54px}
+  .koin{justify-self:end;gap:16px;font-size:20px}
+  #reset{margin-left:12px;padding:10px;border:1px solid var(--tepi);border-radius:12px;opacity:.8}
+  .nav{grid-column:1;grid-row:2;display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:20px 12px calc(20px + env(safe-area-inset-bottom,0px));border-top:0;border-right:1px solid var(--tepi);background:rgba(10,25,43,.92);overflow-y:auto}
+  .nav button{height:52px;min-height:52px;display:flex;justify-content:flex-start;gap:14px;padding:0 16px;border-radius:13px;color:var(--redup);font-size:15px;text-align:left}
+  .nav button svg{width:21px;height:21px;flex:none}
+  .nav button span{font-size:14px;font-weight:700;letter-spacing:.2px;text-transform:none}
+  .nav button[aria-current="true"]{color:#fff;background:linear-gradient(100deg,rgba(36,126,220,.30),rgba(36,126,220,.08));box-shadow:inset 3px 0 #42B8F4}
+  #layar{grid-column:2;grid-row:2;width:100%;max-width:1440px;margin:0 auto;padding:24px clamp(22px,3vw,48px) 42px;scrollbar-width:thin;scrollbar-color:rgba(130,174,210,.35) transparent}
+  #layar::-webkit-scrollbar{display:block;width:8px}
+  #layar::-webkit-scrollbar-thumb{background:rgba(130,174,210,.28);border-radius:99px}
+  .hero{padding:34px 28px;border-radius:24px}
+  .hero h1{font-size:clamp(44px,4vw,64px)}
+  .db-dua{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .db-kartu,.pengaturan,.kartu-klub{border-radius:20px}
+  .pengaturan{padding:20px}
+  .km-nama{font-size:24px}
+  .menu-daftar{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .wz-kartu{max-width:760px}
+}
+@media(min-width:1120px){
+  #app{grid-template-columns:252px minmax(0,1fr)}
+  .atas{grid-template-columns:252px minmax(0,1fr) auto;padding-inline:34px}
+  .nav{padding-inline:16px}
+  #layar{padding:28px clamp(28px,3.4vw,56px) 48px}
+  .db-dua{gap:20px}
+  .db-kartu{min-height:168px}
+  .pengaturan h2{font-size:14px}
+}
+@media(max-width:380px){
+  .atas{padding-inline:10px}
+  .atas .logo img{width:116px}
+  .koin{font-size:14px;gap:4px}
+  .nav button span{font-size:9px}
+}
+
+
+/* v19.3 — professional page systems: Beranda, Tim, Kompetisi, Manajemen Klub */
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:2px 0 18px}
+.page-head .eyebrow{display:block;color:var(--bola,#58b9f5);font-size:10px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:5px}
+.page-head h1{margin:0;color:var(--teks,#f2f6fb);font-size:clamp(25px,3vw,34px);line-height:1.05;letter-spacing:-.6px}
+.page-head p{margin:7px 0 0;color:var(--redup);font-size:13px;max-width:620px;line-height:1.5}
+.page-head .head-meta{flex:none;padding:8px 12px;border:1px solid var(--tepi);border-radius:12px;background:rgba(255,255,255,.035);font-size:11px;color:var(--redup)}
+.page-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 16px}
+.page-kpi{min-width:0;padding:14px 15px;border:1px solid var(--tepi);border-radius:15px;background:linear-gradient(145deg,rgba(28,66,101,.42),rgba(10,25,43,.82));box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.page-kpi small{display:block;color:var(--redup);font-size:10px;font-weight:800;letter-spacing:.65px;text-transform:uppercase}
+.page-kpi b{display:block;margin-top:6px;color:var(--teks);font-size:clamp(18px,2vw,25px);font-variant-numeric:tabular-nums;line-height:1.1}
+.page-kpi em{display:block;margin-top:5px;color:var(--redup);font-size:10px;font-style:normal}
+.screen-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,1fr);gap:16px;align-items:start}
+.screen-grid>.pengaturan,.screen-grid>.db-kartu{min-width:0}
+.tab-sub{position:sticky;top:0;z-index:3;padding:7px;margin:0 0 16px;border:1px solid var(--tepi);border-radius:15px;background:rgba(9,23,40,.94);backdrop-filter:blur(14px);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.tab-sub button{min-height:38px;padding:0 15px;border-radius:10px;font-weight:750}
+.tab-sub button.on{background:linear-gradient(120deg,#176fba,#164c82);color:white;box-shadow:0 5px 15px rgba(24,117,194,.25)}
+#isi{min-width:0}
+#isi>.pengaturan,#isi>.detail{margin-bottom:14px}
+.kartu-klub{border:1px solid rgba(104,174,220,.25);background:linear-gradient(115deg,rgba(18,52,82,.95),rgba(10,27,47,.94));box-shadow:0 12px 30px rgba(0,0,0,.18)}
+.db-kartu{border:1px solid var(--tepi);background:linear-gradient(145deg,rgba(23,54,83,.72),rgba(10,24,42,.9));}
+.pengaturan{border:1px solid var(--tepi);box-shadow:0 8px 24px rgba(0,0,0,.10)}
+#layar[data-layar="beranda"] .db-dua{margin-bottom:14px}
+#layar[data-layar="beranda"]>.pengaturan{margin-top:14px}
+#layar[data-layar="beranda"] .page-head{margin-bottom:14px}
+#layar[data-layar="tim"] .km-statistik{margin-top:12px}
+#layar[data-layar="liga"] .tabel{min-width:620px}
+#layar[data-layar="liga"] .pengaturan{overflow-x:auto}
+#layar[data-layar="klub"] #kb>.page-kpis{margin-top:0}
+#kb>.tab-sub{margin-top:2px}
+@media(min-width:760px){
+ .page-head{margin-bottom:22px}.page-kpis{gap:14px;margin-bottom:20px}.page-kpi{padding:17px 19px;border-radius:17px}.screen-grid{gap:20px}
+ #layar[data-layar="beranda"] .db-dua{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #layar[data-layar="beranda"] .db-klas{columns:2;column-gap:20px}
+ #layar[data-layar="tim"] .lapangan{max-width:760px;margin-inline:auto}
+ #layar[data-layar="tim"] .bangku{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+ #layar[data-layar="tim"] .detail{max-width:none}
+ #layar[data-layar="liga"] .tab-sub{top:-24px}
+ #layar[data-layar="klub"] #isi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+ #layar[data-layar="klub"] #isi>.pengaturan{margin:0;min-width:0}
+ #layar[data-layar="klub"] #isi>.pengaturan:first-child{grid-column:1/-1}
+}
+@media(max-width:600px){
+ .page-head{align-items:flex-start;flex-direction:column;gap:8px}.page-head .head-meta{align-self:flex-start}
+ .page-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.page-kpi{padding:12px;border-radius:13px}.page-kpi b{font-size:20px}
+ .screen-grid{grid-template-columns:1fr}.tab-sub{overflow-x:auto;display:flex;gap:5px;scrollbar-width:none}.tab-sub::-webkit-scrollbar{display:none}.tab-sub button{flex:none}
+}

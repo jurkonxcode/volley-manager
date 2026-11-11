@@ -23,7 +23,7 @@ export function pasangLambang(root, d, ubah) {
 const LANGKAH = ['Klub', 'Lambang', 'Stadion'];
 // Layar buat klub. onSelesai(d) dipanggil dengan data klub baru.
 export function bukaBuatKlub(onSelesai) {
-  const d = { manajer: '', klub: '', singkatan: '', singkatanManual: false, neg: 'ID', kota: NEGARA.ID.kota[0], logo: 'garuda-muda', warnaA: WARNA_ASLI, warnaB: '#F2F2F2', stadion: '', stadionManual: false };
+  const d = { manajer: '', klub: '', singkatan: '', singkatanManual: false, neg: 'ID', kota: NEGARA.ID.kota[0], logo: 'volley-manager', warnaA: WARNA_ASLI, warnaB: '#F2F2F2', stadion: '', stadionManual: false };
   const el = document.createElement('div'); el.className = 'wz'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Buat klub');
   document.body.appendChild(el);
   let langkah = 0, galat = '';
@@ -34,7 +34,7 @@ export function bukaBuatKlub(onSelesai) {
     let isi = '';
     if (langkah === 0) isi = `<h2>Bangun klub impianmu</h2><p class="wz-p">Beri nama klub, pilih negara asal dan kotamu. Negara menentukan nama pemain dan lawan di liga.</p>
 <label class="isian"><span>Nama manajer</span><input id="wm" maxlength="24" placeholder="Nama kamu" value="${esc(d.manajer)}" autocomplete="off"></label>
-<label class="isian"><span>Nama klub</span><input id="wk" maxlength="22" placeholder="Contoh: Garuda Muda" value="${esc(d.klub)}" autocomplete="off"></label>
+<label class="isian"><span>Nama klub</span><input id="wk" maxlength="22" placeholder="Contoh: Volley Club" value="${esc(d.klub)}" autocomplete="off"></label>
 <label class="isian"><span>Singkatan (3 huruf)</span><input id="ws" maxlength="3" value="${esc(d.singkatan)}" autocomplete="off" style="text-transform:uppercase"></label>
 <h3 class="wz-sub">Negara</h3><div class="wz-negara">${Object.entries(NEGARA).map(([k, v]) => `<button type="button" class="${d.neg === k ? 'on' : ''}" data-n="${k}"><span>${v.bendera}</span><small>${v.nama}</small></button>`).join('')}</div>
 <label class="isian"><span>Kota asal</span><select id="wc">${n.kota.map(c => `<option ${c === d.kota ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></label>`;

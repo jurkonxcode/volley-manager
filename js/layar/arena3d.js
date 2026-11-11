@@ -67,7 +67,7 @@ function rakitRenderer() {
   kunci.shadow.bias = -0.00018; sc.add(kunci);
   const isi = new T.DirectionalLight(0x83baff, .85); isi.position.set(8, 12, -10); sc.add(isi);
   const rim = new T.DirectionalLight(0xffd28a, .55); rim.position.set(0, 10, 15); sc.add(rim);
-  const arena = createArena(T, { sponsor: ['GARUDA MUDA', 'VOLLEY MANAGER', 'KOPI NUSANTARA', 'BANK GARUDA', 'SINAR MOTOR', 'TELKO PRIMA'] }); sc.add(arena); sc.userData.arena = arena;
+  const arena = createArena(T, { sponsor: ['VOLLEY MANAGER', 'SPIKE SPORTS', 'COURT PRO', 'ACE ATHLETIC', 'NETPLAY', 'CHAMPION GEAR'] }); sc.add(arena); sc.userData.arena = arena;
   // Bangku tim + botol dari paket GLB (di luar lapangan, x=0 di antara blok kursi prosedural z=W+1.5, di depan papan LED z=7.0).
   const bangku = ambilAset('bench'); if (bangku) { bangku.name = 'AssetPack_TeamBench'; bangku.scale.setScalar(.82); bangku.position.set(0, .08, 6.0); sc.add(bangku); }
   for (const x of [-.62, .62]) { const b = ambilAset('bottle'); if (b) { b.scale.setScalar(.78); b.position.set(x, .08 + .70 * .82, 5.96); sc.add(b); } }   // dudukan bangku setinggi .70 x skala .82

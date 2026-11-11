@@ -23,6 +23,15 @@ Catatan serah-terima: apa yang sudah ada, bagaimana strukturnya, dan jebakan yan
 
 | v15.4 | Pacing laga: tiap reli bertahap (servis, terima, umpan, serangan; ~2-3 dtk per poin di 3D, 1x/2x/Lewati set), label aksi, papan skor bernama + SET/JEDA, hasil set tidak lagi bocor sebelum diputar. Kartu kelangkaan N/R/SR/SSR dari rating (`js/layar/rarity.js`, ambang bisa diubah). Polesan UI semua tab (`css/pro.css`), kartu pra-laga, kolom Form klasemen. Pemain 3D dari FBX Kenney (`assets/models/kenney/`). Belum diuji di HP: rangkaian animasi 3D. |
 
+
+## v19.2 — Identitas merek & desktop responsif
+- Logo produk diperbarui menjadi identitas orisinal bola voli + monogram V, dengan wordmark `VOLLEY MANAGER` (`assets/brand/logo-mark.svg`, `logo-lockup.svg`, `favicon.svg`).
+- Ikon PWA, favicon raster, dan ikon iOS diselaraskan dengan merek baru.
+- Nama klub bawaan menjadi `Volley Club`; simpanan lama yang memakai nama default `Garuda Muda` dimigrasikan otomatis. Nama klub kustom tetap dipertahankan.
+- Header menampilkan merek Volley Manager; lambang klub tetap dipakai pada profil klub, kartu, klasemen, dan pertandingan. Pilihan lambang default kini monogram Volley Manager.
+- Desktop: sidebar vertikal, header lebar, area konten terpusat dan lebih lapang. Mobile: navigasi bawah enam tab tetap dipertahankan. Aturan ada di `css/responsive-desktop.css`.
+- Validasi: seluruh file JavaScript lolos `node --check`. Pengujian interaksi langsung di browser dan perangkat fisik masih perlu dilakukan.
+
 ## Struktur
 - `js/inti/` konfigurasi (semua angka keseimbangan di `konfigurasi.js`), waktu, simpan (localStorage, kunci `volley-manager-v2`, `versi: 2`), acak ber-seed
 - `js/sistem/` logika murni tanpa HTML: analitik (statistik + data grafik dari `musim.hasil`), pemain, stamina, pertandingan, musim (liga/jadwal/klasemen), taktik, pasar (transfer/latihan/fasilitas/cedera), manajer, ekonomi
@@ -186,3 +195,26 @@ Referensi: alur Top Eleven (buat klub: nama/negara/kota/lambang/warna; stadion +
 - `arena3d.js` (gabungan): `buang()` melewati material bersama dan membuang tekstur sekali; bola memakai GLB bila ada; bangku GLB di (0, .08, **6.0**) dan botol di atas dudukan. Di v18 bangku di z=7.0 = persis papan LED (W+2.5) dan botol melayang ±9 cm; dipindah.
 - `asset-preview.html`: ditambahkan importmap `three` (di v18 `GLTFLoader` gagal karena specifier 'three' tak terselesaikan).
 - **Belum terverifikasi di perangkat**: tampilan bangku/botol vs kamera, FPS dengan 12 pemain (+ ±444-600 mesh), bentrok visual dengan bangku prosedural di arena.js.
+
+## v19.3 — Dashboard, Tim, Kompetisi, Manajemen Klub
+- `js/layar/klub.js`: Beranda mendapat judul halaman dan empat KPI yang dihitung dari data musim/klub (peringkat, win record, saldo, fans); modul lama tetap dipertahankan.
+- `js/layar/tim.js`: header Tim & Pemain dan KPI total pemain, starter, overall, level manajer. Skuad, Strategi, Formasi, Pasar tetap menggunakan alur dan handler lama.
+- `js/layar/kompetisi.js`: header Kompetisi dan KPI posisi klub, jumlah hasil pertandingan yang sudah tercatat, pemuncak klasemen, serta pekan tersisa. Tab Klasemen/Jadwal/Persahabatan/Analitik tetap utuh.
+- `js/layar/klub-bangun.js`: Manajemen Klub mendapat KPI saldo, fans, fasilitas yang sudah ditingkatkan, dan gaji mingguan. Subtab Stadion/Fasilitas/Akademi/Kas/Identitas tidak diubah logika transaksinya.
+- `css/responsive-desktop.css`: sistem heading/KPI, tab responsif, grid manajemen dua kolom pada desktop, KPI dua kolom pada ponsel, tabel klasemen horizontal-scroll bila perlu.
+- **Validasi**: seluruh file JS lolos `node --check`. Belum dilakukan uji visual lintas perangkat; verifikasi akhir disarankan di GitHub Pages pada lebar ponsel (360–430 px), tablet (768 px), dan desktop (1366 px ke atas).
+
+
+## v19.4 — Match pacing correction
+- Removed 1×/2× match speed controls and the skip-set action from the live match screen.
+- Removed the profile setting that skipped match animations. Legacy save data may still contain `pengaturan.kec` or `animasiCepat`; these values are ignored and do not affect match pacing.
+- Live match presentation now uses one fixed natural animation tempo and a clear live-status indicator.
+- This iteration does **not** yet claim Top Eleven-style live tactical influence: the current set simulation still calculates its rally sequence before playback. The next engine milestone must make rally outcomes step-based so in-match tactical changes and substitutions can affect subsequent rallies.
+
+## v20 — Beranda & shell mengikuti mockup (Home dashboard)
+- Mockup referensi: gambar dashboard biru/emas (header klub+saldo+tanggal+kecepatan+notifikasi+avatar, sidebar 11 menu, hero stadion, 6 kartu).
+- `css/v20-mockup.css` (dimuat terakhir) + `renderBeranda` di `js/layar/klub.js` (kelas `dx-*`): hero, Ringkasan Klub, Laga Berikutnya, Klasemen (top 5), Keuangan (grafik 5 pekan), Performa Tim (5 laga, donat win rate), Aksi Cepat. Konten lama Beranda (persahabatan, pesan staf, ekonomi, evolusi) dipindah ke bawah (`.dx-detail`).
+- `assets/hero-stadion.webp` dipotong dari gambar mockup (bagian stadion saja, tanpa teks). Ganti file ini untuk banner lain.
+- Desktop >=1024px: header kaya + sidebar 11 menu (`DK` di `main.js`, memetakan ke tab/sub-tab yang sudah ada; `aksi.buka(kunci)`), footer status. Di bawah 1024px tampilan lama (nav bawah 6 tab) tetap dipakai.
+- Tidak ada fitur voli "seri", jadi baris Draws di mockup diganti "Set" (set menang).
+- Belum diuji di browser sungguhan oleh pembuatnya: cek visual di desktop dan HP.

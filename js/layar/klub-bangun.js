@@ -81,7 +81,12 @@ function identitas(S) {
 }
 export function renderKlubBangun(root, S, aksi) {
   const now = sekarang(); P.prosesWaktu(S, now);
-  root.innerHTML = `<div id="kb"><section class="kartu-klub"><div class="km-kepala"><div class="km-avatar logo">${logoTim()}</div><div class="km-id"><div class="km-nama">${esc(S.manajer.tim)}</div><div class="km-tim">${esc(S.identitas.stadion)} · ${esc(S.identitas.kota)}</div></div><div class="km-level"><small>SEMANGAT</small><b>${Math.round(S.klub.semangat)}</b></div></div></section>
+  const fasilitasAktif = Object.entries(S.fasilitas).filter(([k,v]) => k !== 'bangun' && v > 0).length;
+  const totalFasilitas = Object.keys(P.FASILITAS).length;
+  const gaji = gajiMingguan(S);
+  root.innerHTML = `<div id="kb"><header class="page-head"><div><span class="eyebrow">CLUB OPERATIONS</span><h1>Manajemen Klub</h1><p>Bangun infrastruktur, kembangkan akademi, atur keuangan, dan kelola identitas klub.</p></div><span class="head-meta">${esc(S.identitas.kota)} · ${esc(S.identitas.stadion)}</span></header>
+<div class="page-kpis"><div class="page-kpi"><small>Saldo tersedia</small><b>${S.koin.toLocaleString('id-ID')}</b><em>Keuangan klub</em></div><div class="page-kpi"><small>Fans</small><b>${S.klub.fans.toLocaleString('id-ID')}</b><em>Basis pendukung</em></div><div class="page-kpi"><small>Fasilitas aktif</small><b>${fasilitasAktif}/${totalFasilitas}</b><em>Telah ditingkatkan</em></div><div class="page-kpi"><small>Gaji mingguan</small><b>${gaji.toLocaleString('id-ID')}</b><em>Komitmen skuad</em></div></div>
+<section class="kartu-klub"><div class="km-kepala"><div class="km-avatar logo">${logoTim()}</div><div class="km-id"><div class="km-nama">${esc(S.manajer.tim)}</div><div class="km-tim">${esc(S.identitas.stadion)} · ${esc(S.identitas.kota)}</div></div><div class="km-level"><small>SEMANGAT</small><b>${Math.round(S.klub.semangat)}</b></div></div></section>
 <div class="tab-sub tab-scroll">${Object.entries(SUB).map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-sub="${k}">${n}</button>`).join('')}</div>${pesan ? `<div class="komentar">${pesan}</div>` : ''}<div id="isi">${{ stadion, fasilitas, akademi, kas, identitas }[sub](S, now)}</div></div>`;
   pesan = ''; if (sub === 'akademi') aksi.simpan();   // daftar bakat baru ikut tersimpan
   const ulang = () => { aksi.simpan(); aksi.perbaruiKoin(); renderKlubBangun(root, S, aksi); };

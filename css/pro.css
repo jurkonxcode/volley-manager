@@ -121,3 +121,11 @@ input[type=checkbox]:checked::after{transform:translateX(20px)}
 
 /* Bola 2D: terbang lebih pelan mengikuti kecepatan */
 [data-layar="tanding"] .bola.terbang svg{animation-duration:calc(.9s*var(--kt,1))}
+
+/* v19.4 — live match pacing: natural presentation, no speed or skip controls */
+.vm-live-status{display:flex;align-items:center;justify-content:center;gap:9px;min-height:42px;margin:10px 0 14px;padding:9px 14px;border:1px solid rgba(74,190,155,.28);border-radius:12px;background:linear-gradient(110deg,rgba(22,91,76,.22),rgba(14,36,52,.7));color:var(--teks);font-size:11px;letter-spacing:.7px}
+.vm-live-status b{font-weight:900}
+.vm-live-status>span:last-child{color:var(--redup);font-weight:600;letter-spacing:0}
+.vm-live-dot{width:8px;height:8px;border-radius:50%;background:#39d6a0;box-shadow:0 0 0 4px rgba(57,214,160,.12);animation:vm-live-pulse 1.8s ease-in-out infinite}
+@keyframes vm-live-pulse{50%{box-shadow:0 0 0 7px rgba(57,214,160,0)}}
+@media(max-width:480px){.vm-live-status{flex-wrap:wrap;gap:6px 9px}.vm-live-status>span:last-child{flex-basis:100%;text-align:center}}

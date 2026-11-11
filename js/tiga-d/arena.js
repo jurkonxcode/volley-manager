@@ -2,7 +2,7 @@
 // API: createArena(THREE, opsi) -> Group. group.userData: update(dt) (ombak penonton, LED), hype (0-1), setSkor(a, b, namaA, namaB, set).
 export function createArena(THREE, o = {}) {
   const L = (o.courtLength ?? 18) / 2, W = (o.courtWidth ?? 9) / 2, g = new THREE.Group(); g.name = 'VolleyManagerArenaPro';
-  const sponsor = o.sponsor ?? ['GARUDA MUDA', 'VOLLEY MANAGER', 'KOPI NUSANTARA', 'BANK GARUDA', 'SINAR MOTOR', 'TELKO PRIMA'];
+  const sponsor = o.sponsor ?? ['VOLLEY MANAGER', 'SPIKE SPORTS', 'COURT PRO', 'ACE ATHLETIC', 'NETPLAY', 'CHAMPION GEAR'];
   const SRGB = THREE.SRGBColorSpace;
   const mat = (c, r = .7, m = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m });
   const box = (w, h, d, m, p, par = g, sh = true) => { const x = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); x.position.set(...p); x.castShadow = x.receiveShadow = sh; par.add(x); return x; };

@@ -28,6 +28,11 @@ Mode pertandingan 3D memakai arena indoor procedural dengan lantai parquet, net 
 ## Baru di v18
 - Aset merek SVG (`assets/brand/`), favicon, ikon PWA + `manifest.webmanifest`, 20 ikon baru, dan layar sambutan (onboarding) 4 slide. Detail di `HANDOFF.md`.
 
+## Identitas & layout responsif
+- Identitas merek Volley Manager memakai logo orisinal berbasis bola voli + monogram V (SVG), terpisah dari lambang klub yang dipilih pemain.
+- Nama klub awal menjadi Volley Club; simpanan lama yang masih memakai nama default Garuda Muda dimigrasikan otomatis tanpa mengubah nama klub buatan pemain.
+- Desktop memakai sidebar vertikal dan header lebar; ponsel tetap memakai navigasi bawah. CSS responsif dimuat terakhir melalui `css/responsive-desktop.css`.
+
 ## Baru di v19 (gabungan v18 asset pack + v19 pemain)
 - Pemain 3D stylized berkerangka buatan kode (tanpa file model) dengan animasi servis, terima, umpan, smash, blok, selebrasi, dan kecewa. Pratinjau: `pemain-preview.html`.
 - Paket aset GLB (`assets/models/volley-manager/`): bola, bangku tim, botol dipakai di arena; trofi, medali, peluit, dumbbell, net-system siap dipakai. Pratinjau: `asset-preview.html`. Detail: `docs/ASSET_PACK_REALISTIC_V18.md`.
@@ -38,3 +43,11 @@ Menu utama, Kelola Tim bertab (Skuad/Strategi/Formasi/Pasar), liga 8 tim + Kompe
 
 ## Riwayat & serah-terima
 Lihat `HANDOFF.md` untuk riwayat versi, struktur, jebakan, dan daftar yang belum dikerjakan.
+
+## v19.3 — Dashboard & halaman manajemen profesional
+- **Beranda**: header control center dan KPI nyata untuk peringkat, rekor menang, saldo, serta fans.
+- **Tim & Pemain**: ringkasan skuad, starter, overall, dan level manajer; navigasi subhalaman dibuat lebih tegas.
+- **Kompetisi**: ringkasan peringkat, pertandingan selesai, pemuncak klasemen, dan pekan tersisa.
+- **Manajemen Klub**: ringkasan saldo, fans, fasilitas aktif, dan komitmen gaji sebelum tab Stadion/Fasilitas/Akademi/Kas/Identitas.
+- **Desktop**: grid dua kolom untuk modul manajemen, area konten lebih lapang, klasemen memanfaatkan lebar layar. **Mobile**: KPI dua kolom dan tab horizontal yang dapat digeser.
+- Tidak mengubah rumus simulasi, struktur save, maupun sistem navigasi utama.

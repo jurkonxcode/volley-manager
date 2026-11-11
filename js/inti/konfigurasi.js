@@ -10,7 +10,7 @@ export const K = {
   hadiah: { menang: 100, kalah: 30, perLevel: 40 },
   skuadAwal: { koin: 500, tingkat: 44 },
   exp: { dasar: 100, tambahPerLevel: 40, menang: 50, kalah: 20, perLevelLawan: 15 },
-  manajer: { namaAwal: 'Manajer Baru', timAwal: 'Garuda Muda' },
+  manajer: { namaAwal: 'Manajer Baru', timAwal: 'Volley Club' },
   warnaPosisi: { S: '#8E7CF0', OH: '#F4C430', MB: '#46C17B', OP: '#EF5B4A', L: '#4DB6E8' },
   musim: { menitAntarPekan: 20, hadiahPeringkat: [1500, 900, 600, 400, 300, 200, 150, 100] },
   pasar: { jumlah: 10, menitSegar: 30, maksSkuad: 18, minSkuad: 10, biayaScout: 40 },

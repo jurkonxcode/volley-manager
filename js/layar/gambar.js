@@ -125,9 +125,9 @@ export function badanGambar(p, tim, now) {
   return `<span class="badan"><img class="sprite" data-tim="${tim}" data-pose="siap" src="${spriteSrc('siap', tim)}" alt="" draggable="false"></span><i class="stm zona-${zonaStamina(s)}"><b style="width:${s.toFixed(0)}%"></b></i>`;
 }
 // Identitas tim kita (diisi main.js lewat setIdentitasGambar): lambang dan warna jersey tampil di seluruh game.
-export let LOGO = 'assets/logo/logo-garuda-muda.png';
-let NAMA_SAYA = '', WARNA_SAYA = '#102A4A', KODE_LOGO = 'garuda-muda';
-export function setIdentitasGambar(nama, id) { NAMA_SAYA = nama; WARNA_SAYA = id.warnaA; KODE_LOGO = id.logo; LOGO = `assets/logo/logo-${id.logo}.png`; }
+export let LOGO = 'assets/logo/logo-volley-manager.svg';
+let NAMA_SAYA = '', WARNA_SAYA = '#102A4A', KODE_LOGO = 'volley-manager';
+export function setIdentitasGambar(nama, id) { NAMA_SAYA = nama; WARNA_SAYA = id.warnaA; KODE_LOGO = id.logo; LOGO = id.logo === 'volley-manager' ? 'assets/logo/logo-volley-manager.svg' : `assets/logo/logo-${id.logo}.png`; }
 export const logoTim = () => `<img class="logo-img" src="${LOGO}" alt="" draggable="false">`;
 
 // Logo tiap tim lawan (nama tim -> berkas); tim sendiri atau nama lain memakai LOGO.
@@ -140,7 +140,7 @@ function kodeLogo(nama) {
   if (k === KODE_LOGO) k = LOGO_LIST[(LOGO_LIST.indexOf(k) + 1) % 7];   // lawan tidak memakai lambang yang sama dengan kita
   return k;
 }
-export const logoMini = nama => `<img class="logo-mini" src="assets/logo/logo-${kodeLogo(nama)}.png" alt="" draggable="false">`;
-export const logoKode = k => `<img class="logo-mini" src="assets/logo/logo-${k}.png" alt="" draggable="false">`;
+export const logoMini = nama => { const k = kodeLogo(nama), src = k === 'volley-manager' ? 'assets/logo/logo-volley-manager.svg' : `assets/logo/logo-${k}.png`; return `<img class="logo-mini" src="${src}" alt="" draggable="false">`; };
+export const logoKode = k => `<img class="logo-mini" src="${k === 'volley-manager' ? 'assets/logo/logo-volley-manager.svg' : `assets/logo/logo-${k}.png`}" alt="" draggable="false">`;
 // Potret pemain: 12 wajah, dipilih tetap dari id pemain.
 export const potret = p => `<img class="potret" src="assets/potret/p${String(([...String(p.id)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % 12) + 1).padStart(2, '0')}.png" alt="" draggable="false">`;
