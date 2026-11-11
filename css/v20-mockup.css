@@ -131,3 +131,16 @@ body{background:radial-gradient(1000px 520px at 80% -10%,rgba(30,107,255,.26),tr
   #layar[data-layar="profil"]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-content:start}
   #layar[data-layar="profil"]>*{margin:0}
 }
+
+/* ---------- v20.2 — Klub > Stadion ---------- */
+.st-kartu{padding:0;overflow:hidden}
+.st-foto{position:relative;display:flex;align-items:flex-end;min-height:150px;padding:16px 18px;background:linear-gradient(180deg,rgba(6,18,60,.05),rgba(6,18,60,.94)),url(../assets/hero-stadion.webp) 70% center/cover no-repeat,#0B2262}
+.st-judul{display:grid;gap:6px;justify-items:start}
+.st-judul h2,.pengaturan.st-kartu h2{margin:0;font:italic 800 clamp(28px,4vw,40px)/1 'Barlow Condensed',sans-serif;letter-spacing:0;text-transform:none;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.st-judul h2::after,.pengaturan.st-kartu h2::after{display:none}
+.st-lv{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-weight:800;font-size:13px;color:#2A1D00;background:linear-gradient(180deg,#FFD24A,#FF9F0A)}
+.st-bawah{display:grid;gap:14px;padding:16px 18px;align-items:center}
+.st-gambar{width:100%;height:auto;max-height:230px;margin:0;border-radius:14px;background:none;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+.st-info{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.st-info>div{padding:12px 8px;border:1px solid var(--tepi);border-radius:12px;background:rgba(30,107,255,.12)}
+@media(min-width:760px){.st-foto{min-height:190px}.st-bawah{grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:20px}}

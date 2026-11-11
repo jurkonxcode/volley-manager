@@ -23,6 +23,7 @@ Catatan serah-terima: apa yang sudah ada, bagaimana strukturnya, dan jebakan yan
 
 | v20 | Beranda dashboard + header/sidebar/footer desktop mengikuti mockup (`css/v20-mockup.css`) |
 | v20.1 | Skuad/Kompetisi/Laga/Pengaturan selaras mockup; cloud save Supabase (`js/inti/cloud.js`, `supabase/migrations/`) |
+| v20.2 | Klub > Stadion: banner foto, peta stadion SVG dengan keterisian, kartu angka |
 | v15.4 | Pacing laga: tiap reli bertahap (servis, terima, umpan, serangan; ~2-3 dtk per poin di 3D, 1x/2x/Lewati set), label aksi, papan skor bernama + SET/JEDA, hasil set tidak lagi bocor sebelum diputar. Kartu kelangkaan N/R/SR/SSR dari rating (`js/layar/rarity.js`, ambang bisa diubah). Polesan UI semua tab (`css/pro.css`), kartu pra-laga, kolom Form klasemen. Pemain 3D dari FBX Kenney (`assets/models/kenney/`). Belum diuji di HP: rangkaian animasi 3D. |
 
 
@@ -212,6 +213,11 @@ Referensi: alur Top Eleven (buat klub: nama/negara/kota/lambang/warna; stadion +
 - Removed the profile setting that skipped match animations. Legacy save data may still contain `pengaturan.kec` or `animasiCepat`; these values are ignored and do not affect match pacing.
 - Live match presentation now uses one fixed natural animation tempo and a clear live-status indicator.
 - This iteration does **not** yet claim Top Eleven-style live tactical influence: the current set simulation still calculates its rally sequence before playback. The next engine milestone must make rally outcomes step-based so in-match tactical changes and substitutions can affect subsequent rallies.
+
+## v20.2 — Klub > Stadion
+- `stadion()` di `js/layar/klub-bangun.js`: banner foto (`assets/hero-stadion.webp`) dengan nama stadion + pil level, peta stadion dari atas (`gambarStadion`, SVG: cincin tribun per level, titik penonton sesuai keterisian laga liga, lampu sorot di level >=3), dan 4 kartu angka (kapasitas, fans, keterisian, level). Gaya: blok "v20.2" di `css/v20-mockup.css` (`.st-*`).
+- Sebelumnya SVG melebar penuh di desktop (kotak hijau raksasa); kini dibatasi (maks tinggi 230px, 2 kolom di >=760px).
+- Banner memakai foto yang sama dengan Beranda. Ingin foto stadion berbeda: ganti `url(../assets/hero-stadion.webp)` di `.st-foto`, atau beri gambar per level (mis. `assets/stadion-lv{n}.webp`) lewat style inline di `stadion()`.
 
 ## v20.1 — Skuad/Kompetisi/Laga selaras mockup + Supabase
 - **UI:** blok "v20.1" di akhir `css/v20-mockup.css` menyatukan panel (`.page-kpi,.kartu-klub,.pengaturan,.md-kartu,...`), sub-tab biru, tombol utama emas (`.tombol-besar` global jadi pil emas, `.sekunder` biru kaca), klasemen (baris saya solid biru), pra-laga (logo 96px, VS miring). Desktop: konten Laga dibatasi 900px, Pengaturan 2 kolom.

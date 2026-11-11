@@ -61,3 +61,4 @@ Lihat `HANDOFF.md` untuk riwayat versi, struktur, jebakan, dan daftar yang belum
   3. Isi `js/inti/supabase-config.js` (URL + anon key), atau isi lewat **Pengaturan > Akun & Cloud Save** (disimpan di perangkat).
   4. Masuk/daftar di kartu yang sama. Progres otomatis diunggah ~5 dtk setelah berubah; saat game dibuka, data yang lebih baru (`S.diperbarui`) menang (ada konfirmasi bila cloud lebih baru).
   - Kode: `js/inti/cloud.js` (klien + sinkron), `js/layar/cloud-ui.js` (kartu), `supabase-js` dimuat lazy dari CDN jsDelivr hanya bila dikonfigurasi.
+- **v20.2:** Klub > Stadion didesain ulang (banner foto, peta stadion dari atas yang berubah per level dan keterisian, kartu kapasitas/fans/keterisian/level). Detail di `HANDOFF.md`.

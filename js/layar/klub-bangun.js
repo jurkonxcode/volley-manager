@@ -19,10 +19,12 @@ const dots = (lv, maks) => `<div class="titik-set fas-dot">${Array.from({ length
 
 // Ilustrasi stadion dari atas: makin tinggi level, makin banyak lapis tribun.
 function gambarStadion(S) {
-  const lv = S.fasilitas.stadion || 0, A = S.identitas.warnaA, B = S.identitas.warnaB, W = 300, H = 200, pw = 120, ph = 64, cx = W / 2, cy = H / 2;
-  const cincin = Array.from({ length: lv + 1 }, (_, i) => { const g = 8 + (lv - i) * 6 + 2, w = pw + g * 2, h = ph + g * 2; return `<rect x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" rx="${18 + (lv - i) * 3}" fill="${(lv - i) % 2 ? B : A}" opacity="${.55 + .45 * (1 - (lv - i) / (lv + 1))}" stroke="rgba(0,0,0,.35)"/>`; }).join('');
-  const lampu = lv >= 3 ? [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b]) => `<circle cx="${cx + a * (pw / 2 + 14 + lv * 6)}" cy="${cy + b * (ph / 2 + 14 + lv * 6)}" r="3.500" fill="#FFE9A8"/>`).join('') : '';
-  return `<svg class="st-gambar" viewBox="0 0 ${W} ${H}" role="img" aria-label="Stadion level ${lv}">${cincin}<rect x="${cx - pw / 2}" y="${cy - ph / 2}" width="${pw}" height="${ph}" rx="4" fill="#D9803A" stroke="#F6F2E8" stroke-width="2"/><path d="M${cx} ${cy - ph / 2}V${cy + ph / 2}M${cx - pw / 6} ${cy - ph / 2}V${cy + ph / 2}M${cx + pw / 6} ${cy - ph / 2}V${cy + ph / 2}" stroke="#F6F2E8" stroke-width="1.500" fill="none"/>${lampu}</svg>`;
+  const lv = S.fasilitas.stadion || 0, A = S.identitas.warnaA, B = S.identitas.warnaB, W = 320, H = 190, pw = 120, ph = 62, cx = W / 2, cy = H / 2;
+  const p = pemasukanLaga(S, 'liga', true), isi = Math.min(1, p.hadir / Math.max(1, p.kap));
+  const luar = 8 + lv * 7, ow = pw + luar * 2, oh = ph + luar * 2;
+  const cincin = Array.from({ length: lv + 1 }, (_, i) => { const k = lv - i, g = 8 + k * 7, w = pw + g * 2, h = ph + g * 2; return `<rect x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" rx="${16 + k * 3}" fill="${k % 2 ? B : A}" opacity="${.6 + .4 * (1 - k / (lv + 1))}" stroke="rgba(0,0,0,.4)"/>`; }).join('');
+  const lampu = lv >= 3 ? [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b]) => { const x = cx + a * (ow / 2 + 6), y = cy + b * (oh / 2 + 2); return `<circle cx="${x}" cy="${y}" r="9" fill="#FFE9A8" opacity=".22"/><circle cx="${x}" cy="${y}" r="3.5" fill="#FFF3C4"/>`; }).join('') : '';
+  return `<svg class="st-gambar" viewBox="0 0 ${W} ${H}" role="img" aria-label="Stadion level ${lv}, keterisian ${Math.round(isi * 100)} persen"><defs><radialGradient id="stbg" cx=".5" cy=".5" r=".7"><stop offset="0" stop-color="#143A9A"/><stop offset="1" stop-color="#06143F"/></radialGradient><pattern id="stk" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.5" fill="#fff"/></pattern><mask id="stm"><rect x="${cx - ow / 2}" y="${cy - oh / 2}" width="${ow}" height="${oh}" rx="${16 + lv * 3}" fill="#fff"/><rect x="${cx - pw / 2 - 4}" y="${cy - ph / 2 - 4}" width="${pw + 8}" height="${ph + 8}" fill="#000"/></mask></defs><rect width="${W}" height="${H}" rx="14" fill="url(#stbg)"/>${cincin}<rect x="${cx - ow / 2}" y="${cy - oh / 2}" width="${ow}" height="${oh}" fill="url(#stk)" opacity="${(.12 + .55 * isi).toFixed(2)}" mask="url(#stm)"/><rect x="${cx - pw / 2}" y="${cy - ph / 2}" width="${pw}" height="${ph}" rx="4" fill="#E58A3A" stroke="#F6F2E8" stroke-width="2"/><path d="M${cx} ${cy - ph / 2}V${cy + ph / 2}M${cx - pw / 6} ${cy - ph / 2}V${cy + ph / 2}M${cx + pw / 6} ${cy - ph / 2}V${cy + ph / 2}" stroke="#F6F2E8" stroke-width="1.5" fill="none"/>${lampu}</svg>`;
 }
 function tiketBaris(S, jenis, judul) {
   const i = idxTiket(S, jenis), p = pemasukanLaga(S, jenis, true, i);
@@ -32,8 +34,8 @@ function tiketBaris(S, jenis, judul) {
 }
 function stadion(S, now) {
   const lv = S.fasilitas.stadion || 0, d = P.FASILITAS.stadion;
-  return `<section class="pengaturan st-kartu"><h2>${esc(S.identitas.stadion)}</h2>${gambarStadion(S)}
-<div class="st-info"><div><b>${kapasitas(S).toLocaleString('id-ID')}</b><small>Kapasitas</small></div><div><b>${S.klub.fans.toLocaleString('id-ID')}</b><small>Fans</small></div><div><b>${lv}/${d.maks}</b><small>Level</small></div></div></section>
+  return `<section class="pengaturan st-kartu"><div class="st-foto"><div class="st-judul"><span class="st-lv">${ikon('stadion', 16)} Level ${lv} / ${d.maks}</span><h2>${esc(S.identitas.stadion)}</h2></div></div>
+<div class="st-bawah">${gambarStadion(S)}<div class="st-info"><div><b>${kapasitas(S).toLocaleString('id-ID')}</b><small>Kapasitas</small></div><div><b>${S.klub.fans.toLocaleString('id-ID')}</b><small>Fans</small></div><div><b>${Math.round(Math.min(1, pemasukanLaga(S, 'liga', true).hadir / kapasitas(S)) * 100)}%</b><small>Keterisian laga liga</small></div><div><b>${lv}/${d.maks}</b><small>Level</small></div></div></div></section>
 <section class="pengaturan"><h2>Harga tiket</h2>${tiketBaris(S, 'liga', 'Laga liga')}${tiketBaris(S, 'persahabatan', 'Persahabatan')}<small class="redup">Angka kecil = koin per 10 tiket. Harga mahal menghasilkan lebih banyak per tiket, tapi penonton berkurang. Cari harga terbaik: naikkan sampai stadion tidak lagi penuh.</small></section>
 ${kartuFasilitas(S, now, 'stadion')}`;
 }
