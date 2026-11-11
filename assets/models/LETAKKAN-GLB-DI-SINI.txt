@@ -1,1 +1,0 @@
-Taruh model hasil unduhan di sini dan beri nama pemain.glb (atau ubah MODEL_URL di js/tiga-d/player-glb.js).
