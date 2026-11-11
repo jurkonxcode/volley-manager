@@ -3,10 +3,14 @@
 // modul ini hanya menggambar ulang hasil reli (lihat gambarRally di pertandingan.js).
 import { createArena } from '../tiga-d/arena.js';
 import { createPlayer } from '../tiga-d/player.js';
+import { createPlayerGaya, RAMBUT_WARNA } from '../tiga-d/player-gaya.js';
+import { muatAssetPack, ambilAset } from '../tiga-d/asset-pack.js';
 import { muatModel, modelSiap, createPlayerGLB } from '../tiga-d/player-glb.js';
 import { createVolleyball } from '../tiga-d/volleyball.js';
 import { createSpikeEffect } from '../tiga-d/effects.js';
 
+// true = pemain stylized berkerangka buatan kode (player-gaya.js); false = model FBX Kenney / pemain prosedural lama.
+const GAYA = true;
 const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const KULIT = [0xF1C9A5, 0xE0A878, 0xC68642, 0x8D5524];
 const WARNA = { A: 0xB51F35, B: 0x245A9A };
@@ -21,7 +25,8 @@ let pemain = { A: [], B: [] }, tween = [], efek = [], bolaT = null;
 export async function muatThree(batas = 9000) {
   if (T) return T;
   T = await Promise.race([import(THREE_URL), new Promise((_, no) => setTimeout(() => no(new Error('Three.js lambat dimuat')), batas))]);
-  await muatModel(T).catch(e => console.warn('[GLB] model tidak dipakai, pakai pemain prosedural:', e.message));   // gagal => 2D/prosedural tetap jalan
+  if (!GAYA) await muatModel(T).catch(e => console.warn('[GLB] model tidak dipakai, pakai pemain prosedural:', e.message));   // gagal => 2D/prosedural tetap jalan
+  await muatAssetPack(T, ['volleyball', 'bench', 'bottle']).catch(e => console.warn('[AssetPack] memakai aset prosedural:', e.message));   // bola/bangku/botol GLB; gagal => prosedural
   return T;
 }
 
@@ -33,7 +38,16 @@ function bangunRenderer() {
 }
 // Three.js tidak membebaskan memori GPU saat objek hanya dilepas dari scene: geometri, material, dan tekstur harus di-dispose.
 function buang(o) {
-  o.traverse(c => { if (!c.geometry?.userData.shared) c.geometry?.dispose(); for (const m of [].concat(c.material || [])) { m.map?.dispose(); m.dispose(); } });
+  const tekstur = new Set();
+  o.traverse(c => {
+    if (!c.geometry?.userData.shared) c.geometry?.dispose();
+    for (const m of [].concat(c.material || [])) {
+      if (m.userData?.shared) continue;                       // material milik cache aset GLB / bersama
+      for (const k of ['map', 'roughnessMap', 'metalnessMap', 'normalMap', 'aoMap', 'emissiveMap', 'alphaMap']) { const t = m[k]; if (t && !t.userData?.shared) tekstur.add(t); }
+      m.dispose();
+    }
+  });
+  tekstur.forEach(t => t.dispose());
 }
 function rakitRenderer() {
   R = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
@@ -54,7 +68,10 @@ function rakitRenderer() {
   const isi = new T.DirectionalLight(0x83baff, .85); isi.position.set(8, 12, -10); sc.add(isi);
   const rim = new T.DirectionalLight(0xffd28a, .55); rim.position.set(0, 10, 15); sc.add(rim);
   const arena = createArena(T, { sponsor: ['GARUDA MUDA', 'VOLLEY MANAGER', 'KOPI NUSANTARA', 'BANK GARUDA', 'SINAR MOTOR', 'TELKO PRIMA'] }); sc.add(arena); sc.userData.arena = arena;
-  bola = createVolleyball(T, { radius: .22 }); bola.scale.setScalar(1.7); bola.castShadow = true; sc.add(bola);
+  // Bangku tim + botol dari paket GLB (di luar lapangan, x=0 di antara blok kursi prosedural z=W+1.5, di depan papan LED z=7.0).
+  const bangku = ambilAset('bench'); if (bangku) { bangku.name = 'AssetPack_TeamBench'; bangku.scale.setScalar(.82); bangku.position.set(0, .08, 6.0); sc.add(bangku); }
+  for (const x of [-.62, .62]) { const b = ambilAset('bottle'); if (b) { b.scale.setScalar(.78); b.position.set(x, .08 + .70 * .82, 5.96); sc.add(b); } }   // dudukan bangku setinggi .70 x skala .82
+  bola = ambilAset('volleyball') || createVolleyball(T, { radius: .22 }); bola.scale.setScalar(1.7); bola.castShadow = true; sc.add(bola);
 }
 
 function bersihkanPemain() {
@@ -64,7 +81,7 @@ function bersihkanPemain() {
 function isiPemain(tim, daftar) {
   daftar.slice(0, 6).forEach((p, i) => {
     const depan = i < 3, opsi = { number: p.nomor, role: p.posisi, jerseyColor: WARNA[tim], skinColor: KULIT[(p.kulit ?? 0) % 4], facing: tim === 'A' ? 'left' : 'right' },
-      g = modelSiap() ? createPlayerGLB(opsi) : createPlayer(T, opsi);
+      g = GAYA ? createPlayerGaya(T, { ...opsi, hair: p.gaya ?? 0, hairColor: RAMBUT_WARNA[(p.rambut ?? 0) % 4] }) : modelSiap() ? createPlayerGLB(opsi) : createPlayer(T, opsi);
     // facing 'left' di starter memutar +90 derajat (hadap +X); 'right' hadap -X. Tim A di sisi -X menghadap jaring (+X).
     const x = (depan ? X_DEPAN : X_BELAKANG) * (tim === 'A' ? -1 : 1);
     g.position.set(x, .06, Z[i % 3]); g.userData.dasar = g.position.clone();
@@ -103,11 +120,17 @@ function putar(now) {
   R.render(sc, cam);
 }
 const anim = (d, f, tunda = 0, mulai = null) => { const w = { t: 0, d, f, tunda, mulai }; tween.push(w); return w; };
-function lompat(g, tinggi = 1.1, d = .5, tunda = 0) {
-  anim(d, k => { g.position.y = g.userData.dasar.y + Math.sin(k * Math.PI) * tinggi; }, tunda, () => g.userData.main?.('lompat'));
+function lompat(g, tinggi = 1.1, d = .5, tunda = 0, aksi = 'lompat') {   // aksi = nama klip animasi pemain berkerangka
+  anim(d, k => { g.position.y = g.userData.dasar.y + Math.sin(k * Math.PI) * tinggi; }, tunda, () => g.userData.main?.(aksi, d));
 }
 function jongkok(g, d = .45, tunda = 0) {   // tidak menyentuh position.y: bisa bentrok dengan lompat
-  anim(d, k => { g.scale.y = 1 - Math.sin(k * Math.PI) * .16; }, tunda, () => g.userData.main?.('terima'));
+  anim(d, k => { if (!g.userData.rig) g.scale.y = 1 - Math.sin(k * Math.PI) * .16; }, tunda, () => g.userData.main?.('terima', d));
+}
+// Setelah poin: dua pemain pencetak merayakan (lompat kecil), dua pemain lawan kecewa.
+function reaksi(menang, kalah) {
+  const acak = (a, n) => [...a].sort(() => Math.random() - .5).slice(0, n);
+  acak(pemain[menang], 2).forEach(g => lompat(g, .35, .9, Math.random() * .2, 'rayakan'));
+  acak(pemain[kalah], 2).forEach(g => anim(.01, () => {}, Math.random() * .25, () => g.userData.main?.('kecewa')));
 }
 function terbang(dari, ke, tinggi, d, selesai) {
   const a = dari.clone(), b = ke.clone();
@@ -133,35 +156,36 @@ export function reli(r, k = 1) {
 
   if (r.jenis === 'salah') {
     const servis = r.pi >= 3, s = ada(ls, r.pi) || pil(servis ? belakang(ls) : depan(ls));
-    lompat(s, servis ? .5 : 1.15, .7 * k);
+    lompat(s, servis ? .5 : 1.15, .7 * k, 0, servis ? 'servis' : 'smash');
     mendarat.set(-arah * (1 + Math.random() * 8.5), .25, (Math.random() < .5 ? -1 : 1) * (4.9 + Math.random() * .4));   // keluar garis samping (papan LED di z=±5.5)
     jongkok(ada(sk, r.qi) || pil(belakang(sk)), .6 * k, .4 * k);
-    return terbang(pos(s, servis ? 2.2 : 3.1), mendarat, servis ? 3.2 : .8, (servis ? 1.1 : .7) * k);
+    return terbang(pos(s, servis ? 2.2 : 3.1), mendarat, servis ? 3.2 : .8, (servis ? 1.1 : .7) * k, () => { if (!batal()) reaksi(sk, ls); });
   }
   if (r.jenis === 'ace') {
-    const s = dr || pil(belakang(sk)); lompat(s, .5, .7 * k);
+    const s = dr || pil(belakang(sk)); lompat(s, .5, .7 * k, 0, 'servis');
     jongkok(pil(belakang(ls)), .6 * k, .5 * k);
-    return terbang(pos(s, 2.2), mendarat, 3.2, 1.1 * k);
+    return terbang(pos(s, 2.2), mendarat, 3.2, 1.1 * k, () => { if (!batal()) reaksi(sk, ls); });
   }
   // Smash / blok: lawan (ls) melayani, sk menerima, mengumpan, lalu menyerang.
   const srv = pil(belakang(ls)), rcv = pil(belakang(sk)), setter = depan(sk)[1] || depan(sk)[0], atk = (dr && r.pi < 3 ? dr : null) || pil([depan(sk)[0], depan(sk)[2]].filter(Boolean));
   const bertahan = ada(ls, r.ti === sk ? r.qi : r.pi) || pil(belakang(ls));
   const t1 = .8 * k, t2 = .5 * k, t3 = .45 * k, t4 = .3 * k;
-  lompat(srv, .45, .55 * k);
+  lompat(srv, .45, .55 * k, 0, 'servis');
   jongkok(rcv, .6 * k, t1 * .55);
   const selesaiSpike = () => {
     if (batal()) return;
     if (r.jenis === 'blok') {
-      depan(ls).slice(0, 2).forEach(g => lompat(g, 1.0, .5 * k, 0));
+      depan(ls).slice(0, 2).forEach(g => lompat(g, 1.0, .5 * k, 0, 'blok'));
       mendarat.set(arah * (1.2 + Math.random() * 1.2), .25, (Math.random() - .5) * 6);   // bola dipantulkan jatuh di sisi penyerang
     }
     const fx = createSpikeEffect(T, new T.Vector3(0, 2.7, atk.position.z * .6)); sc.add(fx); efek.push(fx);
     if (r.jenis !== 'blok') jongkok(bertahan, .5 * k, 0);
-    terbang(pos(atk, 3.1), mendarat, .8, t4);
+    terbang(pos(atk, 3.1), mendarat, .8, t4, () => { if (!batal()) reaksi(sk, ls); });
   };
   terbang(pos(srv, 2.2), pos(rcv, .9), 3.2, t1, () => {                                 // servis
     if (batal()) return;
-    lompat(atk, 1.15, (t3 + t4 + .1) * 1.4, t2 * .2);
+    lompat(atk, 1.15, (t3 + t4 + .1) * 1.4, t2 * .2, 'smash');
+    if (setter !== atk) setter.userData.main?.('umpan', t2 + .2 * k);
     terbang(pos(rcv, .9), pos(setter, 2.4), 1.8, t2, () => {                            // terima
       if (batal()) return;
       terbang(pos(setter, 2.4), pos(atk, 2.9), 1.1, t3, selesaiSpike);                   // umpan lalu serangan

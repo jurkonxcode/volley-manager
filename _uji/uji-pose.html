@@ -1,0 +1,26 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#1a2238"><canvas id=c></canvas>
+<script type=module>
+import T,{gambarPemain} from './mock-three.js';
+import {createPlayerGaya} from '../js/tiga-d/player-gaya.js';
+const params=new URLSearchParams(location.search);const hanya=params.get('klip');
+const names=['_diam','terima','lompat','servis','umpan','smash','blok','rayakan','kecewa'];
+const S=62,W=190,H=190,N=5;const rows=hanya?[hanya]:names;
+const cv=document.getElementById('c');cv.width=W*N;cv.height=H*rows.length;const ctx=cv.getContext('2d');
+ctx.fillStyle='#1a2238';ctx.fillRect(0,0,cv.width,cv.height);
+const dur={terima:.7,lompat:.55,servis:.6,umpan:.6,smash:.85,blok:.6,rayakan:1.1,kecewa:1.2};
+rows.forEach((n,r)=>{const pandang=params.get('depan')?'depan':'samping';
+ for(let i=0;i<N;i++){const g=createPlayerGaya(T,{number:7,role:'OH',jerseyColor:0xb51f35,skinColor:0xe0a878,hairColor:0x3b2417,hair:i%3});
+  g.scale.setScalar(1);
+  const u=n==='_diam'?0:i/(N-1);
+  if(n!=='_diam'){g.userData.main(n,dur[n]);const dt=1/120;let tt=0;while(tt<u*dur[n]){g.userData.mixer.update(dt);tt+=dt}}
+  else{for(let k=0;k<i*30;k++)g.userData.mixer.update(1/60)}
+  // naikkan badan bila lompat (simulasi arena): puncak di tengah
+  if(n==='lompat'||n==='smash'||n==='blok'||n==='servis'||n==='rayakan'){const h={lompat:1.1,smash:1.1,blok:1,servis:.45,rayakan:.5}[n];g.position.y=Math.sin(u*Math.PI)*h*.7}
+  ctx.save();ctx.beginPath();ctx.rect(i*W,r*H,W,H);ctx.clip();
+  const ox=i*W+W/2,oy=r*H+H-14-g.position.y*S;
+  ctx.strokeStyle='#ffffff22';ctx.beginPath();ctx.moveTo(i*W,r*H+H-14);ctx.lineTo(i*W+W,r*H+H-14);ctx.stroke();
+  g.position.y=0;gambarPemain(ctx,g,ox,oy,S,pandang);
+  ctx.fillStyle='#fff9';ctx.font='11px sans-serif';ctx.fillText(n+' '+(n==='_diam'?'':Math.round(u*100)+'%'),i*W+6,r*H+14);ctx.restore();}
+});
+document.title='siap';
+</script>

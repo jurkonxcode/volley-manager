@@ -1,0 +1,19 @@
+<!doctype html><meta charset=utf8><body style="margin:0"><div id=w style="width:400px;height:300px"></div>
+<script type=module>
+const log=[];window.__log=log;
+const D3=await import('../js/layar/arena3d.js');
+await D3.muatThree();
+const mk=(n)=>Array.from({length:6},(_,i)=>({nomor:n+i,posisi:['S','OH','MB','OP','L','OH'][i],kulit:i%4,rambut:i%4,gaya:i%3}));
+D3.pasang(document.getElementById('w'),mk(1),mk(11));
+await new Promise(r=>setTimeout(r,300));
+const sc=window.__scene;const pl=[];sc.traverse(o=>{if(o.userData&&o.userData.rig)pl.push(o)});
+log.push('pemain rig: '+pl.length);
+const kalls={};pl.forEach(g=>{const m=g.userData.main;g.userData.main=(n,d)=>{kalls[n]=(kalls[n]||0)+1;return m(n,d)}});
+const kasus=[{a:true,jenis:'ace',ti:'A',pi:3},{a:false,jenis:'smash',ti:'B',pi:0,qi:1},{a:true,jenis:'blok',ti:'A',pi:1,qi:0},{a:false,jenis:'salah',ti:'A',pi:4},{a:true,jenis:'smash',ti:'A',pi:1,qi:2},{a:true,jenis:'salah',ti:'B',pi:1}];
+for(const r of kasus){D3.reli(r,.5);await new Promise(x=>setTimeout(x,2600))}
+log.push('aksi: '+JSON.stringify(kalls));
+// pastikan tidak ada NaN pada pose
+let nan=0;pl.forEach(g=>{g.userData.pose.forEach(v=>{if(!isFinite(v))nan++})});log.push('NaN: '+nan);
+log.push('frame: '+window.__frames);
+D3.lepas();document.title='siap';
+</script>

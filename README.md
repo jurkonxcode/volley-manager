@@ -28,6 +28,11 @@ Mode pertandingan 3D memakai arena indoor procedural dengan lantai parquet, net 
 ## Baru di v18
 - Aset merek SVG (`assets/brand/`), favicon, ikon PWA + `manifest.webmanifest`, 20 ikon baru, dan layar sambutan (onboarding) 4 slide. Detail di `HANDOFF.md`.
 
+## Baru di v19 (gabungan v18 asset pack + v19 pemain)
+- Pemain 3D stylized berkerangka buatan kode (tanpa file model) dengan animasi servis, terima, umpan, smash, blok, selebrasi, dan kecewa. Pratinjau: `pemain-preview.html`.
+- Paket aset GLB (`assets/models/volley-manager/`): bola, bangku tim, botol dipakai di arena; trofi, medali, peluit, dumbbell, net-system siap dipakai. Pratinjau: `asset-preview.html`. Detail: `docs/ASSET_PACK_REALISTIC_V18.md`.
+- Detail di `HANDOFF.md`.
+
 ## Sudah ada
 Menu utama, Kelola Tim bertab (Skuad/Strategi/Formasi/Pasar), liga 8 tim + Kompetisi bertab (klasemen, jadwal, analitik dengan grafik performa dan win rate), laga live berperspektif dengan pemain berpose, transfer + scouting, latihan, fasilitas, cedera, profil pemain & manajer.
 

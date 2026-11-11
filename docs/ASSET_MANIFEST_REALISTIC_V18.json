@@ -1,0 +1,51 @@
+{
+  "pack": "Volley Manager Realistic 3D Asset Pack",
+  "version": "18.1",
+  "units": "meters (approximate; props authored at human-scale dimensions)",
+  "models": [
+    {
+      "file": "assets/models/volley-manager/volleyball_pro.glb",
+      "category": "equipment",
+      "description": "Composite volleyball with curved panel seams"
+    },
+    {
+      "file": "assets/models/volley-manager/volleyball_net_system.glb",
+      "category": "equipment",
+      "description": "Net posts, protective padding, top tape and net grid"
+    },
+    {
+      "file": "assets/models/volley-manager/championship_trophy.glb",
+      "category": "awards",
+      "description": "Gold championship cup with dark base"
+    },
+    {
+      "file": "assets/models/volley-manager/championship_medal.glb",
+      "category": "awards",
+      "description": "Gold medal with navy ribbon"
+    },
+    {
+      "file": "assets/models/volley-manager/referee_whistle.glb",
+      "category": "equipment",
+      "description": "Metal referee whistle"
+    },
+    {
+      "file": "assets/models/volley-manager/training_dumbbell.glb",
+      "category": "facility",
+      "description": "Rubber and chrome dumbbell"
+    },
+    {
+      "file": "assets/models/volley-manager/sports_water_bottle.glb",
+      "category": "equipment",
+      "description": "Reusable sideline bottle"
+    },
+    {
+      "file": "assets/models/volley-manager/team_bench.glb",
+      "category": "stadium",
+      "description": "Sideline team bench"
+    }
+  ],
+  "textures": [],
+  "existing_character_source": "assets/models/kenney/",
+  "runtime_loader": "js/tiga-d/asset-pack.js (memuat hanya kunci yang diminta; arena memakai volleyball, bench, bottle)",
+  "textures_catatan": "Peta PBR v18 tidak disertakan di build gabungan: tidak ada GLB yang memakainya (GLB tanpa gambar tertanam) dan peta roughness/metallic hanya warna rata. Tambahkan lagi bila nanti dihubungkan ke material."
+}
