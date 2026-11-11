@@ -3,6 +3,7 @@
 // modul ini hanya menggambar ulang hasil reli (lihat gambarRally di pertandingan.js).
 import { createArena } from '../tiga-d/arena.js';
 import { createPlayer } from '../tiga-d/player.js';
+import { muatModel, modelSiap, createPlayerGLB } from '../tiga-d/player-glb.js';
 import { createVolleyball } from '../tiga-d/volleyball.js';
 import { createSpikeEffect } from '../tiga-d/effects.js';
 
@@ -18,6 +19,7 @@ let pemain = { A: [], B: [] }, tween = [], efek = [], bolaT = null;
 export async function muatThree(batas = 9000) {
   if (T) return T;
   T = await Promise.race([import(THREE_URL), new Promise((_, no) => setTimeout(() => no(new Error('Three.js lambat dimuat')), batas))]);
+  await muatModel(T).catch(e => console.warn('[GLB] model tidak dipakai, pakai pemain prosedural:', e.message));   // gagal => 2D/prosedural tetap jalan
   return T;
 }
 
@@ -29,7 +31,7 @@ function bangunRenderer() {
 }
 // Three.js tidak membebaskan memori GPU saat objek hanya dilepas dari scene: geometri, material, dan tekstur harus di-dispose.
 function buang(o) {
-  o.traverse(c => { c.geometry?.dispose(); for (const m of [].concat(c.material || [])) { m.map?.dispose(); m.dispose(); } });
+  o.traverse(c => { if (!c.geometry?.userData.shared) c.geometry?.dispose(); for (const m of [].concat(c.material || [])) { m.map?.dispose(); m.dispose(); } });
 }
 function rakitRenderer() {
   R = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
@@ -59,7 +61,8 @@ function bersihkanPemain() {
 }
 function isiPemain(tim, daftar) {
   daftar.slice(0, 6).forEach((p, i) => {
-    const depan = i < 3, g = createPlayer(T, { number: p.nomor, role: p.posisi, jerseyColor: WARNA[tim], skinColor: KULIT[(p.kulit ?? 0) % 4], facing: tim === 'A' ? 'left' : 'right' });
+    const depan = i < 3, opsi = { number: p.nomor, role: p.posisi, jerseyColor: WARNA[tim], skinColor: KULIT[(p.kulit ?? 0) % 4], facing: tim === 'A' ? 'left' : 'right' },
+      g = modelSiap() ? createPlayerGLB(opsi) : createPlayer(T, opsi);
     // facing 'left' di starter memutar +90 derajat (hadap +X); 'right' hadap -X. Tim A di sisi -X menghadap jaring (+X).
     const x = (depan ? X_DEPAN : X_BELAKANG) * (tim === 'A' ? -1 : 1);
     g.position.set(x, .06, Z[i % 3]); g.userData.dasar = g.position.clone();
@@ -92,12 +95,15 @@ function putar(now) {
   const dt = Math.min((now - jam) / 1000, .05); jam = now;
   for (let i = tween.length - 1; i >= 0; i--) { const w = tween[i]; w.t += dt; const k = Math.min(w.t / w.d, 1); w.f(k); if (k >= 1) tween.splice(i, 1); }
   for (let i = efek.length - 1; i >= 0; i--) if (!efek[i].userData.update(dt)) { sc.remove(efek[i]); buang(efek[i]); efek.splice(i, 1); }
+  for (const t of ['A', 'B']) for (const g of pemain[t]) g.userData.mixer?.update(dt);
   bola.rotation.x += dt * 8; bola.rotation.z += dt * 5;
   R.render(sc, cam);
 }
 const anim = (d, f) => { const w = { t: 0, d, f }; tween.push(w); return w; };
-function lompat(g, tinggi = 1.1, d = .5) { anim(d, k => { g.position.y = g.userData.dasar.y + Math.sin(k * Math.PI) * tinggi; }); }
-function jongkok(g, d = .45) { anim(d, k => { g.scale.y = 1 - Math.sin(k * Math.PI) * .16; }); }   // tidak menyentuh position.y: bisa bentrok dengan lompat
+function lompat(g, tinggi = 1.1, d = .5) {
+  g.userData.main?.('lompat'); anim(d, k => { g.position.y = g.userData.dasar.y + Math.sin(k * Math.PI) * tinggi; }); }
+function jongkok(g, d = .45) {
+  g.userData.main?.('terima'); anim(d, k => { g.scale.y = 1 - Math.sin(k * Math.PI) * .16; }); }   // tidak menyentuh position.y: bisa bentrok dengan lompat
 function terbang(dari, ke, tinggi, d, selesai) {
   const a = dari.clone(), b = ke.clone();
   // Reli berikutnya datang tiap ~150 ms, lebih cepat dari durasi terbang: gerakan bola lama dibatalkan supaya tidak menimpa yang baru.
