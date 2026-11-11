@@ -1,12 +1,11 @@
 import { kartuMini, figur, ikon } from './gambar.js';
 import { pasangTukar, lepasPilihan } from './skuad.js';
-import { sekarang } from '../inti/waktu.js';
+import { sekarang, durasiPendek } from '../inti/waktu.js';
 import { buatAcak } from '../inti/acak.js';
 import { K } from '../inti/konfigurasi.js';
 import { buatPertandingan, mainkanSet, timSaya, kekuatanTim } from '../sistem/pertandingan.js';
 import { buatLawan } from '../sistem/liga.js';
-import { hadiahPertandingan } from '../sistem/ekonomi.js';
-import { expPertandingan, catatHasil } from '../sistem/manajer.js';
+import { fixtureSaya, kickoff, catatLaga, levelLawan } from '../sistem/musim.js';
 
 let P = baru(), token = 0;
 function baru() { return { fase: 'pilih', m: null, level: 0, lawan: null, skor: { a: 0, b: 0 }, hasil: null, cepat: false }; }
@@ -20,22 +19,14 @@ export function renderPertandingan(root, S, aksi) {
 }
 
 function tampilPilih(root, S, aksi) {
-  const now = sekarang();
-  if (!P.lawan) { const a = buatAcak(now); P.lawan = [1, 2, 3].map(l => buatLawan(l, a, now)); }
-  const saya = Math.round(kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), now));
-  root.innerHTML = `<div class="kuat-saya">${ikon('smash', 30)}<span>${saya}</span></div>` + P.lawan.map((tim, i) => {
-    const l = i + 1;
-    return `<button class="lawan-kartu" data-level="${l}" aria-label="Lawan level ${l}">
-<span class="api">${[3, 2, 1].map(n => `<span class="${n <= l ? 'nyala' : ''}">${ikon('api', 20)}</span>`).join('')}</span>
-<span class="deret">${tim.map(p => figur(p, 'B', now)).join('')}</span>
-<span class="kuat">${ikon('smash', 20)}<span>${Math.round(kekuatanTim(tim, now))}</span></span></button>`;
-  }).join('');
-  root.querySelectorAll('[data-level]').forEach(b => b.onclick = () => {
-    const l = +b.dataset.level;
-    P.level = l; P.m = buatPertandingan(S.skuad, S.susunan, P.lawan[l - 1], l);
-    P.fase = 'siap'; P.skor = { a: 0, b: 0 };
-    renderPertandingan(root, S, aksi);
-  });
+  const M = S.musim, now = sekarang(), f = fixtureSaya(M);
+  if (!f) { root.innerHTML = `<button class="tombol-besar" id="ke">${ikon('trofi', 30)}</button>`; root.querySelector('#ke').onclick = () => aksi.pindah('liga'); return; }
+  const buka = kickoff(M, f.hari), lw = M.tim[f.lawan], tim = buatLawan(lw.tingkat, buatAcak(M.ke * 1000 + f.lawan * 20 + f.hari), now);
+  const saya = Math.round(kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), now, S.taktik)), level = levelLawan(lw.tingkat);
+  root.innerHTML = `<div class="kuat-saya">${ikon('smash', 30)}<span>${saya}</span></div><div class="lawan-kartu"><b class="nama-lawan">${lw.nama}</b><span class="deret">${tim.map(p => figur(p, 'B', now)).join('')}</span><span class="kuat">${ikon('smash', 20)}<span>${Math.round(kekuatanTim(tim, now))}</span></span></div>` +
+    (now >= buka ? `<button class="tombol-besar" id="mulai" aria-label="Mulai">${ikon('main', 30)}</button>` : `<div class="kuat-saya">${ikon('jam', 26)}<span>${durasiPendek(buka - now)}</span></div>`);
+  const mb = root.querySelector('#mulai');
+  if (mb) mb.onclick = () => { P.level = level; P.m = buatPertandingan(S.skuad, S.susunan, tim, level, S.taktik); P.fase = 'siap'; P.skor = { a: 0, b: 0 }; renderPertandingan(root, S, aksi); };
 }
 
 function tampilLapangan(root, S, aksi) {
@@ -49,6 +40,7 @@ function tampilLapangan(root, S, aksi) {
 <div class="separuh">${baris(B.slice(3), 'B', false)}${baris(B.slice(0, 3), 'B', false)}</div><div class="jaring"></div>
 <div class="separuh">${baris(A.slice(0, 3), 'A', edit)}${baris(A.slice(3), 'A', edit)}</div>
 <div class="bola" id="bola" style="left:50%;top:50%">${ikon('bola', 22)}</div><div class="pop" id="pop"></div></div></div>
+<div class="komentar" id="kom">${P.kom || ''}</div>
 ${edit ? `<div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div><button class="tombol-besar" id="main" aria-label="Main set">${ikon('main', 30)}</button>`
        : `<button class="tombol-besar sekunder" id="lompat" aria-label="Lewati animasi">${ikon('lompat', 28)}</button>`}`;
   const k = root.querySelector('#kembali'); if (k) k.onclick = () => { P = baru(); renderPertandingan(root, S, aksi); };
@@ -61,6 +53,9 @@ function gambarRally(root, r, a, b) {
   const skA = root.querySelector('#skA'), skB = root.querySelector('#skB'), bola = root.querySelector('#bola'), pop = root.querySelector('#pop');
   if (!skA || !bola) return;
   skA.textContent = a; skB.textContent = b;
+  const A = timSaya(P.m), B = P.m.lawan, pil = t => t[Math.floor(Math.random() * t.length)].nama.split(' ')[0], sk = r.a ? A : B, ls = r.a ? B : A;
+  P.kom = { ace: `Ace dari ${pil(sk)}!`, blok: `${pil(sk)} blok kokoh!`, smash: `Smash keras ${pil(sk)}!`, salah: `${pil(ls)} membuat kesalahan` }[r.jenis];
+  const kom = root.querySelector('#kom'); if (kom) kom.textContent = P.kom;
   const el = r.a ? skA : skB; el.classList.remove('naik'); void el.offsetWidth; el.classList.add('naik');
   const x = 10 + Math.random() * 80, y = r.a ? 6 + Math.random() * 36 : 58 + Math.random() * 36;   // bola jatuh di sisi yang kebobolan
   bola.style.left = x + '%'; bola.style.top = y + '%';
@@ -75,7 +70,7 @@ async function mainkan(root, S, aksi) {
   const now = sekarang(), hasil = mainkanSet(P.m, buatAcak(now), now);
   const akhir = () => {
     P.skor = { a: hasil.a, b: hasil.b };
-    if (P.m.selesai) { const menang = P.m.pemenang === 'saya', h = hadiahPertandingan(menang, P.level), xp = expPertandingan(menang, P.level); S.koin += h; const naik = catatHasil(S.manajer, menang, xp); P.hasil = { koin: h, exp: xp, naik }; P.fase = 'selesai'; }
+    if (P.m.selesai) { const r = catatLaga(S, P.m.setSaya, P.m.setLawan); P.hasil = { koin: r.koin, exp: r.exp, naik: r.naik }; P.fase = 'selesai'; }
     else P.fase = 'siap';
     aksi.simpan(); aksi.perbaruiKoin();
     if (root.dataset.layar === 'tanding') renderPertandingan(root, S, aksi);

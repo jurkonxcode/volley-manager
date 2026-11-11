@@ -4,6 +4,8 @@ import { sekarang, durasiPendek } from '../inti/waktu.js';
 import { ratingPemain } from '../sistem/pemain.js';
 import { staminaSekarang, zonaStamina, menitPulihPenuh } from '../sistem/stamina.js';
 import { K } from '../inti/konfigurasi.js';
+import { FORMASI, GAYA, autoSusun } from '../sistem/taktik.js';
+const taktikHtml = S => `<div class="taktik">${Object.keys(FORMASI).map(k => `<button class="chip-t ${S.taktik.formasi === k ? 'on' : ''}" data-formasi="${k}">${k}</button>`).join('')}<span class="pemisah"></span>${Object.entries(GAYA).map(([k, g]) => `<button class="chip-t ${S.taktik.gaya === k ? 'on' : ''}" data-gaya="${k}">${g.nama}</button>`).join('')}<button class="chip-t" data-auto aria-label="Susun otomatis">${ikon('ulang', 16)}</button></div>`;
 
 let terpilih = null, fokusId = null;
 export const lepasPilihan = () => { terpilih = null; };
@@ -42,11 +44,13 @@ export function renderSkuad(root, S, aksi) {
   if (!fokusId || !cari(fokusId)) fokusId = S.susunan[0];
   const lap = S.susunan.map(cari), bangku = S.skuad.filter(p => !S.susunan.includes(p.id));
   const baris = a => `<div class="baris">${a.map(p => kartuMini(p, { tim: 'A', now, zona: 'lap' })).join('')}</div>`;
-  root.innerHTML = `<div class="lapangan"><div class="jaring"></div><div class="arena"><div class="separuh">${baris(lap.slice(0, 3))}${baris(lap.slice(3))}</div></div></div>
+  root.innerHTML = `${taktikHtml(S)}<div class="lapangan"><div class="jaring"></div><div class="arena"><div class="separuh">${baris(lap.slice(0, 3))}${baris(lap.slice(3))}</div></div></div>
 <div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div>
 <section class="detail" id="detail">${detailHtml(cari(fokusId), now)}</section>`;
   // Tombol "Profil lengkap" di panel detail: didengar sekali di akar, jadi tidak menumpuk.
   root.onclick = e => {
+    const f = e.target.closest('[data-formasi],[data-gaya],[data-auto]');
+    if (f) { if (f.dataset.formasi) S.taktik.formasi = f.dataset.formasi; if (f.dataset.gaya) S.taktik.gaya = f.dataset.gaya; else S.susunan = autoSusun(S, sekarang()); aksi.simpan(); return renderSkuad(root, S, aksi); }
     const b = e.target.closest('[data-kartu]');
     if (!b) return;
     const p = cari(b.dataset.kartu);

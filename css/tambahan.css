@@ -1,0 +1,22 @@
+.taktik{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.chip-t{padding:7px 12px;border-radius:999px;background:var(--panel);border:1px solid var(--garis);font-weight:700;font-size:14px}
+.chip-t.on{background:var(--bola);color:#0C1A2B}
+.pemisah{width:1px;height:20px;background:var(--garis)}
+.kartu-klub,.laga-depan{background:var(--panel);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.laga-depan{background:var(--panel-2);text-align:center}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:8px 0 12px;font-size:20px}
+.vs span{color:var(--redup)}
+.laga-depan .tombol-besar{margin:0 auto;display:flex;gap:8px;align-items:center;justify-content:center}
+.riwayat{display:flex;gap:6px;flex-wrap:wrap}
+.hc{display:grid;padding:6px 10px;border-radius:10px;font-weight:700;text-align:center}
+.hc small{font-size:11px;font-weight:500;opacity:.8}
+.hc.m{background:rgba(70,193,123,.25)}.hc.k{background:rgba(239,91,74,.25)}
+.tabel{width:100%;border-collapse:collapse;font-size:15px}
+.tabel th{color:var(--redup);font-weight:500;font-size:12px}
+.tabel td,.tabel th{padding:7px 4px;text-align:center}
+.tabel .tn{text-align:left}
+.tabel tr.saya{background:rgba(244,196,48,.18)}
+.jd{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;padding:6px 0;font-size:15px}
+.jd span:last-child{text-align:right}.jd.saya{color:var(--bola)}
+.komentar{min-height:24px;text-align:center;color:var(--bola);font-weight:700;margin:6px 0}
+.nama-lawan{display:block;text-align:center;font-size:20px;font-weight:700;margin:6px 0}

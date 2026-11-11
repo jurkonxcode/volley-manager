@@ -9,7 +9,8 @@ export const K = {
   exp: { dasar: 100, tambahPerLevel: 40, menang: 50, kalah: 20, perLevelLawan: 15 },
   manajer: { namaAwal: 'Manajer Baru', timAwal: 'Garuda Muda' },
   warnaPosisi: { S: '#8E7CF0', OH: '#F4C430', MB: '#46C17B', OP: '#EF5B4A', L: '#4DB6E8' },
-  kunciSimpan: 'volley-manager-v1'
+  musim: { menitAntarPekan: 20, hadiahPeringkat: [1500, 900, 600, 400, 300, 200, 150, 100] },
+  kunciSimpan: 'volley-manager-v2'
 };
 export const URUTAN_STAT = ['servis', 'smash', 'blok', 'receive', 'umpan'];
 export const WARNA_STAT = { servis: '#4DB6E8', smash: '#EF5B4A', blok: '#46C17B', receive: '#8E7CF0', umpan: '#F4C430' };
