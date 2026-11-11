@@ -1,4 +1,4 @@
-import { kartuMini, figur, ikon } from './gambar.js';
+import { kartuMini, figur, ikon, logoTim, logoMini, esc } from './gambar.js';
 import { setPose } from './sprite.js';
 import { pasangTukar, lepasPilihan } from './skuad.js';
 import { sekarang, durasiPendek } from '../inti/waktu.js';
@@ -28,8 +28,15 @@ function tampilPilih(root, S, aksi) {
   if (!f) { root.innerHTML = `<button class="tombol-besar" id="ke">${ikon('trofi', 30)}</button>`; root.querySelector('#ke').onclick = () => aksi.pindah('liga'); return; }
   const buka = kickoff(M, f.hari), lw = M.tim[f.lawan], tim = buatLawan(lw.tingkat, buatAcak(M.ke * 1000 + f.lawan * 20 + f.hari), now);
   const saya = Math.round(kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), now, S.taktik)), level = levelLawan(lw.tingkat);
-  root.innerHTML = `<div class="kuat-saya">${ikon('smash', 30)}<span>${saya}</span></div><div class="lawan-kartu"><b class="nama-lawan">${lw.nama}</b><span class="deret">${tim.map(p => figur(p, 'B', now)).join('')}</span><span class="kuat">${ikon('smash', 20)}<span>${Math.round(kekuatanTim(tim, now))}</span></span></div>` +
-    (now >= buka ? `<button class="tombol-besar" id="mulai" aria-label="Mulai">${ikon('main', 30)}</button>` : `<div class="kuat-saya">${ikon('jam', 26)}<span>${durasiPendek(buka - now)}</span></div>`);
+  const lwKuat = Math.round(kekuatanTim(tim, now)), total = Math.max(saya + lwKuat, 1), selisih = saya - lwKuat;
+  const nada = selisih > 3 ? 'unggul' : selisih < -3 ? 'tertinggal' : 'imbang', teksNada = selisih > 3 ? `Unggul ${selisih}` : selisih < -3 ? `Tertinggal ${-selisih}` : 'Seimbang';
+  root.innerHTML = `<section class="md-kartu"><div class="md-kepala"><span>Musim ${M.ke}</span><span>Pekan ${f.hari + 1} / ${M.jadwal.length}</span><span>${f.kandang ? 'Kandang' : 'Tandang'}</span></div>
+<div class="md-tim"><div class="md-sisi"><div class="md-logo">${logoTim()}</div><b>${esc(S.manajer.tim)}</b></div><div class="md-vs">VS</div><div class="md-sisi"><div class="md-logo">${logoMini(lw.nama)}</div><b>${esc(lw.nama)}</b></div></div>
+<div class="md-kuat"><b>${saya}</b><div class="md-bar" role="img" aria-label="Perbandingan kekuatan"><i style="width:${(saya / total * 100).toFixed(1)}%"></i></div><b>${lwKuat}</b></div>
+<div class="md-nada ${nada}">${teksNada} · kekuatan tim</div>
+<div class="md-taktik"><span>${esc(S.taktik.formasi)}</span><span>${esc(GAYA[S.taktik.gaya]?.nama || S.taktik.gaya)}</span></div></section>
+<section class="md-lawan"><small>Susunan lawan</small><span class="deret">${tim.map(p => figur(p, 'B', now)).join('')}</span></section>` +
+    (now >= buka ? `<button class="tombol-besar" id="mulai" aria-label="Mulai laga">${ikon('main', 26)} Mulai Laga</button>` : `<div class="md-hitung">${ikon('jam', 22)}<span>Kickoff dalam ${durasiPendek(buka - now)}</span></div>`);
   const mb = root.querySelector('#mulai');
   if (mb) mb.onclick = () => { bersihkanSusunan(S, sekarang()); P.level = level; P.hari = f.hari; P.m = buatPertandingan(S.skuad, S.susunan, tim, level, S.taktik); P.fase = 'siap'; P.skor = { a: 0, b: 0 }; renderPertandingan(root, S, aksi); };
 }

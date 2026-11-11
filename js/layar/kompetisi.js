@@ -8,9 +8,10 @@ let sub = 'klasemen';
 export const setSubLiga = s => { sub = s; };
 const SUB = { klasemen: 'Klasemen', jadwal: 'Jadwal', analitik: 'Analitik' };
 
+const formTim = (M, i) => M.hasil.filter(r => r.i === i || r.j === i).slice(-5).map(r => { const k = r.i === i, a = k ? r.s1 : r.s2, b = k ? r.s2 : r.s1; return `<i class="fd ${a > b ? 'm' : 'k'}"></i>`; }).join('');
 function klasemen(M) {
-  const baris = tabel(M).map((x, n) => `<tr class="${x.i === 0 ? 'saya' : ''}"><td>${n + 1}</td><td class="tn">${logoMini(M.tim[x.i].nama)+esc(M.tim[x.i].nama)}</td><td>${x.m}</td><td>${x.mn}</td><td>${x.k}</td><td>${x.sm - x.sk}</td><td><b>${x.poin}</b></td></tr>`).join('');
-  return `<section class="pengaturan"><table class="tabel"><thead><tr><th>#</th><th class="tn">Tim</th><th>M</th><th>Mn</th><th>K</th><th>Sel</th><th>Poin</th></tr></thead><tbody>${baris}</tbody></table></section>`;
+  const baris = tabel(M).map((x, n) => `<tr class="${x.i === 0 ? 'saya' : ''}"><td>${n + 1}</td><td class="tn">${logoMini(M.tim[x.i].nama)+esc(M.tim[x.i].nama)}</td><td>${x.m}</td><td>${x.mn}</td><td>${x.k}</td><td>${x.sm - x.sk}</td><td><b>${x.poin}</b></td><td class="fm">${formTim(M, x.i)}</td></tr>`).join('');
+  return `<section class="pengaturan"><table class="tabel"><thead><tr><th>#</th><th class="tn">Tim</th><th>M</th><th>Mn</th><th>K</th><th>Sel</th><th>Poin</th><th class="fm">Form</th></tr></thead><tbody>${baris}</tbody></table></section>`;
 }
 function jadwal(M) {
   const A = analitik(M), pekan = Math.max(0, M.hari - 1);
