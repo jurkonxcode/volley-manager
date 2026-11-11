@@ -118,3 +118,16 @@ git add -A && git commit -m "update" && git push
 - Jebakan baru: Three.js tidak membebaskan memori GPU saat objek hanya dilepas dari scene. Apa pun yang dibuat per set (pemain, efek) harus di-`dispose` (`buang()` di `arena3d.js`). Bila menambah objek 3D baru yang dibuat berulang, buang juga.
 - `reli()` di `arena3d.js` bergantung pada arti kolom reli: untuk `ace/smash/blok`, `ti` = tim pencetak; untuk `salah`, `ti` = tim PEMBUAT KESALAHAN (lawan pencetak), `pi` >= 3 berarti servis. Jangan diubah di `sistem/pertandingan.js` tanpa menyesuaikan arena3d.
 - Belum terverifikasi: tampilan/cahaya/kamera 3D dan FPS di HP (Three.js tidak bisa diunduh di lingkungan audit; uji hanya dengan Three.js tiruan). Lihat `docs/AUDIT_V15_1.md`.
+
+## v16 — Tema "Malam Pertandingan"
+- Hanya menambah `css/v16.css` (dimuat paling akhir) dan mengubah `index.html` (font Barlow Condensed + link CSS). Logika, state, dan aset tidak diubah. Untuk membatalkan: hapus baris `<link>` v16.
+- Arah: siaran olahraga. Palet ink #070A14, lime #C6FF3D (aksen), oranye lapangan #FF7A1A (garis kartu klub/papan skor), font angka Barlow Condensed. Tombol/chip berpotongan miring (`--potong`).
+- Belum diuji di HP oleh pembuatnya: cek kontras teks di atas gambar hero dan ukuran angka papan skor (76px).
+
+## v16.1 — Fitur klub + negara
+- Beranda jadi dashboard (laga terakhir/berikutnya, klasemen, pesan staf, ekonomi mingguan, evolusi tim, pencapaian). `js/layar/klub.js`.
+- `js/sistem/klub.js`: fans, sponsor (target peringkat + bonus), ekonomi per laga (tiket kandang + sponsor - gaji/20), inbox, pencapaian (`CAPAI`), `gantiNegara`. State baru: `S.klub`, `S.riwayat`, `S.negara`; data lama dilengkapi di `lengkapiKlub`.
+- Promosi/degradasi: `musim.js` (`LIGA`, peringkat <=2 naik, >=7 turun; lawan +7 tingkat per liga). Riwayat musim tersimpan di `S.riwayat`.
+- Nama per negara: `js/data/negara.js` (ID, JP, BR, IT, PL, TR, KR). Pemain punya `neg`; klub lawan dibuat dari kota x pola; logo lawan dipilih dari hash nama. Negara diganti di Profil; nama pemain berubah langsung, klub lawan di musim berikutnya (atau langsung bila belum ada laga). Pilihan disimpan juga di localStorage `vm-negara` agar tetap saat reset.
+- Belum: analitik lintas musim (data sudah di `S.riwayat`, belum ada grafik), gaji tidak benar-benar dibayar per pemain, tidak ada kontrak habis.
+- Diuji di Chromium headless (390x844): Beranda, Kompetisi, Profil, akhir musim + promosi. Font Google tidak termuat di sandbox, jadi tampilan memakai font cadangan.

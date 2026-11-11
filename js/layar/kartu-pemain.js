@@ -1,6 +1,7 @@
 // Kartu profil lengkap pemain, tampil sebagai lembar di atas layar.
 import { potret, radar, chipStat, ikon, esc } from './gambar.js';
 import { rarity } from './rarity.js';
+import { NEGARA } from '../data/negara.js';
 import { K } from '../inti/konfigurasi.js';
 import { ratingPemain, gajiPemain, nilaiPasar } from '../sistem/pemain.js';
 import { staminaSekarang, zonaStamina } from '../sistem/stamina.js';
@@ -21,7 +22,7 @@ export function bukaKartu(p, now) {
 ${radar(p)}
 ${chipStat(p)}
 <section class="data-diri">
-${sel('Tinggi', p.tinggi + ' cm')}${sel('Berat', p.berat + ' kg')}${sel('Asal', esc(p.asal))}${sel('Kontrak s.d.', p.kontrakSampai)}${sel('Gaji', rp(gajiPemain(p)) + ' / minggu')}${sel('Nilai pasar', rp(nilaiPasar(p)) + ' koin')}
+${sel('Tinggi', p.tinggi + ' cm')}${sel('Berat', p.berat + ' kg')}${sel('Asal', (NEGARA[p.neg]?.bendera || '') + ' ' + esc(p.asal))}${sel('Kontrak s.d.', p.kontrakSampai)}${sel('Gaji', rp(gajiPemain(p)) + ' / minggu')}${sel('Nilai pasar', rp(nilaiPasar(p)) + ' koin')}
 </section>
 <section class="kl-batang">
 <div class="baris-info">${ikon('jam', 20)}<div class="batang zona-${zonaStamina(s)}"><i style="width:${s.toFixed(0)}%"></i></div><b>${Math.round(s)}%</b></div>

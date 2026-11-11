@@ -1,6 +1,10 @@
 // Profil manajer: identitas, EXP, catatan pertandingan, dan pengaturan.
 import { ikon, esc } from './gambar.js';
 import { levelDari } from '../sistem/manajer.js';
+import { NEGARA } from '../data/negara.js';
+import { gantiNegara } from '../sistem/klub.js';
+import { buatMusim } from '../sistem/musim.js';
+import { sekarang } from '../inti/waktu.js';
 
 export function renderProfil(root, S, aksi) {
   const m = S.manajer, L = levelDari(m.exp), huruf = (m.nama.trim()[0] || 'M').toUpperCase();
@@ -14,11 +18,13 @@ export function renderProfil(root, S, aksi) {
 <h2>Pengaturan</h2>
 <label class="isian"><span>Nama manajer</span><input id="nm" maxlength="24" value="${esc(m.nama)}" autocomplete="off"></label>
 <label class="isian"><span>Nama tim</span><input id="nt" maxlength="24" value="${esc(m.tim)}" autocomplete="off"></label>
+<label class="isian"><span>Negara (nama pemain dan klub)</span><select id="neg">${Object.entries(NEGARA).map(([k, n]) => `<option value="${k}" ${S.negara === k ? 'selected' : ''}>${n.bendera} ${n.nama}</option>`).join('')}</select></label>
 <label class="saklar"><span>Lewati animasi pertandingan</span><input type="checkbox" id="anim" ${pengaturan.animasiCepat ? 'checked' : ''}></label>
 <button class="tombol-besar sekunder" id="ulang">${ikon('hapus', 24)} Mulai dari awal</button>
 </section>`;
   root.querySelector('#nm').onchange = e => { m.nama = e.target.value.trim() || 'Manajer'; e.target.value = m.nama; aksi.simpan(); renderProfil(root, S, aksi); };
   root.querySelector('#nt').onchange = e => { m.tim = e.target.value.trim() || 'Tim Tanpa Nama'; e.target.value = m.tim; aksi.simpan(); };
   root.querySelector('#anim').onchange = e => { pengaturan.animasiCepat = e.target.checked; aksi.simpan(); };
+  root.querySelector('#neg').onchange = e => { const v = e.target.value; gantiNegara(S, v); try { localStorage.setItem('vm-negara', v); } catch (x) {} if (!S.musim.hasil.length) S.musim = buatMusim(S.musim.ke, m.tim, sekarang(), v, S.musim.liga || 0); aksi.simpan(); alert('Nama pemain diganti. Nama klub lawan berubah di musim baru' + (S.musim.hasil.length ? '.' : ' (sudah berlaku).')); renderProfil(root, S, aksi); };
   root.querySelector('#ulang').onclick = () => aksi.reset();
 }

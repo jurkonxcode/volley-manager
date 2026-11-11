@@ -1,3 +1,4 @@
+import { NEGARA } from '../data/negara.js';
 // Transfer, scouting, latihan, fasilitas, dan cedera. Logika murni.
 import { K } from '../inti/konfigurasi.js';
 import { buatAcak } from '../inti/acak.js';
@@ -11,7 +12,7 @@ export const biayaFasilitas = lv => 100 * (lv + 1) ** 2;
 export function segarkanPasar(S, now) {
   if (S.pasar && now - S.pasar.ts < K.pasar.menitSegar * 60000) return;
   const a = buatAcak(now & 0x7fffffff), pos = ['S', 'OH', 'MB', 'OP', 'L'];
-  S.pasar = { ts: now, daftar: Array.from({ length: K.pasar.jumlah }, () => { const p = buatPemain(a, a.pilih(pos), a.int(40, 56), now); p.scout = false; return p; }) };
+  S.pasar = { ts: now, daftar: Array.from({ length: K.pasar.jumlah }, () => { const p = buatPemain(a, a.pilih(pos), a.int(40, 56), now, a() < .6 ? (S.negara || 'ID') : a.pilih(Object.keys(NEGARA))); p.scout = false; return p; }) };
 }
 export function beli(S, id) {
   const p = S.pasar.daftar.find(x => x.id === id), h = hargaBeli(p);

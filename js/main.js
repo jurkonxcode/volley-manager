@@ -15,12 +15,13 @@ import { ikon, LOGO } from './layar/gambar.js';
 import { siapkanSprite } from './layar/sprite.js';
 import { renderSkuad } from './layar/skuad.js';
 import { renderPertandingan, lepasPilihan } from './layar/pertandingan.js';
+import { lengkapiKlub } from './sistem/klub.js';
 import { renderProfil } from './layar/profil.js';
 
 function gameBaru() {
   const now = sekarang(), acak = buatAcak(now & 0x7fffffff);
-  const { skuad, susunan } = buatSkuadAwal(acak, now, K.skuadAwal.tingkat);
-  return { versi: 2, koin: K.skuadAwal.koin, skuad, susunan, dibuat: now, manajer: buatManajer(now), pengaturan: { animasiCepat: false }, taktik: { formasi: '5-1', gaya: 'seimbang' }, musim: buatMusim(1, K.manajer.timAwal, now) };
+  const neg = localStorage.getItem('vm-negara') || 'ID', { skuad, susunan } = buatSkuadAwal(acak, now, K.skuadAwal.tingkat, neg);
+  return { versi: 2, koin: K.skuadAwal.koin, skuad, susunan, dibuat: now, manajer: buatManajer(now), pengaturan: { animasiCepat: false }, taktik: { formasi: '5-1', gaya: 'seimbang' }, negara: neg, musim: buatMusim(1, K.manajer.timAwal, now, neg) };
 }
 // Data lama (sebelum profil ditambahkan) dilengkapi otomatis, tanpa mengulang permainan.
 function lengkapi(S) {
@@ -32,6 +33,7 @@ function lengkapi(S) {
   S.taktik ??= { formasi: '5-1', gaya: 'seimbang' };
   S.musim ??= buatMusim(1, S.manajer.tim, now);
   S.skuad.forEach(p => lengkapiPemain(p, now));
+  S.musim.liga ??= 0; S.musim.neg ??= 'ID'; lengkapiKlub(S);
   return S;
 }
 let S = lengkapi(muat() ?? gameBaru());

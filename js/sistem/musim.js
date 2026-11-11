@@ -4,7 +4,10 @@ import { buatAcak } from '../inti/acak.js';
 import { hadiahPertandingan } from './ekonomi.js';
 import { cederaLaga } from './pasar.js';
 import { expPertandingan, catatHasil } from './manajer.js';
+import { namaKlub } from '../data/negara.js';
+import { akhirLaga, pesan, buatSponsor } from './klub.js';
 const NAMA = ['Elang Sakti', 'Badai Timur', 'Macan Putih', 'Naga Laut', 'Rajawali', 'Banteng Muda', 'Cakra Biru'];
+export const LIGA = ['Liga Kelurahan', 'Liga Kota', 'Liga Provinsi', 'Liga Nasional'];
 const jepit = (n, a, b) => Math.max(a, Math.min(b, n));
 const peluang = d => jepit(0.5 + d * K.skalaPeluang, K.peluangMin, K.peluangMaks);
 function putaran(n) {
@@ -12,10 +15,10 @@ function putaran(n) {
   for (let r = 0; r < n - 1; r++) { ps.push(Array.from({ length: n / 2 }, (_, i) => [t[i], t[n - 1 - i]])); t.splice(1, 0, t.pop()); }
   return ps;
 }
-export function buatMusim(ke, namaSaya, now) {
-  const acak = buatAcak(ke * 7717 + 1), p1 = putaran(8);
-  const tim = [{ nama: namaSaya, tingkat: K.skuadAwal.tingkat }, ...NAMA.map((nama, i) => ({ nama, tingkat: 38 + i * 2 + acak.int(0, 2) }))];
-  return { ke, tim, jadwal: [...p1, ...p1.map(h => h.map(([a, b]) => [b, a]))], hari: 0, mulai: now, hasil: [] };
+export function buatMusim(ke, namaSaya, now, neg = 'ID', liga = 0) {
+  const acak = buatAcak(ke * 7717 + 1 + liga * 131 + neg.charCodeAt(0) * 17), p1 = putaran(8), nm = neg === 'ID' && liga === 0 && ke === 1 ? NAMA : namaKlub(neg, acak, 7, namaSaya);
+  const tim = [{ nama: namaSaya, tingkat: K.skuadAwal.tingkat }, ...nm.map((nama, i) => ({ nama, tingkat: 38 + liga * 7 + i * 2 + acak.int(0, 2) }))];
+  return { ke, liga, neg, tim, jadwal: [...p1, ...p1.map(h => h.map(([a, b]) => [b, a]))], hari: 0, mulai: now, hasil: [] };
 }
 export const kickoff = (M, h) => M.mulai + h * K.musim.menitAntarPekan * 60000;
 export const levelLawan = tingkat => jepit(Math.round((tingkat - 34) / 6), 1, 3);
@@ -38,6 +41,8 @@ export function catatLaga(S, sa, sb) {
   M.hari++;
   const menang = sa > sb, level = levelLawan(lw.tingkat), koin = Math.round(hadiahPertandingan(menang, level) * (1 + 0.1 * (S.fasilitas?.stadion || 0))), exp = expPertandingan(menang, level);
   S.koin += koin;
+  const ek = akhirLaga(S, f, menang, level, h);
+  pesan(S, (menang ? 'Menang ' : 'Kalah ') + sa + '-' + sb + ' vs ' + lw.nama, `Hadiah ${koin} koin. Pemasukan ${ek.masuk}, gaji ${ek.gaji} koin pekan ini.`);
   return { menang, koin, exp, naik: catatHasil(S.manajer, menang, exp), cedera: S.fasilitas ? cederaLaga(S, acak, Date.now()) : [] };
 }
 // Pekan yang terlewat (kick-off pekan berikutnya sudah lewat) dimainkan otomatis dengan susunan saat ini.
@@ -60,6 +65,11 @@ export function tabel(M) {
 }
 export function akhiriMusim(S, now) {
   const rank = tabel(S.musim).findIndex(x => x.i === 0) + 1, koin = K.musim.hadiahPeringkat[rank - 1] || 100;
-  S.koin += koin; S.musim = buatMusim(S.musim.ke + 1, S.manajer.tim, now);
-  return { rank, koin };
+  const M = S.musim, sp = S.klub.sponsor, ok = rank <= sp.target, bonus = ok ? sp.bonus : 0, liga = rank <= 2 && M.liga < LIGA.length - 1 ? M.liga + 1 : rank >= 7 && M.liga > 0 ? M.liga - 1 : M.liga;
+  S.koin += koin + bonus; S.riwayat.push({ ke: M.ke, liga: M.liga, rank, naik: liga > M.liga, turun: liga < M.liga });
+  S.klub.sponsor = buatSponsor(liga, rank);
+  const ket = liga > M.liga ? 'Promosi ke ' + LIGA[liga] : liga < M.liga ? 'Degradasi ke ' + LIGA[liga] : 'Bertahan di ' + LIGA[liga];
+  pesan(S, `Musim ${M.ke} selesai: peringkat ${rank}`, ket + (ok ? `. Target sponsor tercapai, bonus ${bonus} koin.` : `. Target sponsor (peringkat ${sp.target}) belum tercapai.`));
+  S.musim = buatMusim(M.ke + 1, S.manajer.tim, now, S.negara, liga);
+  return { rank, koin: koin + bonus, ket };
 }

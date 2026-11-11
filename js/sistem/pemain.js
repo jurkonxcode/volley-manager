@@ -1,6 +1,7 @@
 import { URUTAN_STAT } from '../inti/konfigurasi.js';
 import { buatAcak } from '../inti/acak.js';
-import { NAMA_DEPAN, NAMA_BELAKANG, ASAL, SIFAT } from '../data/nama-pemain.js';
+import { ASAL, SIFAT } from '../data/nama-pemain.js';
+import { namaOrang, asalOrang } from '../data/negara.js';
 const PROFIL = {
   S:  { servis: 0,  smash: -10, blok: -4,  receive: 4,   umpan: 18 },
   OH: { servis: 4,  smash: 10,  blok: -2,  receive: 8,   umpan: -8 },
@@ -26,7 +27,7 @@ function isiProfil(p, acak, now) {
   const [a, b] = TINGGI[p.posisi];
   p.tinggi = acak.int(a, b);
   p.berat = jepit(p.tinggi - 105 + acak.int(-4, 6), 60, 100);
-  p.asal = acak.pilih(ASAL);
+  p.asal = p.neg && p.neg !== 'ID' ? asalOrang(p.neg, acak) : acak.pilih(ASAL);
   p.sifat = acak.pilih(SIFAT);
   p.kontrakSampai = new Date(now).getFullYear() + acak.int(1, 4);
 }
@@ -37,10 +38,10 @@ export function nilaiPasar(p) {
   const faktorUmur = p.umur <= 23 ? 1.2 : p.umur >= 30 ? 0.8 : 1;
   return Math.round(Math.pow(p.potensi / 10, 3) * faktorUmur) * 1000;
 }
-export function buatPemain(acak, posisi, tingkat, now) {
+export function buatPemain(acak, posisi, tingkat, now, neg = 'ID') {
   const p = {
     id: 'p' + (urut++) + '_' + acak.int(1000, 9999),
-    nama: acak.pilih(NAMA_DEPAN) + ' ' + acak.pilih(NAMA_BELAKANG),
+    nama: namaOrang(neg, acak), neg,
     posisi, umur: acak.int(17, 33), nomor: acak.int(1, 20),
     tahan: jepit(tingkat + acak.int(-12, 18), 15, 95), mental: jepit(tingkat + acak.int(-10, 15), 15, 95),
     kulit: acak.int(0, 3), rambut: acak.int(0, 3), gaya: acak.int(0, 2),
@@ -51,9 +52,9 @@ export function buatPemain(acak, posisi, tingkat, now) {
   isiProfil(p, acak, now);
   return p;
 }
-export function buatSkuadAwal(acak, now, tingkat) {
+export function buatSkuadAwal(acak, now, tingkat, neg = 'ID') {
   const komposisi = ['S', 'S', 'OH', 'OH', 'OH', 'MB', 'MB', 'MB', 'OP', 'OP', 'L', 'L'];
-  const skuad = komposisi.map(pos => buatPemain(acak, pos, tingkat, now));
+  const skuad = komposisi.map(pos => buatPemain(acak, pos, tingkat, now, neg));
   skuad.forEach((p, i) => { p.nomor = i * 2 + 1; });
   // Susunan awal: baris depan (OH, MB, OP), baris belakang (OH, L, S)
   const susunan = [skuad[2], skuad[5], skuad[8], skuad[3], skuad[10], skuad[0]].map(p => p.id);
@@ -62,6 +63,7 @@ export function buatSkuadAwal(acak, now, tingkat) {
 function hashStr(s) { let h = 5381; for (const c of s) h = ((h << 5) + h + c.charCodeAt(0)) >>> 0; return h; }
 // Pemain dari penyimpanan lama belum punya data diri: isi dengan acak yang tetap (berdasarkan id).
 export function lengkapiPemain(p, now) {
+  p.neg ??= 'ID';
   if (p.tinggi === undefined) isiProfil(p, buatAcak(hashStr(p.id)), now);
   return p;
 }

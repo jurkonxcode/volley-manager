@@ -1,0 +1,149 @@
+/* v16 "Malam Pertandingan" — tema siaran olahraga. Dimuat terakhir; hanya menimpa tampilan, logika tidak disentuh. */
+:root{
+  --malam:#070A14;--panel:#0F1424;--panel-2:#182036;--garis:rgba(238,241,250,.10);--tepi:rgba(238,241,250,.10);
+  --teks:#EEF1FA;--redup:#8D99B5;--bola:#C6FF3D;--baik:#3DDC97;--kritis:#FF5470;--sedang:#FFB72B;
+  --lapangan:#E8822E;--court:#FF7A1A;--aksen:linear-gradient(180deg,#D6FF62,#B6EE1F);
+  --kartu:linear-gradient(180deg,#121932,#0D1226);--r:12px;
+  --font:'Barlow Semi Condensed',system-ui,sans-serif;--font-n:'Barlow Condensed','Barlow Semi Condensed',sans-serif;
+  --potong:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+body{background:
+  linear-gradient(180deg,transparent 60%,rgba(255,122,26,.10)),
+  repeating-linear-gradient(115deg,rgba(255,255,255,.018) 0 2px,transparent 2px 46px),
+  var(--malam);background-attachment:fixed;letter-spacing:.1px}
+body,.nav button,.tabel,.papan b,.md-kuat b{font-family:var(--font)}
+#layar{padding:8px 14px 28px}
+
+/* Header: logo kiri, koin berbentuk papan */
+.atas{padding-bottom:10px;border-bottom:1px solid var(--garis);background:rgba(7,10,20,.85);backdrop-filter:blur(10px)}
+.koin{border-radius:0;clip-path:var(--potong);padding:5px 22px;font:800 22px/1 var(--font-n);letter-spacing:.5px;color:var(--bola);background:var(--panel-2);border:0;box-shadow:none}
+.logo{filter:none}
+
+/* Navigasi: dok solid, penanda lime di atas */
+.nav{margin:0;border:0;border-top:1px solid var(--garis);border-radius:0;background:var(--panel);backdrop-filter:none;box-shadow:0 -10px 24px rgba(0,0,0,.45);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav button{height:60px;font-size:10.5px;letter-spacing:1px;color:var(--redup)}
+.nav button[aria-current="true"]{background:linear-gradient(180deg,rgba(198,255,61,.14),transparent 80%);color:var(--teks)}
+.nav button[aria-current="true"] svg{color:var(--bola);filter:none}
+.nav button[aria-current="true"]::after{left:0;right:0;height:3px;border-radius:0;background:var(--bola)}
+
+/* Kartu: permukaan rata, tepi tegas, garis aksen kiri */
+.kartu-klub,.laga-depan,.pengaturan,.detail,.kartu-manajer,.md-kartu,.md-lawan,.opsi,.menu-baris,.papan,.lapangan{
+  background:var(--kartu);border:1px solid var(--tepi);border-radius:var(--r);box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.pengaturan,.laga-depan,.md-kartu{border-left:3px solid var(--bola)}
+.pengaturan h2,.kartu-klub h2{font:700 12px/1 var(--font);letter-spacing:1.8px;color:var(--redup)}
+.pengaturan h2::after{background:var(--tepi)}
+
+/* Kartu klub: biru malam bergaris diagonal, bukan ungu-merah muda */
+.kartu-klub{border:1px solid rgba(255,255,255,.14);border-left:3px solid var(--court);background:
+  repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 18px),linear-gradient(135deg,#17306B,#0F1A3F 70%)}
+.kartu-klub::after{display:none}
+.km-avatar{background:var(--panel-2);color:var(--bola);box-shadow:0 0 0 2px var(--bola)}
+.km-nama{font:800 26px/1 var(--font-n);letter-spacing:.4px;text-transform:uppercase}
+.km-level small{color:var(--redup);letter-spacing:1.5px}
+.km-level b{font:800 46px/1 var(--font-n);background:none;color:var(--bola);-webkit-text-fill-color:currentColor}
+.km-statistik>div{background:rgba(7,10,20,.55);border-radius:8px;border:1px solid var(--tepi)}
+.km-statistik b{font:800 28px/1.1 var(--font-n)}
+.km-statistik span{font-size:12px;color:var(--redup);letter-spacing:.8px}
+.batang{height:6px;border-radius:0;background:rgba(255,255,255,.12)}
+.batang i{background:var(--bola)}
+
+/* Hero Beranda */
+.hero{border-radius:var(--r);border:1px solid var(--tepi);background:linear-gradient(180deg,rgba(255,122,26,.18),transparent 70%),var(--kartu)}
+.hero h1{font:800 54px/.9 var(--font-n);font-style:italic;text-transform:uppercase;letter-spacing:1px;background:none;color:var(--teks);-webkit-text-fill-color:currentColor;filter:none;text-shadow:3px 3px 0 var(--court)}
+.hero p{font-style:normal;letter-spacing:2px;text-transform:uppercase;font-size:13px}
+.hero-bola{filter:none}
+
+/* Tombol: potongan miring ala grafis siaran */
+.tombol-besar{height:56px;border-radius:0;clip-path:var(--potong);background:var(--aksen);color:#0A1200;font:800 20px/1 var(--font-n);letter-spacing:1.5px;box-shadow:none}
+.tombol-besar:active{transform:translateY(1px);box-shadow:none}
+.tombol-besar.sekunder{background:var(--panel-2);color:var(--teks);border:0}
+.tombol-kecil,.kembali{background:var(--panel-2);border:1px solid var(--tepi);border-radius:10px}
+.chip-t{border-radius:0;clip-path:var(--potong);padding-inline:18px;background:var(--panel-2);border:0;color:var(--redup);font:800 14px/1 var(--font-n);letter-spacing:1px}
+.chip-t.on{background:var(--aksen);color:#0A1200;box-shadow:none}
+.tab-sub{padding:0;border-radius:0;background:none;border:0;border-bottom:1px solid var(--tepi);gap:0}
+.tab-sub button{height:42px;border-radius:0;font:700 15px/1 var(--font);letter-spacing:.8px;text-transform:uppercase;position:relative}
+.tab-sub button.on{background:none;color:var(--teks);box-shadow:none}
+.tab-sub button.on::after{content:"";position:absolute;left:12%;right:12%;bottom:-1px;height:3px;background:var(--bola)}
+.opsi{border-radius:10px}.opsi b{font:800 22px/1 var(--font-n);letter-spacing:.5px}
+.opsi.on{border-color:var(--bola);box-shadow:inset 3px 0 var(--bola);background:rgba(198,255,61,.07)}
+.mini{background:rgba(232,130,46,.30);border-radius:8px}
+.menu-baris{height:54px;border-radius:10px;font:700 17px var(--font);letter-spacing:.3px}
+.menu-baris svg:first-child{color:var(--bola)}
+
+/* Laga depan / pra-laga */
+.laga-depan{padding:16px}
+.vs b,.md-sisi b{font:800 24px/1 var(--font-n);text-transform:uppercase;letter-spacing:.4px}
+.vs span,.md-vs{background:var(--panel-2);color:var(--redup);border-radius:6px}
+.md-kuat b{font:800 34px/1 var(--font-n)}
+.md-kuat b:first-child{color:var(--bola)}
+.md-bar{height:8px;border-radius:0;background:#3A66D6}
+.md-bar i{border-radius:0;background:var(--bola)}
+.md-logo{border-radius:12px;background:var(--panel-2)}
+.md-taktik span{border-radius:6px;background:var(--panel-2)}
+
+/* Papan skor siaran TV */
+.papan{padding:10px 8px;border-radius:10px;border-top:3px solid var(--court);background:linear-gradient(180deg,#0A0F22,#0F1630)}
+.papan b{font:800 76px/1 var(--font-n);text-shadow:none;letter-spacing:-1px}
+.papan .nm{font:800 13px/1 var(--font-n);letter-spacing:1.6px;color:var(--teks)}
+.papan .tengah small{color:var(--bola);font-family:var(--font-n);font-size:14px}
+.komentar{border-radius:8px;background:var(--panel);border:1px solid var(--tepi);border-left:3px solid var(--bola);font:700 16px var(--font);text-align:left}
+.lapangan{border-radius:14px;padding:10px;background:#0A0F22}
+.aksi-label{font-family:var(--font-n);font-size:20px;border-radius:0;clip-path:var(--potong);padding-right:22px;background:var(--bola);color:#0A1200;border:0}
+.aksi-label.smash{background:var(--kritis);color:#fff}.aksi-label.blok{background:var(--baik)}.aksi-label.salah{background:var(--panel-2);color:var(--redup)}
+.kec button{border-radius:8px;background:var(--panel-2);font-family:var(--font-n);font-size:18px}
+.kec button.on{background:var(--aksen);color:#0A1200}
+
+/* Klasemen */
+.tabel th{font-size:11px;color:var(--redup)}
+.tabel td{background:var(--panel);font-size:15px}
+.tabel td.tn{font-weight:700}
+.tabel tr.saya td{background:linear-gradient(90deg,rgba(198,255,61,.16),var(--panel) 70%);color:var(--teks)}
+.tabel tr.saya td:first-child{box-shadow:inset 3px 0 var(--bola);color:var(--bola)}
+.tabel tbody tr:nth-child(-n+2) td:first-child{color:var(--bola)}
+.tabel td b{font:800 20px/1 var(--font-n)}
+.hc{border-radius:6px;font-family:var(--font-n);font-weight:800}
+.hc.m{background:rgba(61,220,151,.16)}.hc.k{background:rgba(255,84,112,.16)}
+.jd3{border-bottom:1px solid var(--tepi)}.jd3.kini span{color:var(--bola)}
+
+/* Kartu pemain: bentuk kartu koleksi, rating besar */
+.kartu{border-radius:10px;background:var(--panel)}
+.kartu.terpilih{background:rgba(198,255,61,.14);outline:2px solid var(--bola);box-shadow:none}
+.lencana{border-radius:5px;font-family:var(--font-n);font-weight:800;letter-spacing:.5px}
+.rating-besar{font:800 56px/1 var(--font-n);background:none;color:var(--bola);-webkit-text-fill-color:currentColor}
+.kartu-lengkap{border-radius:14px;background:linear-gradient(180deg,#141B38,#0B1022)}
+.kl-nama{font:800 28px/1 var(--font-n);text-transform:uppercase}
+.kl-rar b{border-radius:4px;font-family:var(--font-n)}
+.bangku{border-radius:10px;background:var(--panel);border:1px solid var(--tepi)}
+.modal{backdrop-filter:blur(8px);background:rgba(4,6,14,.78)}
+
+/* Profil & formulir */
+input[type=text],input:not([type]){border-radius:8px;background:var(--panel);height:48px}
+input[type=text]:focus,input:not([type]):focus{border-color:var(--bola);box-shadow:0 0 0 3px rgba(198,255,61,.2)}
+input[type=checkbox]:checked{background:var(--bola)}
+input[type=checkbox]:checked::after{background:#0A1200}
+.skor-akhir{font-family:var(--font-n);text-shadow:none}
+@media (min-width:521px){#app{box-shadow:0 0 0 1px var(--tepi),0 0 80px rgba(0,0,0,.6)}}
+
+/* ===== Dashboard Beranda ala game manajer ===== */
+select{width:100%;height:48px;padding:0 12px;border-radius:8px;border:1px solid var(--tepi);background:var(--panel);color:var(--teks);font:inherit}
+.db-dua{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.db-kartu{display:grid;align-content:start;justify-items:center;gap:6px;padding:12px 10px 14px;border-radius:var(--r);background:linear-gradient(180deg,#123D2E,#0D2A24);border:1px solid rgba(61,220,151,.25)}
+.db-kartu h3{font:700 11px/1 var(--font);letter-spacing:1.6px;text-transform:uppercase;color:#9CD9BE;justify-self:start}
+.db-vs{display:flex;align-items:center;gap:8px}.db-vs b{font:800 28px/1 var(--font-n)}.db-vs b.m{color:var(--baik)}.db-vs b.k{color:var(--kritis)}
+.db-vs .logo-mini{width:34px;height:34px}.db-nm{font:700 14px var(--font);text-align:center}.db-kartu small{color:#9CD9BE}
+.db-kartu .tombol-besar{height:42px;font-size:16px;margin-top:4px}.db-kosong{padding:18px 0;color:#9CD9BE}
+.db-klas{display:grid;gap:3px}.db-k{display:grid;grid-template-columns:22px 26px 1fr auto;align-items:center;gap:8px;padding:6px 8px;background:var(--panel);border-radius:6px;font-size:15px}
+.db-k i{font:800 15px var(--font-n);font-style:normal;color:var(--redup)}.db-k .logo-mini{width:22px;height:22px}.db-k b{font:800 18px var(--font-n)}
+.db-k.saya{background:linear-gradient(90deg,rgba(198,255,61,.18),var(--panel));box-shadow:inset 3px 0 var(--bola)}.db-k.saya i{color:var(--bola)}
+.db-pesan b{font:800 17px var(--font)}.db-pesan p{margin:6px 0 10px;color:var(--redup);font-size:15px;line-height:1.35}
+.db-nav{display:flex;justify-content:center;align-items:center;gap:14px;color:var(--redup);font-weight:700}
+.db-nav button{width:40px;height:34px;border-radius:8px;background:var(--panel-2);display:grid;place-items:center}.db-nav .maju svg{transform:rotate(180deg)}
+.db-ek3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;text-align:center}
+.db-ek3 small{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--redup)}.db-ek3 b{font:800 26px var(--font-n)}
+.m{color:var(--baik)}.k{color:var(--kritis)}.db-eko{width:100%;height:auto}
+.db-evo>div{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--tepi)}
+.db-evo svg{color:var(--bola)}.db-evo small{display:block;color:var(--redup);font-size:12px}.db-evo b{font:800 20px var(--font-n)}
+.db-capai summary{display:flex;justify-content:space-between;padding:12px 0 4px;cursor:pointer;list-style:none;font-weight:700}.db-capai summary b{font:800 20px var(--font-n);color:var(--bola)}
+.db-capai div{display:flex;flex-wrap:wrap;gap:6px;padding-top:8px}.db-capai i{font-style:normal;font-size:13px;padding:5px 10px;border-radius:6px;background:var(--panel-2);color:var(--redup)}.db-capai i.on{background:rgba(198,255,61,.16);color:var(--bola)}
+.km-nama{font-size:22px;line-height:1.05;white-space:normal;overflow-wrap:anywhere}.km-id{min-width:0}
+.tabel td.tn{max-width:none;white-space:normal;line-height:1.1;font-size:13.5px}.tabel td{padding:8px 3px}.tabel td.tn .logo-mini{margin-right:6px;vertical-align:middle}
