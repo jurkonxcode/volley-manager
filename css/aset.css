@@ -14,3 +14,14 @@
 .badan{display:block;position:relative;width:56px;height:56px;overflow:visible;animation:napas 2.2s ease-in-out infinite}
 .badan img.sprite{display:block;width:100%;height:100%;object-fit:contain;object-position:50% 100%;pointer-events:none;-webkit-user-drag:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 .a-umpan{animation:hop .5s ease-out}
+/* lantai lapangan bergambar; garis tetap digambar kode (garis serang 1/3 dari jaring, sesuai aturan 3 m dari 9 m) */
+[data-layar="tanding"] .arena{background:url(../assets/lantai.webp) center/cover no-repeat,#E58A3A}
+.arena>.separuh{position:relative}
+.arena>.separuh .baris+.baris{border-top:0}
+.arena>.separuh::after{content:"";position:absolute;left:0;right:0;height:2px;background:rgba(255,255,255,.9);pointer-events:none}
+.arena>.separuh:first-child::after{top:66.7%}
+.arena>.separuh:nth-child(3)::after{top:33.3%}
+/* kotak peringkat/level: angka terbaca */
+.km-level{background:rgba(0,0,0,.32);border:1px solid var(--garis)}
+.km-level small{color:var(--redup)}
+.km-level b{background:none;-webkit-text-fill-color:var(--bola);color:var(--bola)}

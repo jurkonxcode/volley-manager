@@ -1,7 +1,9 @@
-// Sprite pemain: 6 pose PNG di assets/pose/. Tim lawan memakai versi yang dicat ulang (jersey biru tua jadi merah tua).
+// Sprite pemain di assets/pose/. Tim saya (A, sisi dekat) dilihat dari belakang: belakang-*.png.
+// Tim lawan (B, sisi jauh) dilihat dari depan: *.png, dicat ulang (jersey biru tua jadi merah tua).
 export const POSE = ['siap', 'servis', 'receive', 'umpan', 'smash', 'blok'];
 const DIR = 'assets/pose/', cache = { A: {}, B: {} };
-export const spriteSrc = (pose, tim) => cache[tim][pose] || DIR + pose + '.png';
+const berkas = (pose, tim) => DIR + (tim === 'A' ? 'belakang-' : '') + pose + '.png';
+export const spriteSrc = (pose, tim) => cache[tim][pose] || berkas(pose, tim);
 
 function cat(im) {
   const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
@@ -14,16 +16,14 @@ function cat(im) {
   }
   x.putImageData(d, 0, 0); return c.toDataURL('image/png');
 }
+const perbarui = (tim, n) => document.querySelectorAll(`img.sprite[data-tim="${tim}"][data-pose="${n}"]`).forEach(e => { e.src = cache[tim][n]; });
 // Dipanggil sekali saat game dibuka: memuat semua pose lebih dulu agar tidak berkedip, lalu mewarnai versi lawan.
 export function siapkanSprite() {
   POSE.forEach(n => {
-    const im = new Image();
-    im.onload = () => {
-      cache.A[n] = im.src;
-      try { cache.B[n] = cat(im); } catch (e) { cache.B[n] = im.src; }   // gagal (mis. dibuka dari file://): pakai warna asli
-      document.querySelectorAll(`img.sprite[data-tim="B"][data-pose="${n}"]`).forEach(e => { e.src = cache.B[n]; });
-    };
-    im.src = DIR + n + '.png';
+    const a = new Image(); a.onload = () => { cache.A[n] = a.src; perbarui('A', n); }; a.src = berkas(n, 'A');
+    const b = new Image();
+    b.onload = () => { try { cache.B[n] = cat(b); } catch (e) { cache.B[n] = b.src; } perbarui('B', n); };   // gagal (mis. dari file://): warna asli
+    b.src = berkas(n, 'B');
   });
 }
 // Ganti pose pemain sebentar lalu kembali berdiri siaga.
