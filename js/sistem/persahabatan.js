@@ -6,7 +6,8 @@ import { levelDari, expPertandingan } from './manajer.js';
 import { hadiahPertandingan } from './ekonomi.js';
 import { pemasukanLaga } from './stadion.js';
 import { catatKas, pesan } from './klub.js';
-import { simLaga, peluang, levelLawan } from './musim.js';
+import { levelLawan } from './musim.js';
+import { simulasiLaga, waktuLaga } from './otomatis.js';
 const hash = s => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
 export const lengkapiPersahabatan = S => { S.persahabatan ??= { daftar: [], tawaran: null, selesai: [] }; };
 const hariIni = (S, now) => S.persahabatan.selesai.filter(x => now - x.t < 864e5).length + S.persahabatan.daftar.length;
@@ -45,10 +46,10 @@ export function catatPersahabatan(S, id, sa, sb, now = Date.now()) {
   return { menang, koin: hadiah + tambah, exp, naik, cedera: [] };
 }
 // Laga yang lewat K.persahabatan.menitTunggu menit dari kick-off dimainkan otomatis dengan susunan saat ini.
-export function kejarPersahabatan(S, now, kekSaya) {
+export function kejarPersahabatan(S, now) {
   lengkapiPersahabatan(S); let n = 0;
   S.persahabatan.daftar.filter(f => now >= f.kickoff + K.persahabatan.menitTunggu * 60000).forEach(f => {
-    const [sa, sb] = simLaga(peluang(kekSaya - f.lawan.tingkat), buatAcak(hash(f.id))); catatPersahabatan(S, f.id, sa, sb, now); n++;
+    const { sa, sb } = simulasiLaga(S, f.lawan.tingkat, f.lawan.level ?? levelLawan(f.lawan.tingkat), hash(f.id), waktuLaga(S, f.kickoff)); catatPersahabatan(S, f.id, sa, sb, now); n++;
   });
   return n;
 }

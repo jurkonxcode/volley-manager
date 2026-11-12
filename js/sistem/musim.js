@@ -7,6 +7,7 @@ import { expPertandingan, catatHasil } from './manajer.js';
 import { namaKlub } from '../data/negara.js';
 import { akhirLaga, pesan, buatSponsor, pastikanKontrak, kontrakSelesai, catatKas } from './klub.js';
 import { perkembanganMusim } from './akademi.js';
+import { simulasiLaga as mainOtomatis, waktuLaga } from './otomatis.js';
 const NAMA = ['Elang Sakti', 'Badai Timur', 'Macan Putih', 'Naga Laut', 'Rajawali', 'Banteng Muda', 'Cakra Biru'];
 export const LIGA = ['Liga Kelurahan', 'Liga Kota', 'Liga Provinsi', 'Liga Nasional'];
 const jepit = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -31,7 +32,7 @@ export function fixtureSaya(M) {
 function simSet(p, acak, target) { let a = 0, b = 0; while (!((a >= target || b >= target) && Math.abs(a - b) >= 2) && a + b < 200) acak() < p ? a++ : b++; return a > b; }
 export function simLaga(p, acak) { let a = 0, b = 0; while (a < 3 && b < 3) simSet(p, acak, a + b === 4 ? 15 : 25) ? a++ : b++; return [a, b]; }
 // Catat hasil laga saya (set menang, set kalah), simulasikan laga tim lain di pekan itu, lalu maju satu pekan.
-export function catatLaga(S, sa, sb) {
+export function catatLaga(S, sa, sb, ids) {
   const M = S.musim, h = M.hari, acak = buatAcak(M.ke * 7919 + h), f = fixtureSaya(M), lw = M.tim[f.lawan];
   M.jadwal[h].forEach(([i, j]) => {
     let s1, s2;
@@ -44,14 +45,16 @@ export function catatLaga(S, sa, sb) {
   S.koin += koin; catatKas(S, 'hadiah', koin);
   const ek = akhirLaga(S, f, menang, level, h);
   pesan(S, (menang ? 'Menang ' : 'Kalah ') + sa + '-' + sb + ' vs ' + lw.nama, `Hadiah ${koin} koin. Pemasukan ${ek.masuk}, gaji ${ek.gaji} koin pekan ini.`);
-  return { menang, koin, exp, naik: catatHasil(S.manajer, menang, exp), cedera: S.fasilitas ? cederaLaga(S, acak, Date.now()) : [] };
+  return { menang, koin, exp, naik: catatHasil(S.manajer, menang, exp), cedera: S.fasilitas ? cederaLaga(S, acak, Date.now(), ids) : [] };
 }
-// Pekan yang terlewat (kick-off pekan berikutnya sudah lewat) dimainkan otomatis dengan susunan saat ini.
-export function kejar(S, now, kekSaya) {
+// Pekan yang terlewat (kick-off pekan berikutnya sudah lewat) dimainkan otomatis dengan mesin laga penuh pada waktu jadwalnya:
+// stamina terkuras dan pulih seperti laga biasa, dan (K.otomatis.rotasi) pemain lelah digantikan cadangan. Parameter ke-3 tidak dipakai lagi.
+export function kejar(S, now) {
   const M = S.musim; let n = 0;
   while (M.hari < M.jadwal.length && now >= kickoff(M, M.hari + 1)) {
-    const f = fixtureSaya(M), [sa, sb] = simLaga(peluang(kekSaya - M.tim[f.lawan].tingkat), buatAcak(M.ke * 31 + M.hari));
-    catatLaga(S, sa, sb); n++;
+    const f = fixtureSaya(M), lw = M.tim[f.lawan], t = waktuLaga(S, kickoff(M, M.hari));
+    const { sa, sb, ids } = mainOtomatis(S, lw.tingkat, levelLawan(lw.tingkat), M.ke * 31 + M.hari, t);
+    catatLaga(S, sa, sb, ids); n++;
   }
   return n;
 }

@@ -77,9 +77,9 @@ export function prosesWaktu(S, now) {
   if (b && now >= b.selesai) { S.fasilitas[b.kunci] = (S.fasilitas[b.kunci] || 0) + 1; S.fasilitas.bangun = null; pesan(S, 'Pembangunan selesai', `${FASILITAS[b.kunci].nama} naik ke level ${S.fasilitas[b.kunci]}.`); }
 }
 // Setelah laga: pemain di lapangan bisa cedera, lebih mungkin jika stamina rendah.
-export function cederaLaga(S, acak, now) {
+export function cederaLaga(S, acak, now, ids = S.susunan) {   // ids: pemain yang benar-benar main (laga otomatis dengan rotasi)
   const hasil = [];
-  S.susunan.forEach(id => {
+  ids.forEach(id => {
     const p = S.skuad.find(x => x.id === id); if (!p) return;
     if (acak() < K.cedera.dasar + (staminaSekarang(p, now) < 30 ? K.cedera.lelah : 0)) { p.cedera = now + acak.int(30, 120) * 60000 * (1 - 0.15 * S.fasilitas.medis); hasil.push(p.nama.split(' ')[0]); }
   });

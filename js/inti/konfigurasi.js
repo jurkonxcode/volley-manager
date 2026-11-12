@@ -21,7 +21,10 @@ export const K = {
   tiket: [{ n: 'Murah', h: 1, m: 1.35 }, { n: 'Normal', h: 2, m: 1 }, { n: 'Mahal', h: 3, m: 0.72 }, { n: 'Premium', h: 4, m: 0.45 }],   // h = koin per 10 tiket, m = pengali minat penonton
   toko: { perLevel: 2 }, parkir: { perLevel: 3 },
   akademi: { menitSegar: 45, jumlah: 3 },
-  persahabatan: { maksJadwal: 3, maksPerHari: 8, menitTunggu: 30, menitSegar: 30, slot: [0, 10, 30, 60, 180], hadiah: 0.5, exp: 0.5 },
+  persahabatan: { maksJadwal: 3, maksPerHari: 4, menitTunggu: 30, menitSegar: 30, slot: [0, 10, 30, 60, 180], hadiah: 0.35, exp: 0.5 },
+  // v25.2 (Tahap 3): laga otomatis memakai mesin penuh; rotasi = pemain lelah digantikan cadangan (tidak mengubah susunan manajer)
+  otomatis: { rotasi: true, biayaStamina: 0.3 },   // biayaStamina: pengali biaya stamina laga otomatis (1 = sama seperti laga live)
+  ekonomi: { gajiPembagi: 10 },   // gaji mingguan = jumlah gaji pemain / pembagi (dulu 20)
   semangat: { awal: 50, bonusMaks: 0.03, menang: 5, kalah: -5, fMenang: 4, fKalah: 2 },
   kunciSimpan: 'volley-manager-v2'
 };

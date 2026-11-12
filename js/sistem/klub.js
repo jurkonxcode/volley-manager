@@ -28,7 +28,7 @@ export function ubahSemangat(S, d) { S.klub.semangat = Math.max(10, Math.min(100
 // Buku kas: tiap pemasukan (+) dan pengeluaran (-) dicatat per kategori, 150 catatan terakhir.
 export function catatKas(S, kat, jml) { if (!jml) return; S.klub.buku ??= []; S.klub.buku.push({ t: Date.now(), k: kat, j: Math.round(jml) }); if (S.klub.buku.length > 150) S.klub.buku.splice(0, S.klub.buku.length - 150); }
 export function pesan(S, judul, isi) { S.klub.inbox.unshift({ t: Date.now(), judul, isi }); S.klub.inbox.length = Math.min(S.klub.inbox.length, 30); }
-export const gajiMingguan = S => Math.round(S.skuad.reduce((a, p) => a + gajiPemain(p), 0) / 20);
+export const gajiMingguan = S => Math.round(S.skuad.reduce((a, p) => a + gajiPemain(p), 0) / K.ekonomi.gajiPembagi);
 // Dipanggil sekali per laga saya: pemasukan (tiket kandang + sponsor) dikurangi gaji; fans naik-turun; cek pencapaian.
 export function akhirLaga(S, f, menang, level, h) {
   const k = S.klub, gaji = gajiMingguan(S), inc = pemasukanLaga(S, 'liga', f.kandang), masuk = inc.tiket + inc.parkir + inc.merch + k.sponsor.bayar;

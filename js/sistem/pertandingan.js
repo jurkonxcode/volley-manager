@@ -97,7 +97,7 @@ export function mainkanSet(m, acak, now) {
     if ((a >= target || b >= target) && Math.abs(a - b) >= K.set.selisih) break;
     if (rally.length > 300) { if (a === b) a++; break; }
   }
-  [...A, ...B].forEach(p => kurangiStamina(p, biayaSet(p, a + b), now));
+  [...A, ...B].forEach(p => kurangiStamina(p, biayaSet(p, a + b) * (m.faktorBiaya ?? 1), now));
   a > b ? m.setSaya++ : m.setLawan++;
   m.riwayat.push({ a, b }); m.setKe++;
   if (m.setSaya === K.set.menang || m.setLawan === K.set.menang) { m.selesai = true; m.pemenang = m.setSaya > m.setLawan ? 'saya' : 'lawan'; }

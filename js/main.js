@@ -154,8 +154,7 @@ function tampil(nama, kunci) {
   sorotNav(nama, kunci);
   if (nama !== 'tanding') {
     const t = sekarang(); prosesWaktu(S, t); bersihkanSusunan(S, t);
-    const kek = kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), t, S.taktik);
-    const a = kejar(S, t, kek), b = kejarPersahabatan(S, t, kek);
+    const a = kejar(S, t), b = kejarPersahabatan(S, t);
     if (a || b) { simpan(S); aksi.perbaruiKoin(); }
   }
   pastikanKontrak(S);
