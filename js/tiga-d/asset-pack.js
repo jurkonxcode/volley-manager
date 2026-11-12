@@ -11,12 +11,21 @@ const FILES = {
   bench: 'team_bench.glb',
   netSystem: 'volleyball_net_system.glb',
 };
+import { muatBolaMikasa } from './bola-mikasa.js';
 const cache = {};          // key -> Group | null (null = gagal dimuat, tidak dicoba ulang)
 let loader = null;
 // Muat hanya kunci yang diminta (arena pertandingan cuma butuh bola, bangku, botol => ~135 KB, bukan semua 8 model).
 export async function muatAssetPack(THREE, kunci = Object.keys(FILES)) {
   if (!loader) { const { GLTFLoader } = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js'); loader = new GLTFLoader(); }
   await Promise.all(kunci.filter(k => FILES[k] && !(k in cache)).map(async k => {
+    // Bola: coba model Mikasa (FBX) dulu; gagal => volleyball_pro.glb di bawah.
+    if (k === 'volleyball') {
+      try {
+        const b = await muatBolaMikasa(THREE, 0.22);
+        b.traverse(o => { if (!o.isMesh) return; o.castShadow = true; o.receiveShadow = true; o.geometry.userData.shared = true; for (const m of [].concat(o.material || [])) m.userData.shared = true; });
+        cache[k] = b; return;
+      } catch (error) { console.warn('[AssetPack] bola Mikasa gagal dimuat, memakai volleyball_pro.glb:', error.message); }
+    }
     try {
       const gltf = await loader.loadAsync(BASE + FILES[k]);
       gltf.scene.traverse(o => {

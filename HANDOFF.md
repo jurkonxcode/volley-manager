@@ -25,7 +25,9 @@ Catatan serah-terima: apa yang sudah ada, bagaimana strukturnya, dan jebakan yan
 | v20.1 | Skuad/Kompetisi/Laga/Pengaturan selaras mockup; cloud save Supabase (`js/inti/cloud.js`, `supabase/migrations/`) |
 | v20.2 | Klub > Stadion: banner foto, peta stadion SVG dengan keterisian, kartu angka |
 | v15.4 | Pacing laga: tiap reli bertahap (servis, terima, umpan, serangan; ~2-3 dtk per poin di 3D, 1x/2x/Lewati set), label aksi, papan skor bernama + SET/JEDA, hasil set tidak lagi bocor sebelum diputar. Kartu kelangkaan N/R/SR/SSR dari rating (`js/layar/rarity.js`, ambang bisa diubah). Polesan UI semua tab (`css/pro.css`), kartu pra-laga, kolom Form klasemen. Pemain 3D dari FBX Kenney (`assets/models/kenney/`). Belum diuji di HP: rangkaian animasi 3D. |
+| v22 | Net 3D dari model CGTrader "Volleyball Court" (mihail-pavel): `assets/models/volley-manager/volleyball_net_system.glb` (net, tiang berbantalan, antena, kabel; ~277 KB) dipasang lewat kunci `netSystem` di `asset-pack.js` dan `arena3d.js`; net prosedural tetap jadi cadangan. Lantai/lapangan model TIDAK dipakai (teksturnya tidak ikut diunduh). Kursi wasit digeser ke x=1,1. Kredit di Pengaturan dan `docs/KREDIT-ASET.md` |
 
+| v23 | Bola 3D Mikasa dari FBX (`assets/models/mikasa/`, `js/tiga-d/bola-mikasa.js`): logo merek dihapus dari tekstur, dimuat lewat FBXLoader dan menggantikan `volleyball_pro.glb` lewat kunci `volleyball` di `asset-pack.js` (diameter disamakan, `arena3d.js` tidak diubah). Gagal muat => GLB lalu bola prosedural. Belum diuji di browser: arah/skala model FBX, orientasi normal map (kalau lekukan terlihat terbalik, set `normalScale` negatif atau hapus `normalMap`). Katup abu-abu karena tekstur warnanya tidak ada. |
 
 ## v19.2 — Identitas merek & desktop responsif
 - Logo produk diperbarui menjadi identitas orisinal bola voli + monogram V, dengan wordmark `VOLLEY MANAGER` (`assets/brand/logo-mark.svg`, `logo-lockup.svg`, `favicon.svg`).
