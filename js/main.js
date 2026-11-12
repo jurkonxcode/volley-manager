@@ -59,7 +59,12 @@ function lengkapi(S) {
 }
 
 const $ = s => document.querySelector(s), layar = $('#layar');
-let S = null;
+let S = null, peringatSimpan = false;
+// Status simpan: footer (desktop) + satu peringatan per sesi, karena footer tidak tampil di ponsel.
+function infoSimpan(ok) {
+  const el = $('#autosave'); if (el) { el.textContent = ok ? 'Autosave: Aktif' : 'Autosave: GAGAL'; el.classList.toggle('galat', !ok); }
+  if (!ok && !peringatSimpan) { peringatSimpan = true; alert('Game gagal disimpan: penyimpanan perangkat penuh atau diblokir. Kemajuan terbaru bisa hilang bila halaman ditutup.'); }
+}
 const NAMA_TAB = { beranda: 'Beranda', tim: 'Tim', klub: 'Klub', tanding: 'Laga', liga: 'Kompetisi', profil: 'Profil' };
 const TAB = { beranda: ['rumah', renderBeranda], tim: ['skuad', renderTim], klub: ['stadion', renderKlubBangun], tanding: ['jaring', renderPertandingan], liga: ['trofi', renderLiga], profil: ['orang', renderProfil] };
 // Menu sidebar desktop (gaya mockup). h = tersembunyi: hanya dipakai tombol/kartu di Beranda.
@@ -85,14 +90,14 @@ const aksi = {
     if (k === 'help') return alert('Bantuan\n\n• Beranda: ringkasan klub, laga berikutnya, klasemen, dan keuangan.\n• Skuad/Taktik: atur susunan pemain, formasi, dan gaya main.\n• Latihan/Transfer: latih tim, beli, jual, dan scout pemain.\n• Kompetisi: klasemen, jadwal, dan analitik.\n• Game tersimpan otomatis di perangkat ini.');
     it[4]?.(); tampil(it[3], k);
   },
-  simpan: () => { S.diperbarui = Date.now(); simpan(S); jadwalkanUnggah(S); },
+  simpan: () => { S.diperbarui = Date.now(); infoSimpan(simpan(S)); jadwalkanUnggah(S); },
   perbaruiKoin: () => {
     const E = S.klub?.ekonomi || [], u = E[E.length - 1], net = u ? u.masuk - u.keluar : 0, M = S.musim;
     const set = (id, h) => { const el = $(id); if (el) el.innerHTML = h; };
     set('#dk-klub', `${logoTim()}<span><b>${esc(S.manajer.tim)}</b><small>${LIGA[M.liga || 0]}</small></span>`);
     set('#dk-tgl', `${ikon('kalender', 24)}<span><b>Musim ${M.ke}</b><small>Pekan ${Math.min(M.hari + 1, M.jadwal.length)} / ${M.jadwal.length}</small></span>`);
-    set('#dk-spd', `${ikon('main', 16)}<span>${S.pengaturan.animasiCepat ? '2×' : '1×'}</span>`);
-    set('#dk-bel', `${ikon('lonceng', 24)}<i>${Math.min(S.klub?.inbox?.length || 0, 9)}</i>`);
+    const belum = (S.klub?.inbox || []).filter(m => m.t > (S.klub?.dibaca || 0)).length;
+    set('#dk-bel', `${ikon('lonceng', 24)}${belum ? `<i>${Math.min(belum, 9)}</i>` : ''}`);
     set('#dk-avt', esc((S.manajer.nama || 'M').slice(0, 1).toUpperCase()));
     $('#koin').innerHTML = `<span class="kn">${ikon('koin', 24)}<span>${S.koin.toLocaleString('id-ID')}</span>${net ? `<em class="dl ${net >= 0 ? 'm' : 'k'}">${net >= 0 ? '▲' : '▼'} ${Math.abs(net).toLocaleString('id-ID')}</em>` : ''}</span><span class="tkn" title="Token">${ikon('permata', 18)}<span>${S.token || 0}</span></span>`; },
   pindah: n => tampil(n),
@@ -129,9 +134,8 @@ function mulai(data) {
     + `<div class="dk-promo">${ikon('bola', 40)}<b>Bermimpilah Besar,<br>Menang Bersama!</b></div>`;
   $('#nav').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.key) aksi.buka(b.dataset.key); else if (b.dataset.tab) tampil(b.dataset.tab); };
   $('#dk-klub').onclick = () => aksi.buka('club');
-  $('#dk-bel').onclick = () => tampil('beranda');
+  $('#dk-bel').onclick = () => { S.klub.dibaca = Date.now(); aksi.simpan(); aksi.perbaruiKoin(); tampil('beranda'); };
   $('#dk-avt').onclick = () => aksi.buka('set');
-  $('#dk-spd').onclick = () => { S.pengaturan.animasiCepat = !S.pengaturan.animasiCepat; simpan(S); aksi.perbaruiKoin(); };
   aksi.perbaruiKoin();
   tampil('beranda');
   onStatus(st => { const el = $('#cloud-st'); if (el) { el.textContent = st.teks; el.classList.toggle('on', st.ok); } });

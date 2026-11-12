@@ -41,7 +41,7 @@ const argmax = (arr, f) => arr.reduce((b, _, i) => f(arr[i]) > f(arr[b]) ? i : b
 // (pencetak; untuk 'salah' pembuat kesalahan), qi = indeks pemain lawan yang terlibat (penerima/pemblok/penyerang).
 function reli(S, R, tek, acak) {
   const m = o => tek ? 1 + (o.mental - 50) / 400 : 1;   // saat poin ketat, mental menaikkan/menurunkan performa
-  const si = 3 + (S.n++ % 3), sv = S.t[si];
+  const kand = [3, 4, 5].filter(i => K.reli.liberoServis || S.t[i].p.posisi !== 'L'), si = kand.length ? kand[S.n++ % kand.length] : 3 + (S.n++ % 3), sv = S.t[si];   // libero tidak melayani (K.reli.liberoServis)
   const ri = argmax(R.t, o => o.receive * (R.t.indexOf(o) >= 3 ? 1 : .8)), rc = R.t[ri];
   const rcv = rc.receive * m(rc), srv = sv.servis * m(sv);
   const err = K.reli.servisSalah - (srv - 50) * .0004;

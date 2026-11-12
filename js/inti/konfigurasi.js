@@ -4,7 +4,7 @@ export const K = {
   biayaSet: { S: 6, OH: 9, MB: 7, OP: 9, L: 4 },      // % stamina per set (untuk 40 poin, daya tahan 50)
   set: { menang: 3, poin: 25, poinTerakhir: 15, selisih: 2 },
   skalaPeluang: 0.006, peluangMin: 0.2, peluangMaks: 0.8,   // dipakai simulasi liga antar-AI (musim.js); laga live memakai K.reli
-  reli: { servisSalah: .06, ace: .09, blok: .07, serangSalah: .09, smash: .34, balasan: .9, maksPertukaran: 5 },
+  reli: { liberoServis: false, servisSalah: .06, ace: .09, blok: .07, serangSalah: .09, smash: .34, balasan: .9, maksPertukaran: 5 },
   ganti: { maks: 3 },   // pergantian pemain (dari bangku) yang boleh dilakukan di tiap jeda antar-set
   posisi: { salah: .92, liberoDepan: .5 },   // pemain di slot bukan posisinya x0.92; libero di baris depan menyerang/memblok x0.5
   hadiah: { menang: 100, kalah: 30, perLevel: 40 },

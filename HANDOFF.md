@@ -245,3 +245,13 @@ Referensi: alur Top Eleven (buat klub: nama/negara/kota/lambang/warna; stadion +
 
 ## v24 — Kamera dan komposisi 3D
 Kamera dipaskan otomatis ke lapangan (`js/tiga-d/kamera-pro.js`, angka di `KAM`), stadion dikurangi keramaiannya (papan skor gantung dikecilkan, rangka atap disembunyikan, tribun digelapkan, kabut dirapatkan, sorot lampu), bayangan di bawah bola, bola sedikit lebih besar, wadah 3D lebih tinggi + vignette (`css/arena3d-pro.css`). Belum diuji di HP: sudut kamera, tingkat gelap tribun, intensitas sorot lampu.
+
+
+## v25 — Tahap 1: perbaikan logika yang terbukti (audit kode + simulasi Node)
+Diuji lewat Node (tanpa browser): 300 laga penuh, 0 indeks reli tidak valid; win% seimbang ~50%. Tidak mengubah rumus kekuatan, bentuk state `S`, maupun kunci simpan.
+- **Libero tidak lagi melayani** (`sistem/pertandingan.js`). Sebelumnya servis bergiliran di slot 3-5, dan slot 4 selalu libero, jadi libero melayani 1/3 servis. Kini hanya pemain baris belakang non-libero. Saklar: `K.reli.liberoServis` (default `false`). `pi >= 3` tetap berarti servis, jadi arena3d/komentar tidak perlu diubah.
+- **Simpanan rusak tidak hilang diam-diam** (`inti/simpan.js`). `muat()` yang gagal parse / `versi` asing menyalin data mentah ke kunci `volley-manager-v2-cadangan` sebelum game baru menimpanya.
+- **Gagal simpan terlihat** (`main.js`, `index.html`). `simpan()` mengembalikan status; footer `#autosave` berubah jadi "GAGAL" dan muncul satu peringatan per sesi (footer tidak tampil di ponsel).
+- **Tombol kecepatan 1x/2x di header dihapus**: fungsinya sudah dibuang sejak v19.4 tetapi tombol masih mengubah flag yang diabaikan. Field `pengaturan.animasiCepat` dibiarkan demi kompatibilitas simpanan lama.
+- **Lonceng header menghitung pesan BELUM dibaca** (`S.klub.dibaca` = cap waktu terakhir diklik), bukan total pesan. Ketuk lonceng = tandai dibaca + ke Beranda. Badge hilang bila 0.
+- Temuan yang BELUM diubah (butuh keputusan desain), lihat rencana tahap 2-4: tidak ada rotasi lineup, navigasi tanpa riwayat/tombol Back, sorotan sidebar tidak ikut sub-tab, ekonomi pasif terlalu menguntungkan, "Scouting" di sidebar = duplikat "Transfer".
