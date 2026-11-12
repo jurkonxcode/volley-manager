@@ -62,7 +62,7 @@ const taktikBaris = (S, m, A, B, now) => `<div class="taktik" id="taktik">${Obje
 
 function tampilLapangan(root, S, aksi) {
   P.m.susunan = S.susunan; P.m.taktik = S.taktik;   // susunan/taktik bisa diganti (mis. susun otomatis membuat array baru): selalu pakai yang terkini
-  const m = P.m, now = sekarang(), A = timSaya(m), B = m.lawan, edit = P.fase === 'siap', d3 = P.fase === 'main' && !!S.pengaturan?.tiga3d && !gagal3d;
+  const m = P.m, now = sekarang(), A = timSaya(m), B = m.lawan, edit = P.fase === 'siap', d3 = P.fase === 'main' && !gagal3d;   // 3D selalu dipakai saat laga; 2D hanya cadangan bila Three.js/WebGL gagal
   const sebelum = P.fase === 'main' ? m.riwayat.slice(0, P.nSebelum) : m.riwayat;   // mainkanSet sudah mengisi hasil set ini di awal: jangan dibocorkan sebelum diputar
   const setSaya = sebelum.filter(x => x.a > x.b).length, setLawan = sebelum.length - setSaya, setTampil = P.fase === 'main' ? `SET ${P.setAktif}` : m.setKe > 1 ? 'JEDA' : 'SET 1';
   const titik = n => Array.from({ length: K.set.menang }, (_, i) => `<i class="${i < n ? 'isi' : ''}"></i>`).join('');
@@ -70,7 +70,7 @@ function tampilLapangan(root, S, aksi) {
   const bangku = S.skuad.filter(p => !S.susunan.includes(p.id));
   root.innerHTML = `${edit && m.setKe === 1 ? `<button class="kembali" id="kembali" aria-label="Pilih lawan lain">${ikon('kembali', 22)}</button>` : ''}
 <div class="papan"><div class="sisi"><small class="nm">${esc(S.manajer.tim)}</small><div class="titik-set">${titik(setSaya)}</div><b id="skA">${P.skor.a}</b></div><div class="tengah">${ikon('bola', 26)}<small>${setTampil}</small></div><div class="sisi lawan"><small class="nm">${esc(P.lawan || 'Lawan')}</small><div class="titik-set">${titik(setLawan)}</div><b id="skB">${P.skor.b}</b></div></div>
-<div class="lapangan"><button class="tiga-btn ${S.pengaturan?.tiga3d && !gagal3d ? 'on' : ''}" id="tiga" aria-label="Mode 3D">${ikon('kubus', 20)}<span>3D</span></button><div class="aksi-label" id="aksi"></div>${d3 ? '<div class="arena3d" id="arena3d"></div>' : `<div class="arena" id="arena">
+<div class="lapangan"><div class="aksi-label" id="aksi"></div>${d3 ? '<div class="arena3d" id="arena3d"></div>' : `<div class="arena" id="arena">
 <div class="separuh">${baris(B.slice(3), 'B', false)}${baris(B.slice(0, 3), 'B', false)}</div><div class="jaring"></div>
 <div class="separuh">${baris(A.slice(0, 3), 'A', edit)}${baris(A.slice(3), 'A', edit)}</div>
 <div class="bayangan" id="bay" style="left:50%;top:50%"></div><div class="bola" id="bola" style="left:50%;top:50%">${ikon('bola', 22)}</div><div class="pop" id="pop"></div></div>`}</div>
@@ -79,7 +79,6 @@ ${edit ? `${taktikBaris(S, m, A, B, now)}<div class="bangku">${bangku.map(p => k
        : `<div class="vm-live-status"><span class="vm-live-dot"></span><b>PERTANDINGAN BERLANGSUNG</b><span>Ikuti setiap reli</span></div>`}`;
   const k = root.querySelector('#kembali'); if (k) k.onclick = () => { P = baru(); renderPertandingan(root, S, aksi); };
   const mn = root.querySelector('#main'); if (mn) mn.onclick = () => mainkan(root, S, aksi);
-  const tg = root.querySelector('#tiga'); if (tg) tg.onclick = () => { S.pengaturan.tiga3d = !S.pengaturan.tiga3d; gagal3d = false; aksi.simpan(); tampilLapangan(root, S, aksi); if (P.fase === 'main' && root.querySelector('#arena3d')) mulai3D(root, S, aksi); };
   if (edit) {
     const tk = root.querySelector('#taktik');
     tk.onclick = e => {
