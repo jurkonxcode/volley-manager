@@ -10,7 +10,7 @@ import { createVolleyball } from '../tiga-d/volleyball.js';
 import { createSpikeEffect } from '../tiga-d/effects.js';
 
 // true = pemain stylized berkerangka buatan kode (player-gaya.js); false = model FBX Kenney / pemain prosedural lama.
-const GAYA = true;
+const GAYA = false;   // false = pemain dari model Kenney (assets/models/kenney/); true = pemain prosedural bergaya
 const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const KULIT = [0xF1C9A5, 0xE0A878, 0xC68642, 0x8D5524];
 const WARNA = { A: 0xB51F35, B: 0x245A9A };

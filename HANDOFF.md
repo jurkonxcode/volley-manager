@@ -233,3 +233,10 @@ Referensi: alur Top Eleven (buat klub: nama/negara/kota/lambang/warna; stadion +
 - Desktop >=1024px: header kaya + sidebar 11 menu (`DK` di `main.js`, memetakan ke tab/sub-tab yang sudah ada; `aksi.buka(kunci)`), footer status. Di bawah 1024px tampilan lama (nav bawah 6 tab) tetap dipakai.
 - Tidak ada fitur voli "seri", jadi baris Draws di mockup diganti "Set" (set menang).
 - Belum diuji di browser sungguhan oleh pembuatnya: cek visual di desktop dan HP.
+
+
+## Pemain 3D Kenney (v21)
+- Model: Kenney Animated Characters 3 (CC0) di `assets/models/kenney/` (`model.fbx`, `idle/jump/run.fbx`, `kulit.png` = humanFemaleA; `humanMaleA.png` bisa ditukar jadi `kulit.png`). Lisensi: `License.txt`.
+- `arena3d.js`: `GAYA = false` agar model ini dipakai. Set `true` untuk kembali ke pemain prosedural bergaya (player-gaya.js).
+- `player-glb.js`: tekstur diwarnai di canvas: hanya kaus jadi warna tim, kulit mengikuti `skinColor` pemain, sepatu/celana/rambut tetap (`warnaiPiksel`, cache per jersey+kulit). Gagal => tint lama (`WARNA_TIM`). `rayakan` memakai klip lompat (paket tak punya klip rayakan); `terima` belum punya klip.
+- BELUM diuji di browser dengan Three.js asli (sandbox tanpa CDN): cek skala (`TINGGI`), arah hadap (`HADAP_OFFSET`), posisi kamera, dan performa di HP.
