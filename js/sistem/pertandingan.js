@@ -16,6 +16,17 @@ export function kekuatanTim(tim, now, tk) {
 export function buatPertandingan(skuad, susunan, lawan, level, taktik) {
   return { taktik, skuad, susunan, lawan, level, setSaya: 0, setLawan: 0, setKe: 1, riwayat: [], selesai: false, pemenang: null };
 }
+// Status poin krusial untuk tampilan: set point / match point (selisih harus tetap >= K.set.selisih setelah poin berikut).
+export function statusPoin(a, b, setSaya, setLawan) {
+  const terakhir = setSaya + setLawan === 2 * K.set.menang - 2, target = terakhir ? K.set.poinTerakhir : K.set.poin;
+  const bisa = (x, y) => x + 1 >= target && x + 1 - y >= K.set.selisih, nama = sx => sx === K.set.menang - 1 ? 'MATCH POINT' : 'SET POINT';
+  if (bisa(a, b)) return { teks: nama(setSaya), sisi: 'saya' };
+  if (bisa(b, a)) return { teks: nama(setLawan), sisi: 'lawan' };
+  return null;
+}
+// Poin per jenis untuk satu set: [saya, lawan]. 'salah' = poin yang datang dari kesalahan lawan.
+export const statBaru = () => ({ ace: [0, 0], blok: [0, 0], smash: [0, 0], salah: [0, 0] });
+export function tambahStat(st, r) { const c = st[r.jenis]; if (c) c[r.a ? 0 : 1]++; return st; }
 export const timSaya = m => m.susunan.map(id => m.skuad.find(p => p.id === id));
 
 // Pemain di slot yang bukan posisinya kena penalti; libero di baris depan tidak bisa menyerang/memblok.

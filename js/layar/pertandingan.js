@@ -4,7 +4,7 @@ import { pasangTukar, lepasPilihan } from './skuad.js';
 import { sekarang, durasiPendek } from '../inti/waktu.js';
 import { buatAcak } from '../inti/acak.js';
 import { K } from '../inti/konfigurasi.js';
-import { buatPertandingan, mainkanSet, timSaya, kekuatanTim } from '../sistem/pertandingan.js';
+import { buatPertandingan, mainkanSet, timSaya, kekuatanTim, statusPoin, statBaru, tambahStat } from '../sistem/pertandingan.js';
 import { buatLawan } from '../sistem/liga.js';
 import { bersihkanSusunan, FORMASI, GAYA, autoSusun } from '../sistem/taktik.js';
 import { fixtureSaya, kickoff, catatLaga, levelLawan } from '../sistem/musim.js';
@@ -14,6 +14,9 @@ import * as D3 from './arena3d.js';
 let P = baru(), token = 0, gagal3d = false, pilihTab = 'liga', pilihF = null;
 const hashId = s => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
 function baru() { return { fase: 'pilih', jenis: 'liga', fid: null, m: null, level: 0, lawan: null, skor: { a: 0, b: 0 }, hasil: null }; }
+const STAT = [['ace', 'Ace'], ['blok', 'Blok'], ['smash', 'Smash'], ['salah', 'Salah lawan']];
+const statHtml = st => STAT.map(([k, n]) => `<span><small>${n}</small><b><i class="${st[k][0] > st[k][1] ? 'u' : ''}">${st[k][0]}</i> – <i class="${st[k][1] > st[k][0] ? 'u' : ''}">${st[k][1]}</i></b></span>`).join('');
+const spHtml = (sp) => sp ? `<em class="sp ${sp.sisi}" id="sp">${sp.teks}</em>` : '<em class="sp" id="sp"></em>';
 const tunggu = ms => new Promise(r => setTimeout(r, ms));
 
 export function renderPertandingan(root, S, aksi) {
@@ -69,14 +72,14 @@ function tampilLapangan(root, S, aksi) {
   const baris = (a, tim, inter) => `<div class="baris">${a.map(p => kartuMini(p, { tim, now, zona: 'lap', interaktif: inter, badan: true })).join('')}</div>`;
   const bangku = S.skuad.filter(p => !S.susunan.includes(p.id));
   root.innerHTML = `${edit && m.setKe === 1 ? `<button class="kembali" id="kembali" aria-label="Pilih lawan lain">${ikon('kembali', 22)}</button>` : ''}
-<div class="papan"><div class="sisi"><small class="nm">${esc(S.manajer.tim)}</small><div class="titik-set">${titik(setSaya)}</div><b id="skA">${P.skor.a}</b></div><div class="tengah">${ikon('bola', 26)}<small>${setTampil}</small></div><div class="sisi lawan"><small class="nm">${esc(P.lawan || 'Lawan')}</small><div class="titik-set">${titik(setLawan)}</div><b id="skB">${P.skor.b}</b></div></div>
+<div class="papan"><div class="sisi"><small class="nm">${esc(S.manajer.tim)}</small><div class="titik-set">${titik(setSaya)}</div><b id="skA">${P.skor.a}</b></div><div class="tengah">${ikon('bola', 26)}<small>${setTampil}</small>${spHtml(P.fase === 'main' ? statusPoin(P.skor.a, P.skor.b, setSaya, setLawan) : null)}</div><div class="sisi lawan"><small class="nm">${esc(P.lawan || 'Lawan')}</small><div class="titik-set">${titik(setLawan)}</div><b id="skB">${P.skor.b}</b></div></div>${sebelum.length ? `<div class="rincian-set">${sebelum.map(r => `<span class="${r.a > r.b ? 'm' : 'k'}">${r.a}–${r.b}</span>`).join('')}</div>` : ''}
 <div class="lapangan"><div class="aksi-label" id="aksi"></div>${d3 ? '<div class="arena3d" id="arena3d"></div>' : `<div class="arena" id="arena">
 <div class="separuh">${baris(B.slice(3), 'B', false)}${baris(B.slice(0, 3), 'B', false)}</div><div class="jaring"></div>
 <div class="separuh">${baris(A.slice(0, 3), 'A', edit)}${baris(A.slice(3), 'A', edit)}</div>
 <div class="bayangan" id="bay" style="left:50%;top:50%"></div><div class="bola" id="bola" style="left:50%;top:50%">${ikon('bola', 22)}</div><div class="pop" id="pop"></div></div>`}</div>
 <div class="komentar" id="kom">${P.kom || ''}</div>
-${edit ? `${taktikBaris(S, m, A, B, now)}<div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div><button class="tombol-besar" id="main" aria-label="Main set">${ikon('main', 30)}</button>`
-       : `<div class="vm-live-status"><span class="vm-live-dot"></span><b>PERTANDINGAN BERLANGSUNG</b><span>Ikuti setiap reli</span></div>`}`;
+${edit ? `${taktikBaris(S, m, A, B, now)}<div class="bangku">${bangku.map(p => kartuMini(p, { tim: 'A', now, zona: 'bangku' })).join('')}</div><button class="tombol-besar" id="main" aria-label="Main set">${ikon('main', 30)} Mulai Set ${m.setKe}</button>`
+       : `<div class="vm-live-status"><span class="vm-live-dot"></span><b>PERTANDINGAN BERLANGSUNG</b><span>Ikuti setiap reli</span></div><div class="stat-set" id="stat">${statHtml(P.stat || statBaru())}</div>`}`;
   const k = root.querySelector('#kembali'); if (k) k.onclick = () => { P = baru(); renderPertandingan(root, S, aksi); };
   const mn = root.querySelector('#main'); if (mn) mn.onclick = () => mainkan(root, S, aksi);
   if (edit) {
@@ -108,7 +111,7 @@ async function mulai3D(root, S, aksi) {
   try {
     await D3.muatThree();
     if (!wadah.isConnected) return;
-    D3.pasang(wadah, timSaya(P.m), P.m.lawan); siap3d = true;
+    D3.pasang(wadah, timSaya(P.m), P.m.lawan); siap3d = true; D3.skor(P.skor.a, P.skor.b, P.nama, P.lawan, 'SET ' + P.setAktif);
   } catch (e) {
     console.warn('Mode 3D tidak tersedia, kembali ke 2D:', e);
     gagal3d = true; siap3d = false;
@@ -130,6 +133,10 @@ function gambarRally(root, r, a, b) {
   const skA = root.querySelector('#skA'), skB = root.querySelector('#skB'), bola = root.querySelector('#bola'), pop = root.querySelector('#pop');
   if (!skA) return;
   skA.textContent = a; skB.textContent = b;
+  if (P.stat) { tambahStat(P.stat, r); const st = root.querySelector('#stat'); if (st) st.innerHTML = statHtml(P.stat); }
+  const sb = P.m.riwayat.slice(0, P.nSebelum), sS = sb.filter(x => x.a > x.b).length, sp = statusPoin(a, b, sS, sb.length - sS), spe = root.querySelector('#sp');
+  if (spe) { spe.textContent = sp ? sp.teks : ''; spe.className = 'sp ' + (sp ? sp.sisi : ''); }
+  if (siap3d) D3.skor(a, b, P.nama, P.lawan, 'SET ' + P.setAktif);
   const A = timSaya(P.m), B = P.m.lawan, nm = (ti, i) => (ti === 'A' ? A : B)[i]?.nama.split(' ')[0] ?? '';
   const pelaku = nm(r.ti, r.pi), lawan = nm(r.ti === 'A' ? 'B' : 'A', r.qi);
   P.kom = { ace: `Ace dari ${pelaku}!`, blok: `${pelaku} blok kokoh!`, smash: `Smash keras ${pelaku}!`, salah: `${pelaku} membuat kesalahan` }[r.jenis];
@@ -166,7 +173,7 @@ function beriPose(root, r) {
 }
 async function mainkan(root, S, aksi) {
   const saya = ++token; P.fase = 'main'; P.m.kickoff = [...S.susunan];   // susunan yang main set ini: patokan hitungan pergantian di jeda berikutnya
-  P.skor = { a: 0, b: 0 }; P.setAktif = P.m.setKe; P.nSebelum = P.m.riwayat.length;
+  P.skor = { a: 0, b: 0 }; P.stat = statBaru(); P.nama = S.manajer.tim; P.setAktif = P.m.setKe; P.nSebelum = P.m.riwayat.length;
   tampilLapangan(root, S, aksi);
   if (root.querySelector('#arena3d')) { await mulai3D(root, S, aksi); if (saya !== token) return; }
   const now = sekarang(), hasil = mainkanSet(P.m, buatAcak(now), now);
@@ -198,7 +205,8 @@ function tampilSelesai(root, S, aksi) {
 <div class="skor-akhir"><b>${m.setSaya}</b><span>-</span><b>${m.setLawan}</b></div>
 <div class="rincian">${m.riwayat.map(r => `<span class="${r.a > r.b ? 'm' : 'k'}">${r.a}-${r.b}</span>`).join('')}</div>
 <div class="hadiah">${ikon('koin', 32)}<b>+${P.hasil.koin}</b></div><div class="hadiah exp">${ikon('bintang', 26)}<b>+${P.hasil.exp} EXP</b>${P.hasil.naik ? `<span class="naik">Level ${P.hasil.naik}!</span>` : ''}</div></div>
-${P.jenis === 'persahabatan' ? '<div class="komentar">Laga persahabatan: tidak masuk klasemen. Semangat tim dan fans naik.</div>' : ''}${P.hasil.cedera?.length ? `<div class="komentar">Cedera: ${P.hasil.cedera.join(', ')}</div>` : ''}<button class="tombol-besar" id="lagi" aria-label="Main lagi">${ikon('ulang', 30)}</button>`;
+${P.jenis === 'persahabatan' ? '<div class="komentar">Laga persahabatan: tidak masuk klasemen. Semangat tim dan fans naik.</div>' : ''}${P.hasil.cedera?.length ? `<div class="komentar">Cedera: ${P.hasil.cedera.join(', ')}</div>` : ''}<button class="tombol-besar" id="lagi" aria-label="Lanjut">${ikon('ulang', 30)} Lanjut</button>`;
   root.querySelector('#lagi').onclick = () => { P = baru(); renderPertandingan(root, S, aksi); };
 }
+export const sedangLaga = () => P.fase === 'main';   // v25: dipakai router untuk melindungi tombol Back saat laga live
 export { lepasPilihan };

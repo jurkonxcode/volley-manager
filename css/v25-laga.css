@@ -1,0 +1,20 @@
+/* v25: layar laga disempurnakan (set point, statistik set, riwayat set), banner musim, dialog bantuan. Dimuat paling akhir. */
+.arena3d{height:clamp(280px,calc(100svh - 400px),560px)}
+.papan .tengah em.sp{display:inline-block;margin-top:4px;padding:4px 9px;border-radius:99px;font:800 11px/1 var(--font-n,inherit);font-style:normal;letter-spacing:1.2px;white-space:nowrap}
+.papan .tengah em.sp:empty{display:none}
+.papan .tengah em.sp.saya{background:#C6FF3D;color:#0A1200}
+.papan .tengah em.sp.lawan{background:#FF3B4E;color:#fff;animation:vmDenyut 1s ease-in-out infinite}
+@keyframes vmDenyut{50%{opacity:.55}}
+.rincian-set{display:flex;justify-content:center;gap:8px;margin:-4px 0 10px}
+.rincian-set span{padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.08);font:800 13px/1.3 var(--font-n,inherit);font-variant-numeric:tabular-nums}
+.rincian-set .m{color:#6EE7A8}.rincian-set .k{color:#FF8A8A}
+.stat-set{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.stat-set span{display:grid;justify-items:center;gap:3px;padding:8px 4px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.04)}
+.stat-set small{font:700 10px/1 var(--font-n,inherit);letter-spacing:1px;text-transform:uppercase;color:var(--redup,#9BA8C9);white-space:nowrap}
+.stat-set b{font:800 18px/1 var(--font-n,inherit);font-variant-numeric:tabular-nums}
+.stat-set i{font-style:normal;opacity:.7}.stat-set i.u{opacity:1;color:#FFC83D}
+.banner-musim{display:grid;gap:4px;width:100%;margin:0 0 12px;padding:14px 16px;text-align:left;border:1px solid #FFC83D;border-radius:12px;background:linear-gradient(135deg,rgba(255,200,61,.22),rgba(255,200,61,.06));color:#fff;cursor:pointer}
+.banner-musim b{font-size:17px;color:#FFC83D}.banner-musim span{font-size:13px;opacity:.85}
+.modal-bantuan{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(2,6,18,.72)}
+.modal-bantuan .mb-kartu{width:min(440px,100%);max-height:86vh;overflow:auto;padding:20px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:#0B1B3F}
+.modal-bantuan h2{margin:0 0 10px}.modal-bantuan ul{margin:0 0 16px;padding-left:18px;display:grid;gap:8px;font-size:14px;line-height:1.45}

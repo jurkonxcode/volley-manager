@@ -13,6 +13,7 @@ import { singkat } from '../sistem/identitas.js';
 
 let sub = 'stadion', pesan = '', ticker = 0;
 export const setSubKlub = s => { sub = s; };
+export const getSubKlub = () => sub;
 const SUB = { stadion: 'Stadion', fasilitas: 'Fasilitas', akademi: 'Akademi', kas: 'Kas', identitas: 'Klub' };
 const koin = n => `${ikon('koin', 14)} ${n}`, token = n => `${ikon('permata', 14)} ${n}`;
 const dots = (lv, maks) => `<div class="titik-set fas-dot">${Array.from({ length: maks }, (_, i) => `<i class="${i < lv ? 'isi' : ''}"></i>`).join('')}</div>`;

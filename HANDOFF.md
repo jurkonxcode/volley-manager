@@ -255,3 +255,16 @@ Diuji lewat Node (tanpa browser): 300 laga penuh, 0 indeks reli tidak valid; win
 - **Tombol kecepatan 1x/2x di header dihapus**: fungsinya sudah dibuang sejak v19.4 tetapi tombol masih mengubah flag yang diabaikan. Field `pengaturan.animasiCepat` dibiarkan demi kompatibilitas simpanan lama.
 - **Lonceng header menghitung pesan BELUM dibaca** (`S.klub.dibaca` = cap waktu terakhir diklik), bukan total pesan. Ketuk lonceng = tandai dibaca + ke Beranda. Badge hilang bila 0.
 - Temuan yang BELUM diubah (butuh keputusan desain), lihat rencana tahap 2-4: tidak ada rotasi lineup, navigasi tanpa riwayat/tombol Back, sorotan sidebar tidak ikut sub-tab, ekonomi pasif terlalu menguntungkan, "Scouting" di sidebar = duplikat "Transfer".
+
+
+## v25.1 — Tahap 2: navigasi + layar laga
+Diuji di Node dengan DOM tiruan (`main.js` dimuat sungguhan, satu laga penuh dimainkan, 0 galat). BELUM diuji di browser/HP: tampilan CSS baru, Three.js, tombol Back sungguhan.
+- **Bug bola raksasa (kamera "menempel ke bola")**: `arena3d.js` memakai `bola.scale.setScalar(2.1)` yang MENIMPA skala model Mikasa (FBX satuan cm, skalanya dihitung di `bola-mikasa.js`). Bila FBX berhasil dimuat bola jadi sebesar layar; bila gagal (cadangan GLB/prosedural) tampak normal, makanya muncul acak. Kini `multiplyScalar(2.1)`. JANGAN kembali ke `setScalar`.
+- **Papan skor di arena sinkron**: `D3.skor(a,b,namaA,namaB,set)` dipanggil dari `pertandingan.js` (awal set + tiap poin). Sebelumnya papan gantung selalu 0-0.
+- **SET POINT / MATCH POINT** (`statusPoin` di `sistem/pertandingan.js`, logika murni): pil di papan skor atas, hijau = milik kita, merah berkedip = lawan.
+- **Statistik set** (`statBaru`/`tambahStat`): strip Ace / Blok / Smash / Salah lawan (poin kita – lawan) di bawah lapangan saat laga live. **Riwayat set** (chip 25–22 dst.) muncul di bawah papan skor setelah set pertama.
+- Tombol ikon-saja diberi teks: "Mulai Set N", "Lanjut", "Selesaikan musim". Tinggi arena 3D: `calc(100svh - 400px)` (css/v25-laga.css) agar strip baru muat di HP.
+- **Router hash** (`js/inti/rute.js` + `main.js`): tiap pindah tab/menu dicatat `#/tab[/menu]`; Back browser berfungsi, refresh/tautan langsung membuka layar yang sama. Sub-tab di dalam layar (mis. chip Klasemen/Jadwal) belum mencatat riwayat sendiri. Back saat laga live meminta konfirmasi (`sedangLaga()`).
+- **Sorotan sidebar desktop mengikuti sub-tab** (`kunciAktif`/`sorotNav`): Skuad/Taktik/Latihan/Transfer/Keuangan tidak lagi tertukar.
+- **Banner "Musim N selesai"** di Beranda dan tombol "Lihat Kompetisi" kini membuka Klasemen (sebelumnya bisa mendarat di sub-tab Persahabatan yang tidak punya tombol tutup musim). **Bantuan** jadi dialog, bukan `alert`.
+- Jebakan: `node --check` TIDAK diandalkan untuk modul ES di proyek ini (lolos untuk sintaks yang sebenarnya salah). Uji dengan mengimpor modul sungguhan (lihat harness DOM tiruan di riwayat v25.1).

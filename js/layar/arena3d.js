@@ -80,7 +80,7 @@ function rakitRenderer() {
   // Bangku tim + botol dari paket GLB (di luar lapangan, x=0 di antara blok kursi prosedural z=W+1.5, di depan papan LED z=7.0).
   const bangku = ambilAset('bench'); if (bangku) { bangku.name = 'AssetPack_TeamBench'; bangku.scale.setScalar(.82); bangku.position.set(0, .08, 6.0); sc.add(bangku); }
   for (const x of [-.62, .62]) { const b = ambilAset('bottle'); if (b) { b.scale.setScalar(.78); b.position.set(x, .08 + .70 * .82, 5.96); sc.add(b); } }   // dudukan bangku setinggi .70 x skala .82
-  bola = ambilAset('volleyball') || createVolleyball(T, { radius: .22 }); bola.scale.setScalar(2.1); bola.castShadow = true; sc.add(bola); pasangBayangan(T, sc, bola);
+  bola = ambilAset('volleyball') || createVolleyball(T, { radius: .22 }); bola.scale.multiplyScalar(2.1);   /* v25: JANGAN setScalar: menimpa skala model Mikasa (FBX) hingga bola sebesar layar */ bola.castShadow = true; sc.add(bola); pasangBayangan(T, sc, bola);
 }
 
 function bersihkanPemain() {
@@ -113,6 +113,8 @@ export function pasang(el, A, B) {
   ukuran(); ro?.disconnect(); ro = new ResizeObserver(ukuran); ro.observe(el);
   jam = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(putar);
 }
+// v25: papan skor gantung di arena mengikuti skor laga (sebelumnya selalu 0-0).
+export function skor(a, b, na, nb, set) { try { sc?.userData.arena?.userData.setSkor?.(a, b, na, nb, set); } catch (e) {} }
 export function lepas() { cancelAnimationFrame(raf); raf = 0; ro?.disconnect(); R?.domElement.remove(); wadah = null; }
 
 const ease = t => t * t * (3 - 2 * t);

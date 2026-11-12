@@ -12,12 +12,13 @@ import { bersihkanSusunan } from './sistem/taktik.js';
 import { renderBeranda } from './layar/klub.js';
 import { renderLiga } from './layar/kompetisi.js';
 import { ikon, esc, logoTim, setIdentitasGambar } from './layar/gambar.js';
-import { setSub } from './layar/tim.js';
-import { setSubKlub } from './layar/klub-bangun.js';
+import { setSub, getSub } from './layar/tim.js';
+import { setSubKlub, getSubKlub } from './layar/klub-bangun.js';
 import { setSubLiga } from './layar/kompetisi.js';
-import { setBagian } from './layar/pasar.js';
+import { setBagian, getBagian } from './layar/pasar.js';
 import { siapkanSprite } from './layar/sprite.js';
-import { renderPertandingan, lepasPilihan } from './layar/pertandingan.js';
+import { renderPertandingan, lepasPilihan, sedangLaga } from './layar/pertandingan.js';
+import { bentukRute, bacaRute } from './inti/rute.js';
 import { lengkapiKlub, pastikanKontrak } from './sistem/klub.js';
 import { renderProfil } from './layar/profil.js';
 import { renderKlubBangun } from './layar/klub-bangun.js';
@@ -87,7 +88,7 @@ const KUNCI = { beranda: 'home', tim: 'squad', klub: 'club', liga: 'comp', profi
 const aksi = {
   buka: k => {
     const it = DK.find(x => x[0] === k); if (!it) return;
-    if (k === 'help') return alert('Bantuan\n\n• Beranda: ringkasan klub, laga berikutnya, klasemen, dan keuangan.\n• Skuad/Taktik: atur susunan pemain, formasi, dan gaya main.\n• Latihan/Transfer: latih tim, beli, jual, dan scout pemain.\n• Kompetisi: klasemen, jadwal, dan analitik.\n• Game tersimpan otomatis di perangkat ini.');
+    if (k === 'help') return bukaBantuan();
     it[4]?.(); tampil(it[3], k);
   },
   simpan: () => { S.diperbarui = Date.now(); infoSimpan(simpan(S)); jadwalkanUnggah(S); },
@@ -111,11 +112,46 @@ const aksi = {
   reset: () => { if (confirm('Mulai dari awal? Semua data klub, manajer, dan pemain akan hilang.')) { hapus(); location.reload(); } }
 };
 
+// Menu sidebar aktif mengikuti sub-tab yang sedang dibuka (sebelumnya hanya satu menu per tab).
+let kunciTerakhir = null, awalRiwayat = true, dariRiwayat = false;
+function kunciAktif(nama) {
+  if (nama === 'tim') { const s = getSub(); return s === 'skuad' ? 'squad' : s === 'pasar' ? (getBagian() === 'latihan' ? 'training' : kunciTerakhir === 'scout' ? 'scout' : 'transfer') : 'tactics'; }
+  if (nama === 'klub') return getSubKlub() === 'kas' ? 'fin' : 'club';
+  return KUNCI[nama];
+}
+function sorotNav(nama, kunci) {
+  const kk = kunci || kunciAktif(nama); kunciTerakhir = kk;
+  document.querySelectorAll('#nav .mb').forEach(b => b.setAttribute('aria-current', b.dataset.tab === nama));
+  document.querySelectorAll('#nav .dkn').forEach(b => b.setAttribute('aria-current', b.dataset.key === kk));
+}
+// Riwayat browser: tiap perpindahan tab/menu dicatat sebagai #/tab[/menu] sehingga Back dan refresh tidak lagi membuang pemain ke Beranda.
+function catatRiwayat(nama, kunci) {
+  if (dariRiwayat) return;
+  const h = bentukRute(nama, kunci), st = { n: nama, k: kunci || null };
+  try { if (awalRiwayat) { history.replaceState(st, '', h); awalRiwayat = false; } else if (location.hash !== h) history.pushState(st, '', h); } catch (e) {}
+}
+function bukaRute(n, k) { const it = k && DK.find(x => x[0] === k); it?.[4]?.(); tampil(n, k || undefined); }
+window.addEventListener('popstate', () => {
+  if (!S) return;
+  const [n, k] = bacaRute(location.hash, TAB, DK);
+  if (sedangLaga() && n !== 'tanding' && !confirm('Laga sedang berlangsung. Keluar dari layar laga? Pertandingan tetap berjalan dan hasilnya tetap dicatat.')) {
+    try { history.pushState({ n: 'tanding', k: null }, '', bentukRute('tanding')); } catch (e) {}
+    return;
+  }
+  dariRiwayat = true; try { bukaRute(n, k); } finally { dariRiwayat = false; }
+});
+function bukaBantuan() {
+  if ($('#modal-bantuan')) return;
+  const d = document.createElement('div'); d.id = 'modal-bantuan'; d.className = 'modal-bantuan'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
+  d.innerHTML = `<div class="mb-kartu"><h2>Bantuan</h2><ul><li><b>Beranda</b>: ringkasan klub, laga berikutnya, klasemen, dan keuangan.</li><li><b>Skuad / Taktik</b>: atur susunan pemain, formasi, dan gaya main.</li><li><b>Latihan / Transfer</b>: latih tim, beli, jual, dan scout pemain.</li><li><b>Kompetisi</b>: klasemen, jadwal, analitik. Saat musim selesai, tutup musim di sini untuk klaim hadiah.</li><li><b>Laga</b>: SET POINT / MATCH POINT muncul di papan skor; statistik set tampil di bawah lapangan.</li><li>Tombol Back browser kembali ke layar sebelumnya. Game tersimpan otomatis di perangkat ini.</li></ul><button class="tombol-besar" id="tutup-bantuan">Mengerti</button></div>`;
+  const tutup = () => d.remove(); d.onclick = e => { if (e.target === d) tutup(); };
+  document.body.appendChild(d); d.querySelector('#tutup-bantuan').onclick = tutup;
+}
+
 function tampil(nama, kunci) {
   lepasPilihan();
   layar.dataset.layar = nama;
-  document.querySelectorAll('#nav .mb').forEach(b => b.setAttribute('aria-current', b.dataset.tab === nama));
-  document.querySelectorAll('#nav .dkn').forEach(b => b.setAttribute('aria-current', b.dataset.key === (kunci || KUNCI[nama])));
+  sorotNav(nama, kunci);
   if (nama !== 'tanding') {
     const t = sekarang(); prosesWaktu(S, t); bersihkanSusunan(S, t);
     const kek = kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), t, S.taktik);
@@ -125,6 +161,7 @@ function tampil(nama, kunci) {
   pastikanKontrak(S);
   TAB[nama][1](layar, S, aksi);
   layar.scrollTop = 0;
+  catatRiwayat(nama, kunci);
 }
 function mulai(data) {
   S = lengkapi(data);
@@ -137,7 +174,8 @@ function mulai(data) {
   $('#dk-bel').onclick = () => { S.klub.dibaca = Date.now(); aksi.simpan(); aksi.perbaruiKoin(); tampil('beranda'); };
   $('#dk-avt').onclick = () => aksi.buka('set');
   aksi.perbaruiKoin();
-  tampil('beranda');
+  layar.addEventListener('click', () => setTimeout(() => { const n = layar.dataset.layar; if (n) sorotNav(n); }, 0));   // sub-tab di dalam layar mengubah menu aktif
+  { const [n0, k0] = bacaRute(location.hash, TAB, DK); bukaRute(n0, k0); }
   onStatus(st => { const el = $('#cloud-st'); if (el) { el.textContent = st.teks; el.classList.toggle('on', st.ok); } });
   if (terkonfigurasi()) sinkronAwal(S).then(r => { if (r === 'cloud') location.reload(); });
 }

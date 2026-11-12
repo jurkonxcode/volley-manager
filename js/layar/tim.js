@@ -9,6 +9,7 @@ import { K } from '../inti/konfigurasi.js';
 import { sekarang } from '../inti/waktu.js';
 let sub = 'skuad';
 export const setSub = s => { sub = s; };
+export const getSub = () => sub;
 const SUB = { skuad: 'Skuad', strategi: 'Strategi', formasi: 'Formasi', pasar: 'Pasar' };
 const persen = m => Object.entries(m).map(([k, v]) => `${k} ${v > 1 ? '+' : ''}${Math.round((v - 1) * 100)}%`).join(' · ') || 'Netral';
 function ringkas(S) {

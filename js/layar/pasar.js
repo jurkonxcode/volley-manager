@@ -6,6 +6,7 @@ import { ratingPemain } from '../sistem/pemain.js';
 import * as P from '../sistem/pasar.js';
 let bagian = 'transfer', pesan = '';
 export const setBagian = b => { bagian = b; };
+export const getBagian = () => bagian;
 const BAGIAN = { transfer: 'Transfer', latihan: 'Latihan' };
 const NAMA_STAT = { servis: 'Servis', smash: 'Smash', blok: 'Blok', receive: 'Receive', umpan: 'Umpan', tahan: 'Daya tahan' };
 const koin = n => `${ikon('koin', 14)} ${n}`;
