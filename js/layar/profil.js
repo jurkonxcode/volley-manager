@@ -22,7 +22,8 @@ export function renderProfil(root, S, aksi) {
 <label class="isian"><span>Negara (nama pemain dan klub)</span><select id="neg">${Object.entries(NEGARA).map(([k, n]) => `<option value="${k}" ${S.negara === k ? 'selected' : ''}>${n.bendera} ${n.nama}</option>`).join('')}</select></label>
 <button class="tombol-besar sekunder" id="ulang">${ikon('hapus', 24)} Mulai dari awal</button>
 </section>
-<section class="pengaturan" id="cloud"></section>`;
+<section class="pengaturan" id="cloud"></section>
+<p class="kredit-aset" style="font-size:12px;opacity:.65;text-align:center;margin:14px 12px 22px">Net, tiang, dan antena 3D: "Volleyball Court" oleh mihail-pavel (CGTrader, lisensi Royalty Free).</p>`;
   renderCloud(root.querySelector('#cloud'), S, aksi);
   root.querySelector('#nm').onchange = e => { m.nama = e.target.value.trim() || 'Manajer'; e.target.value = m.nama; aksi.simpan(); renderProfil(root, S, aksi); };
   root.querySelector('#nt').onchange = e => { m.tim = e.target.value.trim() || 'Tim Tanpa Nama'; e.target.value = m.tim; S.musim.tim[0].nama = m.tim; aksi.identitas(); };

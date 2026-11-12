@@ -55,7 +55,7 @@ export function createArena(THREE, o = {}) {
 
   // 4. Perlengkapan lapangan: kursi wasit, hakim garis, meja skor, bangku pemain, troli bola.
   const logam = mat(0x34465b, .4, .55), merah = mat(0xc33b42, .48), kursi = mat(0x18283d, .6);
-  const wasit = new THREE.Group(); wasit.position.set(.5, 0, -W - 1.2); g.add(wasit);
+  const wasit = new THREE.Group(); wasit.position.set(1.1, 0, -W - 1.2); g.add(wasit);
   for (const x of [-.32, .32]) for (const z of [-.25, .25]) box(.055, 1.45, .055, logam, [x, .72, z], wasit);
   box(.82, .08, .68, merah, [0, 1.48, 0], wasit); box(.62, .48, .5, kursi, [0, 1.78, -.03], wasit); box(.7, .06, .06, logam, [0, 2.04, .22], wasit);
   for (const x of [-L - 1, L + 1]) for (const z of [-W - 1, W + 1]) box(.4, .4, .4, merah, [x, .2, z], g, false);
