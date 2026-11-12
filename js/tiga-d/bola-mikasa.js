@@ -15,11 +15,14 @@ export async function muatBolaMikasa(THREE, radius = 0.22) {
     const ganti = m => String(m?.name || '').toLowerCase().includes('pimpa') ? katup : kulit;
     o.material = Array.isArray(o.material) ? o.material.map(ganti) : ganti(o.material);
   });
-  // Pusatkan dan skalakan supaya diameter = 2 x radius (sama dengan bola GLB/prosedural, jadi arena3d.js tidak perlu diubah).
+  // Pusatkan lalu kecilkan lewat grup DALAM. Grup luar (yang dikembalikan) sengaja tidak diskalakan: arena3d.js memanggil
+  // bola.scale.setScalar(...) pada grup luar, dan itu akan menimpa skala normalisasi (model FBX berukuran cm => bola raksasa).
   const kotak = new THREE.Box3().setFromObject(fbx), ukuran = kotak.getSize(new THREE.Vector3()), pusat = kotak.getCenter(new THREE.Vector3());
+  const maks = Math.max(ukuran.x, ukuran.y, ukuran.z);
+  if (!isFinite(maks) || maks <= 0) throw new Error('ukuran model FBX tidak valid');
   fbx.position.sub(pusat);
-  const bola = new THREE.Group(); bola.name = 'BolaMikasa'; bola.add(fbx);
-  bola.scale.setScalar((radius * 2) / Math.max(ukuran.x, ukuran.y, ukuran.z));
+  const dalam = new THREE.Group(); dalam.add(fbx); dalam.scale.setScalar((radius * 2) / maks);
+  const bola = new THREE.Group(); bola.name = 'BolaMikasa'; bola.add(dalam);
   bola.userData.radius = radius;
   return bola;
 }
