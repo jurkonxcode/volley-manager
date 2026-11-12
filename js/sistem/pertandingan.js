@@ -3,18 +3,25 @@ import { K } from '../inti/konfigurasi.js';
 import { pengaliTaktik, FORMASI } from './taktik.js';
 import { URUTAN_STAT } from '../inti/konfigurasi.js';
 import { staminaSekarang, faktorStamina, kurangiStamina, biayaSet } from './stamina.js';
+import { buatAcak } from '../inti/acak.js';
+import { faktorCounter, pilihTaktikLawan, adaptasiLawan } from './taktik-lawan.js';
+import { modSifat, kebalTekanan, bonusPemimpin, faktorForm, perbaruiForm, catatPerf, masukReli, tambahBeban } from './performa.js';
 const jepit = (n, a, b) => Math.max(a, Math.min(b, n));
 
 export function kekuatanTim(tim, now, tk) {
   const mu = tk ? pengaliTaktik(tk) : {};
   const slot = tk ? FORMASI[tk.formasi]?.slot : null;
-  const eff = (p, st, i) => p[st] * faktorStamina(staminaSekarang(p, now)) * (mu[st] || 1) * faktorPosisi(p, i, slot, st);
+  const eff = (p, st, i) => p[st] * faktorStamina(staminaSekarang(p, now)) * faktorForm(p) * (mu[st] || 1) * faktorPosisi(p, i, slot, st);
   const rata = st => tim.reduce((a, p, i) => a + eff(p, st, i), 0) / tim.length;
   const umpan = Math.max(...tim.map((p, i) => eff(p, 'umpan', i)));
   return 0.30 * rata('smash') + 0.15 * rata('servis') + 0.20 * rata('blok') + 0.20 * rata('receive') + 0.15 * umpan;
 }
-export function buatPertandingan(skuad, susunan, lawan, level, taktik) {
-  return { taktik, skuad, susunan, lawan, level, setSaya: 0, setLawan: 0, setKe: 1, riwayat: [], selesai: false, pemenang: null };
+const hashStr = s => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+// opsi: { tingkatLawan, kandang: 'A' | 'B' | null, seed, tanpaForm, taktikLawan, tanpaAdaptasi }. Lawan memilih taktik di awal laga (bisa menangkal gaya manajer) dan beradaptasi tiap set.
+export function buatPertandingan(skuad, susunan, lawan, level, taktik, opsi = {}) {
+  const tingkat = opsi.tingkatLawan ?? 30 + level * 6, acak = buatAcak(opsi.seed ?? hashStr(lawan.map(p => p.nama + p.smash + p.blok + p.receive).join()));   // seed dari profil pemain (bukan id): taktik lawan stabil walau id dibuat ulang
+  return { taktik, skuad, susunan, lawan, level, setSaya: 0, setLawan: 0, setKe: 1, riwayat: [], selesai: false, pemenang: null,
+    taktikLawan: opsi.taktikLawan ?? pilihTaktikLawan(lawan, taktik, tingkat, acak), tingkatLawan: tingkat, kandang: opsi.kandang ?? null, perf: {}, tanpaForm: !!opsi.tanpaForm, tanpaAdaptasi: !!opsi.tanpaAdaptasi, catatan: null };
 }
 // Status poin krusial untuk tampilan: set point / match point (selisih harus tetap >= K.set.selisih setelah poin berikut).
 export function statusPoin(a, b, setSaya, setLawan) {
@@ -36,13 +43,16 @@ function faktorPosisi(p, i, slot, st) {
   return f;
 }
 // Nilai efektif tiap pemain: statistik x stamina x taktik x posisi. Dihitung sekali per set.
-function siapkan(id, tim, now, tk) {
-  const mu = tk ? pengaliTaktik(tk) : {}, slot = tk ? FORMASI[tk.formasi]?.slot : null;
-  return { id, n: 0, t: tim.map((p, i) => {
-    const f = faktorStamina(staminaSekarang(p, now)), o = { p, mental: p.mental ?? 50 };
+// pengali = faktor luar (penangkal gaya lawan, bonus kandang). Setiap pemain menyimpan sifat dan rujukan ke tim (untuk momentum).
+function siapkan(id, tim, now, tk, pengali = 1) {
+  const mu = tk ? pengaliTaktik(tk) : {}, slot = tk ? FORMASI[tk.formasi]?.slot : null, pem = bonusPemimpin(tim);
+  const T = { id, n: 0, mom: 1, run: 0, toSisa: 0, toPakai: 0, tertinggal: false, t: [] };
+  T.t = tim.map((p, i) => {
+    const f = faktorStamina(staminaSekarang(p, now)) * faktorForm(p) * pengali * pem, o = { p, mental: p.mental ?? 50, sifat: p.sifat, tm: T };
     for (const st of URUTAN_STAT) o[st] = p[st] * f * (mu[st] || 1) * faktorPosisi(p, i, slot, st);
     return o;
-  }) };
+  });
+  return T;
 }
 const lawanId = id => id === 'A' ? 'B' : 'A';
 const argmax = (arr, f) => arr.reduce((b, _, i) => f(arr[i]) > f(arr[b]) ? i : b, 0);
@@ -51,7 +61,9 @@ const argmax = (arr, f) => arr.reduce((b, _, i) => f(arr[i]) > f(arr[b]) ? i : b
 // Mengembalikan { menang: 'A'|'B', jenis, ti, pi, qi }: ti/pi = tim & indeks pemain yang menentukan poin
 // (pencetak; untuk 'salah' pembuat kesalahan), qi = indeks pemain lawan yang terlibat (penerima/pemblok/penyerang).
 function reli(S, R, tek, acak) {
-  const m = o => tek ? 1 + (o.mental - 50) / 400 : 1;   // saat poin ketat, mental menaikkan/menurunkan performa
+  // Saat poin ketat mental menaikkan/menurunkan performa (sifat Tenang kebal efek negatif; Pejuang/Pemalu/Pemberani punya efek sendiri).
+  // Momentum (run poin beruntun) dan efek time-out berlaku kapan saja.
+  const m = o => (tek ? (1 + (kebalTekanan(o.sifat) ? Math.max(0, o.mental - 50) : o.mental - 50) / 400) * modSifat(o.sifat, tek, o.tm.tertinggal) : 1) * o.tm.mom;
   const kand = [3, 4, 5].filter(i => K.reli.liberoServis || S.t[i].p.posisi !== 'L'), si = kand.length ? kand[S.n++ % kand.length] : 3 + (S.n++ % 3), sv = S.t[si];   // libero tidak melayani (K.reli.liberoServis)
   const ri = argmax(R.t, o => o.receive * (R.t.indexOf(o) >= 3 ? 1 : .8)), rc = R.t[ri];
   const rcv = rc.receive * m(rc), srv = sv.servis * m(sv);
@@ -83,23 +95,52 @@ function reli(S, R, tek, acak) {
   return { menang: menang.id, jenis: 'smash', ti: menang.id, pi: 0, qi: 0 };
 }
 
+// Momentum: tim yang sedang run >= K.lanjut.momentum.mulai poin beruntun tampil sedikit lebih baik; time-out memutus run lawan.
+function setMomentum(T, runLen, pencetak) {
+  const M = K.lanjut.momentum;
+  const run = pencetak && runLen >= M.mulai ? 1 + Math.min(M.maks, M.langkah * (runLen - M.mulai + 1)) : 1;
+  T.mom = run * (T.toSisa > 0 ? 1 + M.timeoutBonus : 1);
+}
+
 // Mainkan satu set. Mengubah stamina semua pemain di lapangan. Mengembalikan daftar reli untuk animasi.
+// Reli yang memicu time-out membawa `to: 'A' | 'B'` (tim yang meminta time-out setelah reli itu).
 export function mainkanSet(m, acak, now) {
-  const terakhir = m.setKe === 2 * K.set.menang - 1;
+  const terakhir = m.setKe === 2 * K.set.menang - 1, M = K.lanjut.momentum;
   const target = terakhir ? K.set.poinTerakhir : K.set.poin;
-  const A = timSaya(m), B = m.lawan, TA = siapkan('A', A, now, m.taktik), TB = siapkan('B', B, now);
-  let a = 0, b = 0, pelayan = acak() < .5 ? 'A' : 'B'; const rally = [];
+  m.perf ??= {}; m.catatan = null;
+  const A = timSaya(m), B = m.lawan, bonusK = s => m.kandang === s ? 1 + K.lanjut.kandang : 1;
+  const cgA = m.taktik && m.taktikLawan ? faktorCounter(m.taktik.gaya, m.taktikLawan.gaya) : 1, cgB = m.taktik && m.taktikLawan ? faktorCounter(m.taktikLawan.gaya, m.taktik.gaya) : 1;
+  const TA = siapkan('A', A, now, m.taktik, cgA * bonusK('A')), TB = siapkan('B', B, now, m.taktikLawan, cgB * bonusK('B')), tim = { A: TA, B: TB };
+  let a = 0, b = 0, pelayan = acak() < .5 ? 'A' : 'B', run = 0, terakhirMenang = null; const rally = [];
   for (;;) {
     const tek = Math.max(a, b) >= target - 5 && Math.abs(a - b) <= 3;
+    TA.tertinggal = a < b; TB.tertinggal = b < a;
     const r = reli(pelayan === 'A' ? TA : TB, pelayan === 'A' ? TB : TA, tek, acak);
     const saya = r.menang === 'A'; saya ? a++ : b++; pelayan = r.menang;   // pemenang reli melayani berikutnya
-    rally.push({ a: saya, jenis: r.jenis, ti: r.ti, pi: r.pi, qi: r.qi });
-    if ((a >= target || b >= target) && Math.abs(a - b) >= K.set.selisih) break;
+    const item = { a: saya, jenis: r.jenis, ti: r.ti, pi: r.pi, qi: r.qi };
+    // Catatan kontribusi pemain saya (untuk form): semua pemain di lapangan dihitung ikut reli, pelaku mendapat poin/kesalahan.
+    A.forEach(p => masukReli(m.perf, p.id));
+    if (r.ti === 'A' && A[r.pi]) catatPerf(m.perf, A[r.pi].id, r.jenis, true);
+    rally.push(item);
+    const selesaiSet = (a >= target || b >= target) && Math.abs(a - b) >= K.set.selisih;
+    // Momentum dan time-out
+    run = terakhirMenang === r.menang ? run + 1 : 1; terakhirMenang = r.menang;
+    TA.toSisa = Math.max(0, TA.toSisa - 1); TB.toSisa = Math.max(0, TB.toSisa - 1);
+    if (!selesaiSet && run >= M.timeoutRun) {
+      const T = tim[lawanId(r.menang)];   // tim yang kehilangan run meminta time-out (maks M.timeoutMaks per set, tidak selalu)
+      if (T.toPakai < M.timeoutMaks && acak() < .75) { T.toPakai++; T.toSisa = 3; run = 0; item.to = T.id; }
+    }
+    setMomentum(TA, run, r.menang === 'A'); setMomentum(TB, run, r.menang === 'B');
+    if (selesaiSet) break;
     if (rally.length > 300) { if (a === b) a++; break; }
   }
   [...A, ...B].forEach(p => kurangiStamina(p, biayaSet(p, a + b) * (m.faktorBiaya ?? 1), now));
+  A.forEach(p => tambahBeban(p, now));
   a > b ? m.setSaya++ : m.setLawan++;
   m.riwayat.push({ a, b }); m.setKe++;
-  if (m.setSaya === K.set.menang || m.setLawan === K.set.menang) { m.selesai = true; m.pemenang = m.setSaya > m.setLawan ? 'saya' : 'lawan'; }
-  return { rally, a, b, menangSaya: a > b };
+  if (m.setSaya === K.set.menang || m.setLawan === K.set.menang) {
+    m.selesai = true; m.pemenang = m.setSaya > m.setLawan ? 'saya' : 'lawan';
+    if (!m.tanpaForm) perbaruiForm(m.skuad, m.perf, m.pemenang === 'saya');
+  } else adaptasiLawan(m, acak, a < b);   // lawan membaca gaya manajer di jeda antar-set
+  return { rally, a, b, menangSaya: a > b, catatan: m.catatan };
 }

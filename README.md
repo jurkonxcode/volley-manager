@@ -62,3 +62,6 @@ Lihat `HANDOFF.md` untuk riwayat versi, struktur, jebakan, dan daftar yang belum
   4. Masuk/daftar di kartu yang sama. Progres otomatis diunggah ~5 dtk setelah berubah; saat game dibuka, data yang lebih baru (`S.diperbarui`) menang (ada konfirmasi bila cloud lebih baru).
   - Kode: `js/inti/cloud.js` (klien + sinkron), `js/layar/cloud-ui.js` (kartu), `supabase-js` dimuat lazy dari CDN jsDelivr hanya bila dikonfigurasi.
 - **v20.2:** Klub > Stadion didesain ulang (banner foto, peta stadion dari atas yang berubah per level dan keterisian, kartu kapasitas/fans/keterisian/level). Detail di `HANDOFF.md`.
+
+## Baru di v26 — Logika lanjutan
+Taktik lawan yang membaca dan beradaptasi (segitiga gaya serang/seimbang/bertahan + laporan scouting), momentum dan time-out dalam set, sifat pemain, form, beban kerja dan cedera berjenjang, latihan berbasis umur/potensi, harga transfer dinamis, liga AI dengan mesin laga penuh, dan arsip musim. Rincian dan angka kalibrasi di `HANDOFF.md`; uji dengan `node tes/logika.mjs`.

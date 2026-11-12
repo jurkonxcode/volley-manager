@@ -6,6 +6,7 @@ import { biayaPerpanjang, perpanjang } from '../sistem/klub.js';
 import { K } from '../inti/konfigurasi.js';
 import { ratingPemain, gajiPemain, nilaiPasar } from '../sistem/pemain.js';
 import { staminaSekarang, zonaStamina } from '../sistem/stamina.js';
+import { labelForm, bebanSekarang } from '../sistem/performa.js';
 
 const rp = n => n.toLocaleString('id-ID');
 const sel = (label, nilai) => `<div class="sel"><span>${label}</span><b>${nilai}</b></div>`;
@@ -25,7 +26,7 @@ export function bukaKartu(p, now, S, aksi) {
 ${radar(p)}
 ${chipStat(p)}
 <section class="data-diri">
-${sel('Tinggi', p.tinggi + ' cm')}${sel('Berat', p.berat + ' kg')}${sel('Asal', (NEGARA[p.neg]?.bendera || '') + ' ' + esc(p.asal))}${sel('Kontrak s.d.', p.kM ? 'Musim ' + p.kM : p.kontrakSampai)}${sel('Gaji', rp(gajiPemain(p)) + ' / minggu')}${sel('Nilai pasar', rp(nilaiPasar(p)) + ' koin')}
+${sel('Tinggi', p.tinggi + ' cm')}${sel('Berat', p.berat + ' kg')}${sel('Asal', (NEGARA[p.neg]?.bendera || '') + ' ' + esc(p.asal))}${sel('Kontrak s.d.', p.kM ? 'Musim ' + p.kM : p.kontrakSampai)}${sel('Gaji', rp(gajiPemain(p)) + ' / minggu')}${sel('Nilai pasar', rp(nilaiPasar(p)) + ' koin')}${own ? sel('Form', `${labelForm(p.form || 0)} (${(p.form || 0) > 0 ? '+' : ''}${(p.form || 0).toFixed(1)})`) + sel('Kondisi', p.cedera > now ? `Cedera ${esc((p.cederaJenis || '').toLowerCase())}` : `Fit · beban ${Math.round(bebanSekarang(p, now))}%`) : ''}
 </section>
 ${kontrak}
 <section class="kl-batang">

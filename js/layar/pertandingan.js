@@ -9,6 +9,7 @@ import { buatLawan } from '../sistem/liga.js';
 import { bersihkanSusunan, FORMASI, GAYA, autoSusun } from '../sistem/taktik.js';
 import { fixtureSaya, kickoff, catatLaga, levelLawan } from '../sistem/musim.js';
 import { catatPersahabatan } from '../sistem/persahabatan.js';
+import { laporanLawan } from '../sistem/taktik-lawan.js';
 import * as D3 from './arena3d.js';
 
 let P = baru(), token = 0, gagal3d = false, pilihTab = 'liga', pilihF = null;
@@ -37,7 +38,7 @@ function tampilPilih(root, S, aksi) {
   const lw = pf ? pf.lawan : M.tim[f.lawan], level = pf ? pf.lawan.level : levelLawan(lw.tingkat), buka = pf ? pf.kickoff : kickoff(M, f.hari), kandang = pf ? pf.kandang : f.kandang;
   const tim = buatLawan(lw.tingkat, buatAcak(pf ? hashId(pf.id) : M.ke * 1000 + f.lawan * 20 + f.hari), now);
   const saya = Math.round(kekuatanTim(timSaya({ skuad: S.skuad, susunan: S.susunan }), now, S.taktik));
-  const lwKuat = Math.round(kekuatanTim(tim, now)), total = Math.max(saya + lwKuat, 1), selisih = saya - lwKuat;
+  const rep = laporanLawan(tim), lwKuat = Math.round(kekuatanTim(tim, now)), total = Math.max(saya + lwKuat, 1), selisih = saya - lwKuat;
   const nada = selisih > 3 ? 'unggul' : selisih < -3 ? 'tertinggal' : 'imbang', teksNada = selisih > 3 ? `Unggul ${selisih}` : selisih < -3 ? `Tertinggal ${-selisih}` : 'Seimbang';
   const seg = f && PF.length ? `<div class="tab-sub"><button class="${tab === 'liga' ? 'on' : ''}" data-pt="liga">Liga</button><button class="${tab === 'persahabatan' ? 'on' : ''}" data-pt="persahabatan">Persahabatan (${PF.length})</button></div>` : '';
   const pilih = pf && PF.length > 1 ? `<div class="taktik">${PF.map(x => `<button class="chip-t ${x.id === pf.id ? 'on' : ''}" data-pf="${x.id}">${esc(x.lawan.nama)}</button>`).join('')}</div>` : '';
@@ -46,7 +47,8 @@ function tampilPilih(root, S, aksi) {
 <div class="md-tim"><div class="md-sisi"><div class="md-logo">${logoTim()}</div><b>${esc(S.manajer.tim)}</b></div><div class="md-vs">VS</div><div class="md-sisi"><div class="md-logo">${logoMini(lw.nama)}</div><b>${esc(lw.nama)}</b></div></div>
 <div class="md-kuat"><b>${saya}</b><div class="md-bar" role="img" aria-label="Perbandingan kekuatan"><i style="width:${(saya / total * 100).toFixed(1)}%"></i></div><b>${lwKuat}</b></div>
 <div class="md-nada ${nada}">${teksNada} · kekuatan tim</div>
-<div class="md-taktik"><span>${esc(S.taktik.formasi)}</span><span>${esc(GAYA[S.taktik.gaya]?.nama || S.taktik.gaya)}</span><span>Semangat ${Math.round(S.klub.semangat)}</span></div></section>
+<div class="md-taktik"><span>${esc(S.taktik.formasi)}</span><span>${esc(GAYA[S.taktik.gaya]?.nama || S.taktik.gaya)}</span><span>Semangat ${Math.round(S.klub.semangat)}</span></div>
+<div class="md-taktik"><span>Lawan: ${esc(rep.nama)}</span><span>Saran: ${esc(rep.namaSaran)}</span></div></section>
 <section class="md-lawan"><small>Susunan lawan</small><span class="deret">${tim.map(p => figur(p, 'B', now)).join('')}</span></section>` +
     (now >= buka ? `<button class="tombol-besar" id="mulai" aria-label="Mulai laga">${ikon('main', 26)} Mulai Laga</button>` : `<div class="md-hitung">${ikon('jam', 22)}<span>Kickoff dalam ${durasiPendek(buka - now)}</span></div>`);
   root.querySelectorAll('[data-pt]').forEach(b => b.onclick = () => { pilihTab = b.dataset.pt; renderPertandingan(root, S, aksi); });
@@ -54,14 +56,14 @@ function tampilPilih(root, S, aksi) {
   const mb = root.querySelector('#mulai');
   if (mb) mb.onclick = () => {
     bersihkanSusunan(S, sekarang()); P.level = level; P.lawan = lw.nama; P.jenis = pf ? 'persahabatan' : 'liga'; P.fid = pf ? pf.id : null; P.hari = pf ? null : f.hari;
-    P.m = buatPertandingan(S.skuad, S.susunan, tim, level, S.taktik); P.fase = 'siap'; P.skor = { a: 0, b: 0 }; renderPertandingan(root, S, aksi);
+    P.m = buatPertandingan(S.skuad, S.susunan, tim, level, S.taktik, { tingkatLawan: lw.tingkat, kandang: kandang ? 'A' : 'B' }); P.fase = 'siap'; P.skor = { a: 0, b: 0 }; renderPertandingan(root, S, aksi);
   };
 }
 
 // Pergantian di jeda antar-set: pemain di susunan yang tidak main di set terakhir. Dibatasi K.ganti.maks.
 const terpakai = (m, susunan) => m.kickoff ? susunan.filter(id => !m.kickoff.includes(id)).length : 0;
 const taktikBaris = (S, m, A, B, now) => `<div class="taktik" id="taktik">${Object.keys(FORMASI).map(k => `<button class="chip-t ${S.taktik.formasi === k ? 'on' : ''}" data-formasi="${k}">${k}</button>`).join('')}<span class="pemisah"></span>${Object.entries(GAYA).map(([k, g]) => `<button class="chip-t ${S.taktik.gaya === k ? 'on' : ''}" data-gaya="${k}">${g.nama}</button>`).join('')}<button class="chip-t" data-auto aria-label="Susun otomatis">${ikon('ulang', 16)}</button></div>
-<div class="banding"><span class="kuat ${m.kickoff && terpakai(m, S.susunan) >= K.ganti.maks ? 'habis' : ''}">${m.kickoff ? `${ikon('ulang', 14)} ${terpakai(m, S.susunan)}/${K.ganti.maks}` : ''}</span><span>${ikon('smash', 16)} <b>${Math.round(kekuatanTim(A, now, S.taktik))}</b> <i>vs</i> <b>${Math.round(kekuatanTim(B, now))}</b></span></div>`;
+<div class="banding"><span class="kuat ${m.kickoff && terpakai(m, S.susunan) >= K.ganti.maks ? 'habis' : ''}">${m.kickoff ? `${ikon('ulang', 14)} ${terpakai(m, S.susunan)}/${K.ganti.maks}` : ''}</span><span>${ikon('smash', 16)} <b>${Math.round(kekuatanTim(A, now, S.taktik))}</b> <i>vs</i> <b>${Math.round(kekuatanTim(B, now, m.taktikLawan))}</b></span></div>`;
 
 function tampilLapangan(root, S, aksi) {
   P.m.susunan = S.susunan; P.m.taktik = S.taktik;   // susunan/taktik bisa diganti (mis. susun otomatis membuat array baru): selalu pakai yang terkini
@@ -140,6 +142,7 @@ function gambarRally(root, r, a, b) {
   const A = timSaya(P.m), B = P.m.lawan, nm = (ti, i) => (ti === 'A' ? A : B)[i]?.nama.split(' ')[0] ?? '';
   const pelaku = nm(r.ti, r.pi), lawan = nm(r.ti === 'A' ? 'B' : 'A', r.qi);
   P.kom = { ace: `Ace dari ${pelaku}!`, blok: `${pelaku} blok kokoh!`, smash: `Smash keras ${pelaku}!`, salah: `${pelaku} membuat kesalahan` }[r.jenis];
+  if (r.to) P.kom += ` · Time-out ${r.to === 'A' ? P.nama : P.lawan}`;
   const kom = root.querySelector('#kom'); if (kom) kom.textContent = P.kom;
   const el = r.a ? skA : skB; el.classList.remove('skor-naik'); void el.offsetWidth; el.classList.add('skor-naik');
   if (!bola) return;   // mode 3D: animasinya sudah digambar arena3d.js (mulaiReli)
@@ -182,7 +185,7 @@ async function mainkan(root, S, aksi) {
     const basi = P.jenis === 'persahabatan' ? !S.persahabatan.daftar.some(f => f.id === P.fid) : P.hari !== S.musim.hari;   // sudah dimainkan otomatis selagi laga ini berjalan: jangan dicatat dua kali
     if (P.m.selesai && basi) P = baru();
     else if (P.m.selesai) { const r = P.jenis === 'persahabatan' ? catatPersahabatan(S, P.fid, P.m.setSaya, P.m.setLawan) : catatLaga(S, P.m.setSaya, P.m.setLawan); P.hasil = { koin: r.koin, exp: r.exp, naik: r.naik, cedera: r.cedera }; P.fase = 'selesai'; }
-    else P.fase = 'siap';
+    else { P.fase = 'siap'; if (hasil.catatan) P.kom = hasil.catatan; }   // lawan beralih gaya di jeda: tampilkan sebagai komentar
     aksi.simpan(); aksi.perbaruiKoin();
     if (root.dataset.layar === 'tanding') renderPertandingan(root, S, aksi);
   };

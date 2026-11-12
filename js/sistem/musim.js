@@ -8,6 +8,7 @@ import { namaKlub } from '../data/negara.js';
 import { akhirLaga, pesan, buatSponsor, pastikanKontrak, kontrakSelesai, catatKas } from './klub.js';
 import { perkembanganMusim } from './akademi.js';
 import { simulasiLaga as mainOtomatis, waktuLaga } from './otomatis.js';
+import { simulasiLagaAI } from './liga-ai.js';
 const NAMA = ['Elang Sakti', 'Badai Timur', 'Macan Putih', 'Naga Laut', 'Rajawali', 'Banteng Muda', 'Cakra Biru'];
 export const LIGA = ['Liga Kelurahan', 'Liga Kota', 'Liga Provinsi', 'Liga Nasional'];
 const jepit = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -31,13 +32,13 @@ export function fixtureSaya(M) {
 }
 function simSet(p, acak, target) { let a = 0, b = 0; while (!((a >= target || b >= target) && Math.abs(a - b) >= 2) && a + b < 200) acak() < p ? a++ : b++; return a > b; }
 export function simLaga(p, acak) { let a = 0, b = 0; while (a < 3 && b < 3) simSet(p, acak, a + b === 4 ? 15 : 25) ? a++ : b++; return [a, b]; }
-// Catat hasil laga saya (set menang, set kalah), simulasikan laga tim lain di pekan itu, lalu maju satu pekan.
+// Catat hasil laga saya (set menang, set kalah), simulasikan laga tim lain di pekan itu dengan mesin laga penuh, lalu maju satu pekan.
 export function catatLaga(S, sa, sb, ids) {
   const M = S.musim, h = M.hari, acak = buatAcak(M.ke * 7919 + h), f = fixtureSaya(M), lw = M.tim[f.lawan];
   M.jadwal[h].forEach(([i, j]) => {
     let s1, s2;
     if (i === 0) [s1, s2] = [sa, sb]; else if (j === 0) [s2, s1] = [sa, sb];
-    else [s1, s2] = simLaga(peluang(M.tim[i].tingkat - M.tim[j].tingkat), acak);
+    else [s1, s2] = simulasiLagaAI(M.tim[i].tingkat, M.tim[j].tingkat, (M.ke * 7919 + h) * 131 + i * 17 + j);   // mesin laga penuh (kandang = tim pertama di jadwal)
     M.hasil.push({ h, i, j, s1, s2 });
   });
   M.hari++;
@@ -53,7 +54,7 @@ export function kejar(S, now) {
   const M = S.musim; let n = 0;
   while (M.hari < M.jadwal.length && now >= kickoff(M, M.hari + 1)) {
     const f = fixtureSaya(M), lw = M.tim[f.lawan], t = waktuLaga(S, kickoff(M, M.hari));
-    const { sa, sb, ids } = mainOtomatis(S, lw.tingkat, levelLawan(lw.tingkat), M.ke * 31 + M.hari, t);
+    const { sa, sb, ids } = mainOtomatis(S, lw.tingkat, levelLawan(lw.tingkat), M.ke * 31 + M.hari, t, { kandang: f.kandang });
     catatLaga(S, sa, sb, ids); n++;
   }
   return n;
@@ -72,7 +73,9 @@ export function akhiriMusim(S, now) {
   const M = S.musim, sp = S.klub.sponsor, ok = rank <= sp.target, bonus = ok ? sp.bonus : 0, liga = rank <= 2 && M.liga < LIGA.length - 1 ? M.liga + 1 : rank >= 7 && M.liga > 0 ? M.liga - 1 : M.liga;
   S.koin += koin + bonus; catatKas(S, 'hadiah', koin); catatKas(S, 'sponsor', bonus);
   const tk = rank === 1 ? K.token.juara : rank <= 3 ? K.token.tiga : K.token.lain; S.token = (S.token || 0) + tk;
-  S.riwayat.push({ ke: M.ke, liga: M.liga, rank, poin: tabel(M).find(x => x.i === 0).poin, naik: liga > M.liga, turun: liga < M.liga });
+  const tb = tabel(M), saya = tb.find(x => x.i === 0);
+  S.riwayat.push({ ke: M.ke, liga: M.liga, rank, poin: saya.poin, naik: liga > M.liga, turun: liga < M.liga,
+    mn: saya.mn, k: saya.k, sm: saya.sm, sk: saya.sk, juara: M.tim[tb[0].i].nama, podium: tb.slice(0, 3).map(x => M.tim[x.i].nama) });   // arsip lintas musim
   S.klub.sponsor = buatSponsor(liga, rank); perkembanganMusim(S, M.ke * 4099 + rank); pastikanKontrak(S); const kt = kontrakSelesai(S, now);
   let ket = liga > M.liga ? 'Promosi ke ' + LIGA[liga] : liga < M.liga ? 'Degradasi ke ' + LIGA[liga] : 'Bertahan di ' + LIGA[liga];
   if (kt.pergi.length) ket += `. ${kt.pergi.length} pemain habis kontrak dan pergi`;

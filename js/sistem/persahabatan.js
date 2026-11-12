@@ -49,7 +49,7 @@ export function catatPersahabatan(S, id, sa, sb, now = Date.now()) {
 export function kejarPersahabatan(S, now) {
   lengkapiPersahabatan(S); let n = 0;
   S.persahabatan.daftar.filter(f => now >= f.kickoff + K.persahabatan.menitTunggu * 60000).forEach(f => {
-    const { sa, sb } = simulasiLaga(S, f.lawan.tingkat, f.lawan.level ?? levelLawan(f.lawan.tingkat), hash(f.id), waktuLaga(S, f.kickoff)); catatPersahabatan(S, f.id, sa, sb, now); n++;
+    const { sa, sb } = simulasiLaga(S, f.lawan.tingkat, f.lawan.level ?? levelLawan(f.lawan.tingkat), hash(f.id), waktuLaga(S, f.kickoff), { kandang: f.kandang }); catatPersahabatan(S, f.id, sa, sb, now); n++;
   });
   return n;
 }

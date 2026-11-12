@@ -26,6 +26,20 @@ export const K = {
   otomatis: { rotasi: true, biayaStamina: 0.3 },   // biayaStamina: pengali biaya stamina laga otomatis (1 = sama seperti laga live)
   ekonomi: { gajiPembagi: 10 },   // gaji mingguan = jumlah gaji pemain / pembagi (dulu 20)
   semangat: { awal: 50, bonusMaks: 0.03, menang: 5, kalah: -5, fMenang: 4, fKalah: 2 },
+  // v26 (logika lanjutan): semua angka baru ada di sini supaya mudah diseimbangkan.
+  lanjut: {
+    counter: 0.01,              // gaya yang unggul (serang > seimbang > bertahan > serang) x(1+c), yang kalah x(1-c)
+    adaptasi: { dasar: 0.08, perTingkat: 0.008, maks: 0.5 },   // peluang lawan memilih gaya penangkal; naik mengikuti tingkat tim lawan. Gaya aktif lawan disembunyikan: hanya scouting pra-laga dan pengumuman saat lawan beralih
+    kandang: 0.01,              // bonus semua statistik untuk tuan rumah (suporter)
+    momentum: { mulai: 3, langkah: 0.006, maks: 0.025, timeoutRun: 4, timeoutMaks: 2, timeoutBonus: 0.01 },   // run >= mulai poin beruntun menaikkan performa; timeout memutus run lawan
+    sifat: { tenang: 1, pejuang: 0.02, pemalu: -0.02, pemimpin: 0.005, pemberani: 0.015 },
+    form: { pengali: 0.002, maks: 10, peluruh: 0.8, bangku: 0.9 },   // form -10..+10 => +-2% statistik; bangku memudar ke 0
+    beban: { perSet: 5, pulihMenit: 6, ambang: 40, risiko: 0.0008, rotasi: 400 },   // beban kerja 0-100: risiko cedera naik di atas ambang, autoSusun merotasi pemain berbeban tinggi
+    cederaJenis: [{ n: 'Ringan', p: 0.6, menit: [20, 60] }, { n: 'Sedang', p: 0.3, menit: [60, 240] }, { n: 'Berat', p: 0.1, menit: [240, 720] }],
+    cederaBerulang: 0.15,       // tiap cedera sebelumnya menambah 15% peluang cedera lagi
+    latihan: { umur: [[22, 1.25], [27, 1], [30, 0.75], [99, 0.5]], dekatPotensi: 0.25, sifat: { 'Pekerja Keras': 1.2, 'Disiplin': 1.1, 'Ambisius': 1.1 } },
+    harga: { umur: [[22, 1.25], [27, 1], [30, 0.85], [99, 0.65]], potensi: 120 }   // harga beli naik untuk pemain muda berpotensi, turun untuk veteran
+  },
   kunciSimpan: 'volley-manager-v2'
 };
 export const URUTAN_STAT = ['servis', 'smash', 'blok', 'receive', 'umpan'];

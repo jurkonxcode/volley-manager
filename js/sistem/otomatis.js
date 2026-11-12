@@ -15,9 +15,10 @@ export const waktuLaga = (S, kickoff) => Math.max(kickoff, ...S.skuad.map(p => p
 export function susunanOtomatis(S, now) { return K.otomatis.rotasi ? autoSusun(S, now) : S.susunan; }
 
 // Mainkan satu laga penuh. Mengubah stamina pemain (seperti laga live). Mengembalikan { sa, sb, ids }.
-export function simulasiLaga(S, tingkatLawan, level, seed, now) {
+// opsi.kandang: true/false = saya tuan rumah / tamu (bonus suporter), tidak diisi = netral.
+export function simulasiLaga(S, tingkatLawan, level, seed, now, opsi = {}) {
   const ids = susunanOtomatis(S, now), lawan = buatLawan(tingkatLawan, buatAcak(seed ^ 0x5bd1e995), now);
-  const m = buatPertandingan(S.skuad, ids, lawan, level, S.taktik), acak = buatAcak(seed);
+  const m = buatPertandingan(S.skuad, ids, lawan, level, S.taktik, { tingkatLawan, seed: seed ^ 0x2545f491, kandang: opsi.kandang == null ? null : opsi.kandang ? 'A' : 'B' }), acak = buatAcak(seed);
   m.faktorBiaya = K.otomatis.biayaStamina;   // laga otomatis menguras stamina lebih ringan dari laga live
   while (!m.selesai) mainkanSet(m, acak, now);
   return { sa: m.setSaya, sb: m.setLawan, ids };

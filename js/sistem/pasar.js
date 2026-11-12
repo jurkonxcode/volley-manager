@@ -4,6 +4,7 @@ import { K } from '../inti/konfigurasi.js';
 import { buatAcak } from '../inti/acak.js';
 import { buatPemain, ratingPemain } from './pemain.js';
 import { staminaSekarang } from './stamina.js';
+import { peluangCedera, buatCedera } from './performa.js';
 import { catatKas, pesan } from './klub.js';
 export const STAT_LATIHAN = ['servis', 'smash', 'blok', 'receive', 'umpan', 'tahan'];
 // Fasilitas klub. maks = level tertinggi, kali = pengali biaya dan lama pembangunan.
@@ -16,7 +17,9 @@ export const FASILITAS = {
   parkir: { nama: 'Parkir & Kafe', ikon: 'parkir', maks: 5, kali: 1, info: 'Pemasukan tambahan tiap laga kandang, naik mengikuti jumlah penonton' }
 };
 export const urutFasilitas = Object.keys(FASILITAS);
-export const hargaBeli = p => Math.round(ratingPemain(p) ** 2 / 8);
+const faktorTabel = (tabel, umur) => (tabel.find(([maks]) => umur <= maks) || tabel[tabel.length - 1])[1];
+// Harga beli: dari rating, naik untuk pemain muda yang masih punya ruang tumbuh (potensi), turun untuk veteran.
+export const hargaBeli = p => Math.round(ratingPemain(p) ** 2 / 8 * faktorTabel(K.lanjut.harga.umur, p.umur ?? 25) * (1 + Math.max(0, (p.potensi ?? 0) - ratingPemain(p)) / K.lanjut.harga.potensi));
 export const hargaJual = p => Math.round(hargaBeli(p) * 0.6);
 export const biayaFasilitas = (kunci, lv) => Math.round(100 * (lv + 1) ** 2 * (FASILITAS[kunci]?.kali ?? 1) / 10) * 10;
 export const menitBangun = (kunci, lv) => Math.round(15 * (lv + 1) * (FASILITAS[kunci]?.kali ?? 1));
@@ -68,20 +71,29 @@ export function segarkanPaksa(S, now) {
   if ((S.token || 0) < 1) return 'Token kurang'; S.token -= 1; S.pasar = null; segarkanPasar(S, now); return null;
 }
 // Selesaikan latihan dan pembangunan yang waktunya sudah lewat.
+// Peluang satu pemain naik 1 poin dari latihan: dasar dari fasilitas, dikali umur (muda cepat, veteran lambat),
+// jarak ke potensi (rating sudah mendekati potensi sulit naik), dan sifat (Pekerja Keras, Disiplin, Ambisius).
+export function peluangLatih(p, levelFasilitas = 0) {
+  const L = K.lanjut.latihan, dasar = 0.6 + 0.05 * levelFasilitas, dekat = ratingPemain(p) >= (p.potensi ?? 99) ? L.dekatPotensi : 1;
+  return Math.min(0.95, dasar * faktorTabel(L.umur, p.umur ?? 25) * dekat * (L.sifat[p.sifat] || 1));
+}
+// Selesaikan latihan dan pembangunan yang waktunya sudah lewat.
 export function prosesWaktu(S, now) {
   if (S.latihan && now >= S.latihan.selesai) {
-    const a = buatAcak(now & 0x7fffffff), st = S.latihan.stat, p = 0.6 + 0.05 * S.fasilitas.latihan;
-    S.skuad.forEach(x => { if (a() < p && x[st] < 99) x[st]++; }); S.latihan = null;
+    const a = buatAcak(now & 0x7fffffff), st = S.latihan.stat, naik = [];
+    S.skuad.forEach(x => { if (a() < peluangLatih(x, S.fasilitas.latihan) && x[st] < 99) { x[st]++; naik.push(x.nama.split(' ')[0]); } }); S.latihan = null;
+    if (naik.length) pesan(S, 'Latihan selesai', `${st[0].toUpperCase() + st.slice(1)} naik: ${naik.slice(0, 5).join(', ')}${naik.length > 5 ? ` dan ${naik.length - 5} lainnya` : ''}.`);
   }
   const b = S.fasilitas.bangun;
   if (b && now >= b.selesai) { S.fasilitas[b.kunci] = (S.fasilitas[b.kunci] || 0) + 1; S.fasilitas.bangun = null; pesan(S, 'Pembangunan selesai', `${FASILITAS[b.kunci].nama} naik ke level ${S.fasilitas[b.kunci]}.`); }
 }
-// Setelah laga: pemain di lapangan bisa cedera, lebih mungkin jika stamina rendah.
+// Setelah laga: pemain di lapangan bisa cedera. Peluang naik karena stamina rendah, beban kerja tinggi, dan riwayat cedera;
+// jenis (ringan/sedang/berat) memengaruhi lamanya, dan pusat medis memperpendeknya.
 export function cederaLaga(S, acak, now, ids = S.susunan) {   // ids: pemain yang benar-benar main (laga otomatis dengan rotasi)
   const hasil = [];
   ids.forEach(id => {
-    const p = S.skuad.find(x => x.id === id); if (!p) return;
-    if (acak() < K.cedera.dasar + (staminaSekarang(p, now) < 30 ? K.cedera.lelah : 0)) { p.cedera = now + acak.int(30, 120) * 60000 * (1 - 0.15 * S.fasilitas.medis); hasil.push(p.nama.split(' ')[0]); }
+    const p = S.skuad.find(x => x.id === id); if (!p || p.cedera > now) return;
+    if (acak() < peluangCedera(p, staminaSekarang(p, now), now)) { const j = buatCedera(p, acak, now, S.fasilitas.medis); hasil.push(`${p.nama.split(' ')[0]} (${j.toLowerCase()})`); }
   });
   return hasil;
 }
