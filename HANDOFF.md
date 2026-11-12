@@ -242,3 +242,6 @@ Referensi: alur Top Eleven (buat klub: nama/negara/kota/lambang/warna; stadion +
 - `arena3d.js`: `GAYA = false` agar model ini dipakai. Set `true` untuk kembali ke pemain prosedural bergaya (player-gaya.js).
 - `player-glb.js`: tekstur diwarnai di canvas: hanya kaus jadi warna tim, kulit mengikuti `skinColor` pemain, sepatu/celana/rambut tetap (`warnaiPiksel`, cache per jersey+kulit). Gagal => tint lama (`WARNA_TIM`). `rayakan` memakai klip lompat (paket tak punya klip rayakan); `terima` belum punya klip.
 - BELUM diuji di browser dengan Three.js asli (sandbox tanpa CDN): cek skala (`TINGGI`), arah hadap (`HADAP_OFFSET`), posisi kamera, dan performa di HP.
+
+## v24 — Kamera dan komposisi 3D
+Kamera dipaskan otomatis ke lapangan (`js/tiga-d/kamera-pro.js`, angka di `KAM`), stadion dikurangi keramaiannya (papan skor gantung dikecilkan, rangka atap disembunyikan, tribun digelapkan, kabut dirapatkan, sorot lampu), bayangan di bawah bola, bola sedikit lebih besar, wadah 3D lebih tinggi + vignette (`css/arena3d-pro.css`). Belum diuji di HP: sudut kamera, tingkat gelap tribun, intensitas sorot lampu.

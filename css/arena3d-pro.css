@@ -1,0 +1,3 @@
+/* v24: layar laga 3D lebih tinggi, dengan vignette. Dimuat setelah aset.css. */
+.arena3d{height:clamp(320px,calc(100svh - 330px),560px);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.08)}
+.arena3d::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(130% 100% at 50% 52%,transparent 52%,rgba(4,9,20,.72) 100%)}

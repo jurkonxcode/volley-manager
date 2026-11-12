@@ -8,6 +8,7 @@ import { muatAssetPack, ambilAset } from '../tiga-d/asset-pack.js';
 import { muatModel, modelSiap, createPlayerGLB } from '../tiga-d/player-glb.js';
 import { createVolleyball } from '../tiga-d/volleyball.js';
 import { createSpikeEffect } from '../tiga-d/effects.js';
+import { paskanKamera, percantikArena, pasangBayangan } from '../tiga-d/kamera-pro.js';
 
 // true = pemain stylized berkerangka buatan kode (player-gaya.js); false = model FBX Kenney / pemain prosedural lama.
 const GAYA = false;   // false = pemain dari model Kenney (assets/models/kenney/); true = pemain prosedural bergaya
@@ -67,7 +68,7 @@ function rakitRenderer() {
   kunci.shadow.bias = -0.00018; sc.add(kunci);
   const isi = new T.DirectionalLight(0x83baff, .85); isi.position.set(8, 12, -10); sc.add(isi);
   const rim = new T.DirectionalLight(0xffd28a, .55); rim.position.set(0, 10, 15); sc.add(rim);
-  const arena = createArena(T, { sponsor: ['VOLLEY MANAGER', 'SPIKE SPORTS', 'COURT PRO', 'ACE ATHLETIC', 'NETPLAY', 'CHAMPION GEAR'] }); sc.add(arena); sc.userData.arena = arena;
+  const arena = createArena(T, { sponsor: ['VOLLEY MANAGER', 'SPIKE SPORTS', 'COURT PRO', 'ACE ATHLETIC', 'NETPLAY', 'CHAMPION GEAR'] }); sc.add(arena); sc.userData.arena = arena; percantikArena(T, sc, arena);
   // Net + tiang + antena dari model "Volleyball Court" (mihail-pavel, CGTrader, Royalty Free) menggantikan net prosedural. GLB gagal dimuat => net prosedural tetap dipakai.
   const jaring = ambilAset('netSystem');
   if (jaring) {
@@ -79,7 +80,7 @@ function rakitRenderer() {
   // Bangku tim + botol dari paket GLB (di luar lapangan, x=0 di antara blok kursi prosedural z=W+1.5, di depan papan LED z=7.0).
   const bangku = ambilAset('bench'); if (bangku) { bangku.name = 'AssetPack_TeamBench'; bangku.scale.setScalar(.82); bangku.position.set(0, .08, 6.0); sc.add(bangku); }
   for (const x of [-.62, .62]) { const b = ambilAset('bottle'); if (b) { b.scale.setScalar(.78); b.position.set(x, .08 + .70 * .82, 5.96); sc.add(b); } }   // dudukan bangku setinggi .70 x skala .82
-  bola = ambilAset('volleyball') || createVolleyball(T, { radius: .22 }); bola.scale.setScalar(1.7); bola.castShadow = true; sc.add(bola);
+  bola = ambilAset('volleyball') || createVolleyball(T, { radius: .22 }); bola.scale.setScalar(2.1); bola.castShadow = true; sc.add(bola); pasangBayangan(T, sc, bola);
 }
 
 function bersihkanPemain() {
@@ -100,8 +101,7 @@ function ukuran() {
   if (!wadah || !R) return;
   const w = wadah.clientWidth || 340, h = wadah.clientHeight || 300, asp = w / h;
   R.setSize(w, h, false); cam.aspect = asp;
-  const jarak = asp < 1.25 ? 25 + (1.25 - asp) * 14 : 24;   // layar sempit: mundur supaya lapangan muat
-  cam.position.set(-jarak * .82, jarak * .61, jarak * .27); cam.lookAt(0, 1.0, 0); cam.updateProjectionMatrix();
+  paskanKamera(T, cam, asp);
 }
 
 // Pasang canvas ke wadah dan isi pemain. Dipanggil tiap set dimulai (renderer dipakai ulang).
